@@ -1,0 +1,30 @@
+name: Build and Run Tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Create build directory
+      run: mkdir build
+    - name: Installing meson and ninja
+      run: python3 -m pip install meson ninja
+    - name: Run meson configuration
+      run: meson setup build -DonlyOpenSource=true
+    - name: Building project
+      run: ninja -C build
+    - name: Running tests
+      run: ninja test -C build
+    - uses: actions/upload-artifact@v4
+      with:
+        name: meson-logs
+        path: build/meson-logs/
+        
