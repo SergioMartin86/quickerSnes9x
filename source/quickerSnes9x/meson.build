@@ -1,65 +1,99 @@
-# Declaring source and include dirs for a Genesis game instance / emulator
+# quickerSnes9x Core sources
 
-inputType = 'uint16_t'
+quickerSnes9xSrc =  [
+  'core/apu/apu.cpp',
+  'core/apu/bapu/dsp/sdsp.cpp',
+  'core/apu/bapu/dsp/SPC_DSP.cpp',
+  'core/apu/bapu/smp/smp.cpp',
+  'core/apu/bapu/smp/smp_state.cpp',
+  'core/bsx.cpp',
+  'core/c4.cpp',
+  'core/c4emu.cpp',
+  'core/cheats.cpp',
+  'core/cheats2.cpp',
+  'core/clip.cpp',
+  'core/conffile.cpp',
+  'core/controls.cpp',
+  'core/cpu.cpp',
+  'core/cpuexec.cpp',
+  'core/cpuops.cpp',
+  'core/crosshairs.cpp',
+  'core/dma.cpp',
+  'core/dsp.cpp',
+  'core/dsp1.cpp',
+  'core/dsp2.cpp',
+  'core/dsp3.cpp',
+  'core/dsp4.cpp',
+  'core/fxinst.cpp',
+  'core/fxemu.cpp',
+  'core/gfx.cpp',
+  'core/globals.cpp',
+  'core/logger.cpp',
+  'core/memmap.cpp',
+  'core/msu1.cpp',
+  'core/movie.cpp',
+  'core/obc1.cpp',
+  'core/ppu.cpp',
+  'core/stream.cpp',
+  'core/sa1.cpp',
+  'core/sa1cpu.cpp',
+  'core/screenshot.cpp',
+  'core/sdd1.cpp',
+  'core/sdd1emu.cpp',
+  'core/seta.cpp',
+  'core/seta010.cpp',
+  'core/seta011.cpp',
+  'core/seta018.cpp',
+  'core/snapshot.cpp',
+  'core/snes9x.cpp',
+  'core/spc7110.cpp',
+  'core/srtc.cpp',
+  'core/tile.cpp',
+  'core/filter/2xsai.cpp',
+  'core/filter/blit.cpp',
+  'core/filter/epx.cpp',
+  'core/filter/hq2x.cpp',
+  'core/filter/snes_ntsc.c',
+  'core/statemanager.cpp',
+  'core/unix/unix.cpp',
+  'core/unix/x11.cpp',
+]
+
+quickerSnes9xIncludeDirs = [
+  '.',
+  'core',
+  'core/unix',
+  'core/apu',
+  'core/apu/bapu',
+  'core/filter', 
+]
+
+quickerSnes9xCompileFlags = [
+    '-DNO_DUP_MAIN',
+    '-DHAVE_MKSTEMP',
+    '-DHAVE_STRINGS_H',
+    '-DHAVE_SYS_IOCTL_H',
+    '-DHAVE_STDINT_H',
+    '-DRIGHTSHIFT_IS_SAR',
+    '-DUSE_XVIDEO',
+    '-DNOSOUND'
+]
+
+# quickerSnes9x Core Configuration
+
+ quickerNESDependency = declare_dependency(
+  compile_args        : [ ],
+  include_directories : include_directories(quickerSnes9xIncludeDirs),
+  sources             : [ quickerSnes9x ]
+ )
+
+
+
+# Declaring source and include dirs for a Genesis game instance / emulator
 
 srcDir = meson.current_source_dir()
 emuInstanceSrc = [ 
-  srcDir + '/snes9x/apu/apu.cpp',
-  srcDir + '/snes9x/apu/bapu/dsp/sdsp.cpp',
-  srcDir + '/snes9x/apu/bapu/dsp/SPC_DSP.cpp',
-  srcDir + '/snes9x/apu/bapu/smp/smp.cpp',
-  srcDir + '/snes9x/apu/bapu/smp/smp_state.cpp',
-  srcDir + '/snes9x/bsx.cpp',
-  srcDir + '/snes9x/c4.cpp',
-  srcDir + '/snes9x/c4emu.cpp',
-  srcDir + '/snes9x/cheats.cpp',
-  srcDir + '/snes9x/cheats2.cpp',
-  srcDir + '/snes9x/clip.cpp',
-  srcDir + '/snes9x/conffile.cpp',
-  srcDir + '/snes9x/controls.cpp',
-  srcDir + '/snes9x/cpu.cpp',
-  srcDir + '/snes9x/cpuexec.cpp',
-  srcDir + '/snes9x/cpuops.cpp',
-  srcDir + '/snes9x/crosshairs.cpp',
-  srcDir + '/snes9x/dma.cpp',
-  srcDir + '/snes9x/dsp.cpp',
-  srcDir + '/snes9x/dsp1.cpp',
-  srcDir + '/snes9x/dsp2.cpp',
-  srcDir + '/snes9x/dsp3.cpp',
-  srcDir + '/snes9x/dsp4.cpp',
-  srcDir + '/snes9x/fxinst.cpp',
-  srcDir + '/snes9x/fxemu.cpp',
-  srcDir + '/snes9x/gfx.cpp',
-  srcDir + '/snes9x/globals.cpp',
-  srcDir + '/snes9x/logger.cpp',
-  srcDir + '/snes9x/memmap.cpp',
-  srcDir + '/snes9x/msu1.cpp',
-  srcDir + '/snes9x/movie.cpp',
-  srcDir + '/snes9x/obc1.cpp',
-  srcDir + '/snes9x/ppu.cpp',
-  srcDir + '/snes9x/stream.cpp',
-  srcDir + '/snes9x/sa1.cpp',
-  srcDir + '/snes9x/sa1cpu.cpp',
-  srcDir + '/snes9x/screenshot.cpp',
-  srcDir + '/snes9x/sdd1.cpp',
-  srcDir + '/snes9x/sdd1emu.cpp',
-  srcDir + '/snes9x/seta.cpp',
-  srcDir + '/snes9x/seta010.cpp',
-  srcDir + '/snes9x/seta011.cpp',
-  srcDir + '/snes9x/seta018.cpp',
-  srcDir + '/snes9x/snapshot.cpp',
-  srcDir + '/snes9x/snes9x.cpp',
-  srcDir + '/snes9x/spc7110.cpp',
-  srcDir + '/snes9x/srtc.cpp',
-  srcDir + '/snes9x/tile.cpp',
-  srcDir + '/snes9x/filter/2xsai.cpp',
-  srcDir + '/snes9x/filter/blit.cpp',
-  srcDir + '/snes9x/filter/epx.cpp',
-  srcDir + '/snes9x/filter/hq2x.cpp',
-  srcDir + '/snes9x/filter/snes_ntsc.c',
-  srcDir + '/snes9x/statemanager.cpp',
-  srcDir + '/snes9x/unix/unix.cpp',
-  srcDir + '/snes9x/unix/x11.cpp',
+
 ]
 
 emuInstanceIncludes = include_directories([

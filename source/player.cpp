@@ -1,16 +1,8 @@
+#include <cstdlib>
 #include "argparse/argparse.hpp"
+#include "utils.hpp"
 #include "emuInstance.hpp"
 #include "playbackInstance.hpp"
-#include "utils.hpp"
-#include <cstdlib>
-
-#ifdef _USE_QUICKNES
-  #include "quickNESInstance.hpp"
-#endif
-
-#ifdef _USE_QUICKERNES
-  #include "quickerNESInstance.hpp"
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -98,14 +90,8 @@ int main(int argc, char *argv[])
 
   refreshTerminal();
 
-// Creating emulator instance
-#ifdef _USE_QUICKNES
-  auto e = QuickNESInstance();
-#endif
-
-#ifdef _USE_QUICKERNES
-  auto e = quickerNES::QuickerNESInstance();
-#endif
+  // Creating emulator instance 
+  auto e = EmuInstance();
 
   // Setting controller types
   e.setController1Type(controller1Type);

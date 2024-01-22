@@ -4,8 +4,6 @@
 #include <utils.hpp>
 #include <string>
 #include <vector>
-#include <utils.hpp>
-#include <state.hpp>
 
 #include "snes9x.h"
 #include "memmap.h"
@@ -106,56 +104,6 @@ class EmuInstance : public EmuInstanceBase
   memStream stream(state, _STATE_DATA_SIZE_PLAY);
   S9xUnfreezeFromStream(&stream);
 #endif
- }
-
- static INPUT_TYPE moveStringToCode(const std::string& move)
- {
-  INPUT_TYPE moveCode = 0;
-
-  for (size_t i = 0; i < move.size(); i++) switch(move[i])
-  {
-   case 'U': moveCode |= SNES_UP_MASK; break;
-   case 'D': moveCode |= SNES_DOWN_MASK; break;
-   case 'L': moveCode |= SNES_LEFT_MASK; break;
-   case 'R': moveCode |= SNES_RIGHT_MASK; break;
-   case 'A': moveCode |= SNES_A_MASK; break;
-   case 'B': moveCode |= SNES_B_MASK; break;
-   case 'X': moveCode |= SNES_X_MASK; break;
-   case 'Y': moveCode |= SNES_Y_MASK; break;
-   case 'l': moveCode |= SNES_TL_MASK; break;
-   case 'r': moveCode |= SNES_TR_MASK; break;
-   case 'S': moveCode |= SNES_START_MASK; break;
-   case 's': moveCode |= SNES_SELECT_MASK; break;
-   case '.': break;
-   case '|': break;
-  }
-
-  //printf("move %s - %u\n", move.c_str(), moveCode);
-
-  return moveCode;
- }
-
- static std::string moveCodeToString(const INPUT_TYPE move)
- {
-  std::string moveString = "|..|";
-
-  if (move & SNES_UP_MASK)     moveString += 'U'; else moveString += '.';
-  if (move & SNES_DOWN_MASK)   moveString += 'D'; else moveString += '.';
-  if (move & SNES_LEFT_MASK)   moveString += 'L'; else moveString += '.';
-  if (move & SNES_RIGHT_MASK)  moveString += 'R'; else moveString += '.';
-  if (move & SNES_SELECT_MASK) moveString += 's'; else moveString += '.';
-  if (move & SNES_START_MASK)  moveString += 'S'; else moveString += '.';
-  if (move & SNES_Y_MASK)      moveString += 'Y'; else moveString += '.';
-  if (move & SNES_B_MASK)      moveString += 'B'; else moveString += '.';
-  if (move & SNES_X_MASK)      moveString += 'X'; else moveString += '.';
-  if (move & SNES_A_MASK)      moveString += 'A'; else moveString += '.';
-  if (move & SNES_TL_MASK)     moveString += 'l'; else moveString += '.';
-  if (move & SNES_TR_MASK)     moveString += 'r'; else moveString += '.';
-
-//  printf("move %u - %s\n", move, moveString.c_str());
-
-  moveString += "|............|";
-  return moveString;
  }
 
  void advanceState(const INPUT_TYPE move) override

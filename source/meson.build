@@ -1,6 +1,6 @@
 # Getting core configurations
-subdir('quickNES')
-subdir('quickerNES')
+subdir('snes9x')
+subdir('quickerSnes9x')
 
 # Tool Configuration
 

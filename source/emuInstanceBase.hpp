@@ -2,22 +2,27 @@
 
 #include "sha1/sha1.hpp"
 #include <utils.hpp>
-#include <controller.hpp>
+#include "controller.hpp"
 
-#define _LOW_MEM_SIZE 0x800
-#define _HIGH_MEM_SIZE 0x2000
-#define _NAMETABLES_MEM_SIZE 0x1000
+#include "snes9x.h"
+#include "memmap.h"
+#include "apu/apu.h"
+#include "gfx.h"
+#include "snapshot.h"
+#include "controls.h"
+#include "cheats.h"
+#include "movie.h"
+#include "logger.h"
+#include "display.h"
+#include "conffile.h"
+#include "statemanager.h"
 
-// Size of image generated in graphics buffer
-static const uint16_t image_width = 256;
-static const uint16_t image_height = 240;
-
-class EmuInstance
+class EmuInstanceBase
 {
   public:
 
-  EmuInstance() = default;
-  virtual ~EmuInstance() = default;
+  EmuInstanceBase() = default;
+  virtual ~EmuInstanceBase() = default;
 
   inline void advanceState(const std::string &move)
   {
@@ -43,8 +48,6 @@ class EmuInstance
 
     if (type == "None") { _controller.setController1Type(Controller::controller_t::none); isTypeRecognized = true; }
     if (type == "Joypad") { _controller.setController1Type(Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController1Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController1Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
 
     if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
   }
@@ -55,8 +58,6 @@ class EmuInstance
 
     if (type == "None") { _controller.setController2Type(Controller::controller_t::none); isTypeRecognized = true; }
     if (type == "Joypad") { _controller.setController2Type(Controller::controller_t::joypad); isTypeRecognized = true; }
-    if (type == "FourScore1") { _controller.setController2Type(Controller::controller_t::fourscore1); isTypeRecognized = true; }
-    if (type == "FourScore2") { _controller.setController2Type(Controller::controller_t::fourscore2); isTypeRecognized = true; }
     
     if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
   }
@@ -67,10 +68,6 @@ class EmuInstance
   {
     MetroHash128 hash;
 
-    hash.Update(getLowMem(), _LOW_MEM_SIZE);
-    // hash.Update(getHighMem(), _HIGH_MEM_SIZE);
-    // hash.Update(getNametableMem(), _NAMETABLES_MEM_SIZE);
-    // hash.Update(getChrMem(), getChrMemSize());
 
     hash_t result;
     hash.Finalize(reinterpret_cast<uint8_t *>(&result));

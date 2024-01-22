@@ -1,3 +1,0 @@
-[submodule "source/snes9x/core"]
-	path = source/snes9x/core
-	url = git@github.com:SergioMartin86/snes9x.git
