@@ -341,42 +341,10 @@ static bool try_load_config_file (const char *fname, ConfigFile &conf)
 	return (false);
 }
 
-void S9xLoadConfigFiles (char **argv, int argc)
+void S9xLoadConfigFiles ()
 {
 	static __thread ConfigFile	conf; // static because some of its functions return pointers
 	conf.Clear();
-
-	bool	skip = false;
-	for (int i = 0; i < argc; i++)
-	{
-		if (!strcasecmp(argv[i], "-nostdconf"))
-		{
-			skip = true;
-			break;
-		}
-	}
-
-	if (!skip)
-	{
-	#ifdef SYS_CONFIG_FILE
-		try_load_config_file(SYS_CONFIG_FILE, conf);
-		S9xParsePortConfig(conf, 0);
-	#endif
-
-		std::string	fname;
-
-		fname = S9xGetDirectory(DEFAULT_DIR);
-		fname += SLASH_STR S9X_CONF_FILE_NAME;
-		try_load_config_file(fname.c_str(), conf);
-	}
-	else
-		fprintf(stderr, "Skipping standard config files.\n");
-
-	for (int i = 0; i < argc - 1; i++)
-		if (!strcasecmp(argv[i], "-conf"))
-			try_load_config_file(argv[++i], conf);
-
-	// Parse config file here
 
 	// ROM
 

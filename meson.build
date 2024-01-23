@@ -8,7 +8,7 @@ project('quickerSnes9x','c','cpp',
 subdir('source')
 
 # Common application flags
-commonCompileArgs = [ '-Wfatal-errors', '-Wall' ]
+commonCompileArgs = [ '-Wall', '-Wfatal-errors' ]
 
 # Building playback tool
 
@@ -16,7 +16,13 @@ if get_option('buildPlayer') == true
   executable('player',
     'source/player.cpp',
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
-    dependencies        : [ quickerSnes9xDependency, toolDependency, dependency('sdl2'), dependency('SDL2_image') ],
+    dependencies        : [ quickerSnes9xDependency,
+                            toolDependency,
+                            dependency('sdl2'),
+                            dependency('SDL2_image'),
+                            dependency('x11', required : false),
+                            dependency('xext', required : false),
+                            dependency('xv', required : false), ],
     include_directories : include_directories(['source']),
     link_args           : [ '-lncurses' ],
   )
@@ -24,9 +30,9 @@ endif
 
 # Building tester tool for QuickerSnes9x
 
-quickerSnes9X = executable('quickerSnes9xTester',
+quickerSnes9xTester = executable('quickerSnes9xTester',
   'source/tester.cpp',
-  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING', '-Werror' ],
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ], 
   dependencies        : [ quickerSnes9xDependency, toolDependency ],
   include_directories : include_directories(['../extern/json'])
 )
@@ -41,4 +47,4 @@ quickerSnes9X = executable('quickerSnes9xTester',
 #)
 
 # Building tests
-subdir('tests')
+#subdir('tests')

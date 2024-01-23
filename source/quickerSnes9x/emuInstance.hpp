@@ -50,6 +50,8 @@ class EmuInstance : public EmuInstanceBase
 
     _baseMem = Memory.RAM;
     _apuMem = SNES::smp.apuram;
+    
+    return true;
   }
 
   void serializeFullState(uint8_t *state) const override
@@ -96,6 +98,16 @@ class EmuInstance : public EmuInstanceBase
   void disableLiteStateBlock(const std::string& block)
   {
     EXIT_WITH_ERROR("Feature not supported yet");
+  }
+
+  void doSoftReset() override
+  {
+    S9xSoftReset();
+  }
+  
+  void doHardReset() override
+  {
+    S9xReset();
   }
 
   std::string getCoreName() const override { return "quickerSnes9x"; }

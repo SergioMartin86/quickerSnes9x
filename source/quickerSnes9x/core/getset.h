@@ -191,6 +191,7 @@
 #ifndef _GETSET_H_
 #define _GETSET_H_
 
+#include <cstdint>
 #include "cpuexec.h"
 #include "dsp.h"
 #include "sa1.h"
@@ -658,7 +659,7 @@ inline void S9xSetWord (uint16 Word, uint32 Address, enum s9xwrap_t w = WRAP_NON
 	}
 
 	switch ((pint) SetAddress)
-	{
+	{ 
 		case CMemory::MAP_CPU:
 			if (o)
 			{

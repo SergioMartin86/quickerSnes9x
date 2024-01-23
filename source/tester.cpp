@@ -2,18 +2,12 @@
 #include "nlohmann/json.hpp"
 #include "sha1/sha1.hpp"
 #include "utils.hpp"
+#include "emuInstance.hpp"
 #include <chrono>
 #include <sstream>
 #include <vector>
 #include <string>
 
-#ifdef _USE_QUICKNES
-  #include "quickNESInstance.hpp"
-#endif
-
-#ifdef _USE_QUICKERNES
-  #include "quickerNESInstance.hpp"
-#endif
 
 int main(int argc, char *argv[])
 {
@@ -101,13 +95,7 @@ int main(int argc, char *argv[])
   std::string controller2Type = scriptJson["Controller 2 Type"].get<std::string>();
 
   // Creating emulator instance
-  #ifdef _USE_QUICKNES
-  auto e = QuickNESInstance();
-  #endif
-
-  #ifdef _USE_QUICKERNES
-  auto e = quickerNES::QuickerNESInstance();
-  #endif
+  auto e = EmuInstance();
 
   // Setting controller types
   e.setController1Type(controller1Type);

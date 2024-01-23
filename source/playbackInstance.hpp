@@ -34,6 +34,19 @@ class PlaybackInstance
   {
     // Enabling emulation rendering
     _emu->enableRendering();
+
+    // Building sequence information
+    for (const auto &input : sequence)
+    {
+      // Adding new step
+      addStep(input);
+
+      // Advance state based on the input received
+      _emu->advanceState(input);
+    }
+
+    // Adding last step with no input
+    addStep("<End Of Sequence>");
   }
 
   // Function to render frame
@@ -59,9 +72,9 @@ class PlaybackInstance
     }
 
     // Updating image
-    int32_t curBlit[BLIT_SIZE];
-    saveBlit(_emu->getInternalEmulatorPointer(), curBlit, hqn::HQNState::NES_VIDEO_PALETTE, 0, 0, 0, 0);
-    _hqnGUI->update_blit(curBlit, _overlayBaseSurface, overlayButtonASurface, overlayButtonBSurface, overlayButtonSelectSurface, overlayButtonStartSurface, overlayButtonLeftSurface, overlayButtonRightSurface, overlayButtonUpSurface, overlayButtonDownSurface);
+     doRendering = true;
+    S9xMainLoop();
+     doRendering = false;
   }
 
   size_t getSequenceLength() const

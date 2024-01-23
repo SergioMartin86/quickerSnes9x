@@ -17,8 +17,6 @@
 #include "conffile.h"
 #include "statemanager.h"
 
-extern void InitTimer (void);
-
 class EmuInstanceBase
 {
   public:
@@ -78,13 +76,12 @@ class EmuInstanceBase
 
   inline void enableRendering()
    {
-    S9xInitInputDevices();
-    S9xInitDisplay(0, NULL);
-    S9xSetupDefaultKeymap();
-    S9xTextMode();
-    S9xGraphicsMode();
-    S9xSetTitle(String);
-    InitTimer();
+      S9xInitInputDevices();
+      S9xInitDisplay(0, NULL);
+      S9xSetupDefaultKeymap();
+      S9xTextMode();
+      S9xGraphicsMode();
+      S9xSetTitle(String);
 
      _doRendering = true; 
    };

@@ -203,6 +203,7 @@
 #include <strings.h>
 #endif
 #include <sys/types.h>
+#include <cstdint>
 
 #ifdef __WIN32__
 #define NOMINMAX
@@ -276,7 +277,7 @@ typedef unsigned long long	uint64;
 #ifdef PTR_NOT_INT
 typedef long				pint;
 #else   // __PTR_NOT_INT
-typedef int					pint;
+typedef uint64_t		pint;
 #endif  // __PTR_NOT_INT
 #endif	//  __WIN32__
 #endif	// HAVE_STDINT_H

@@ -82,11 +82,11 @@ int main(int argc, char *argv[])
   initializeTerminal();
 
   // Printing provided parameters
-  printw("[] Rom File Path:      '%s'\n", romFilePath.c_str());
-  printw("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
-  printw("[] Sequence Length:    %lu\n", sequence.size());
-  printw("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
-  printw("[] Generating Sequence...\n");
+  LOG("[] Rom File Path:      '%s'\n", romFilePath.c_str());
+  LOG("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
+  LOG("[] Sequence Length:    %lu\n", sequence.size());
+  LOG("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
+  LOG("[] Generating Sequence...\n");
 
   refreshTerminal();
 
@@ -139,13 +139,13 @@ int main(int argc, char *argv[])
     {
       clearTerminal();
 
-      printw("[] ----------------------------------------------------------------\n");
-      printw("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      printw("[] Input:          %s\n", input.c_str());
-      printw("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
+      LOG("[] ----------------------------------------------------------------\n");
+      LOG("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
+      LOG("[] Input:          %s\n", input.c_str());
+      LOG("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
 
       // Only print commands if not in reproduce mode
-      if (isReproduce == false) printw("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
+      if (isReproduce == false) LOG("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
 
       refreshTerminal();
     }
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
       saveData.resize(stateSize);
       memcpy(saveData.data(), stateData, stateSize);
       if (saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
-      printw("[] Saved state to %s\n", saveFileName.c_str());
+      LOG("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action
       showFrameInfo = false;

@@ -37,11 +37,11 @@ public:
 
     // Parsing console inputs
     isValid &= parseConsoleInputs(_input.reset, _input.power, ss);
-
+    
     // Parsing controller 1 inputs
     isValid &= parseControllerInputs(_controller1Type, _input.port1, ss);
 
-    // Parsing controller 1 inputs
+    // Parsing controller 2 inputs
     isValid &= parseControllerInputs(_controller2Type, _input.port2, ss);
 
     // End separator
@@ -50,8 +50,8 @@ public:
     // If its not the end of the stream, then extra values remain and its invalid
     ss.get();
     if (ss.eof() == false) isValid = false;
-
-    // Returning valid flag
+    
+    // Returning valid flag 
     return isValid;
   };
 

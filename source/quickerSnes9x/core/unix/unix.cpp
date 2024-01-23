@@ -1567,7 +1567,7 @@ int __MAIN (int argc, char **argv)
 
 	CPU.Flags = 0;
 
-	S9xLoadConfigFiles(argv, argc);
+	S9xLoadConfigFiles();
 	rom_filename = S9xParseArgs(argv, argc);
 
 	make_snes9x_dirs();
@@ -1854,9 +1854,6 @@ int __MAIN (int argc, char **argv)
 
 int initSnes9x (int argc, char **argv)
 {
-  if (argc < 2)
-   S9xUsage();
-
   s9x_base_dir = default_dir;
 
   memset(&Settings, 0, sizeof(Settings));
@@ -1901,8 +1898,7 @@ int initSnes9x (int argc, char **argv)
 
   CPU.Flags = 0;
 
-  S9xLoadConfigFiles(argv, argc);
-  rom_filename = S9xParseArgs(argv, argc);
+  S9xLoadConfigFiles();
 
   make_snes9x_dirs();
 
