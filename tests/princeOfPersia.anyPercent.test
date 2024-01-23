@@ -1,0 +1,9 @@
+{
+  "Rom File": "roms/Prince of Persia (J).smc",
+  "Expected ROM SHA1": "DE1D327F90EE57C8B20E2489109638B8632F18F5",
+  "Initial State File": "",
+  "Sequence File": "princeOfPersia.anyPercent.sol",
+  "Disable State Blocks": [ ],
+  "Controller 1 Type": "Joypad",
+  "Controller 2 Type": "None"
+}

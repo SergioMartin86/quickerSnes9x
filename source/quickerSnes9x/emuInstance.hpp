@@ -29,88 +29,83 @@ class EmuInstance : public EmuInstanceBase
  uint8_t* _baseMem;
  uint8_t* _apuMem;
 
- EmuInstance(const nlohmann::json& config) : EmuInstanceBase(config)
+ EmuInstance() : EmuInstanceBase()
  {
-  // Checking whether configuration contains the rom file
-  if (isDefined(config, "Rom File") == false) EXIT_WITH_ERROR("[ERROR] Configuration file missing 'Rom File' key.\n");
-  std::string romFilePath = config["Rom File"].get<std::string>();
-
-  // Checking whether configuration contains the state file
-  if (isDefined(config, "State File") == false) EXIT_WITH_ERROR("[ERROR] Configuration file missing 'State File' key.\n");
-  std::string stateFilePath = config["State File"].get<std::string>();
-
-  int argc = 2;
-  char romPath[4096];
+  int argc = 1;
   char bin[] = "./snes9x";
-  strcpy(romPath, romFilePath.c_str());
-  char* argv[2] = { bin, romPath };
+  char* argv[1] = { bin };
 
   doRendering = false;
   initSnes9x(argc, argv);
-
-  _baseMem = Memory.RAM;
-  _apuMem = SNES::smp.apuram;
-//  saveStateFile("boot.state");
-//  exit(0);
-
-   loadStateFile(stateFilePath);
-
-//   Printing State size
-//  printf("State Size: %u\n", S9xFreezeSizeFast());
-//  exit(0);
  }
 
- void loadStateFile(const std::string& stateFilePath) override
- {
-  if (stateFilePath == "") { S9xReset(); return; }
+  virtual bool loadROMFileImpl(const std::string &romData) override
+  {
+    uint32 saved_flags = CPU.Flags;
 
-  // Loading state data
-  std::string stateData;
-  if (loadStringFromFile(stateData, stateFilePath.c_str()) == false) EXIT_WITH_ERROR("Could not find/read state file: '%s'\n", stateFilePath.c_str());
+    Memory.LoadROMMem ((const uint8*) romData.data(), romData.size());
 
-  // Loading state object into the emulator
-  memStream stream((uint8_t*)stateData.data(), S9xFreezeSize());
-  S9xUnfreezeFromStream(&stream);
- }
+    CPU.Flags = saved_flags;
+    Settings.StopEmulation = FALSE;
 
- void saveStateFile(const std::string& stateFilePath) const override
- {
-  std::string stateBuffer;
-  stateBuffer.resize(S9xFreezeSize());
+    _baseMem = Memory.RAM;
+    _apuMem = SNES::smp.apuram;
+  }
 
-  memStream stream((uint8_t*)stateBuffer.data(), S9xFreezeSize());
-  S9xFreezeToStream(&stream);
+  void serializeFullState(uint8_t *state) const override
+  {
+    memStream stream(state, _fullStateSize);
+    S9xFreezeToStream(&stream);
+  }
 
-  saveStringToFile(stateBuffer, stateFilePath.c_str());
- }
+  void deserializeFullState(const uint8_t *state) override
+  {
+    // Loading state object into the emulator
+    memStream stream(state, _fullStateSize);
+    S9xUnfreezeFromStream(&stream);
+  }
 
- void serializeState(uint8_t* state) const override
- {
-#ifdef PREVENT_RENDERING
-  memStream stream(state, _STATE_DATA_SIZE_TRAIN);
-  S9xFreezeToStreamFast(&stream);
-#else
-  memStream stream(state, _STATE_DATA_SIZE_PLAY);
-  S9xFreezeToStream(&stream);
-#endif
- }
+  void serializeLiteState(uint8_t *state) const override
+  {
+    memStream stream(state, _liteStateSize);
+    S9xFreezeToStream(&stream);
+  }
 
- void deserializeState(const uint8_t* state) override
- {
-#ifdef PREVENT_RENDERING
-  memStream stream(state, _STATE_DATA_SIZE_TRAIN);
-  S9xUnfreezeFromStreamFast(&stream);
-#else
-  memStream stream(state, _STATE_DATA_SIZE_PLAY);
-  S9xUnfreezeFromStream(&stream);
-#endif
- }
+  void deserializeLiteState(const uint8_t *state) override
+  {
+    // Loading state object into the emulator
+    memStream stream(state, _liteStateSize);
+    S9xUnfreezeFromStream(&stream);
+  }
 
- void advanceState(const INPUT_TYPE move) override
- {
-  MovieSetJoypad(0, move);
-  S9xMainLoop();
-  //printf("move %u -> %u\n", move, *((uint16*)&_baseMem[0x0272]));
- }
+  size_t getFullStateSize() const override
+  {
+    return S9xFreezeSize();
+  }
+
+  size_t getLiteStateSize() const override
+  {
+    return S9xFreezeSize();
+  }
+
+  void enableLiteStateBlock(const std::string& block)
+  {
+    EXIT_WITH_ERROR("Feature not supported yet");
+  }
+
+  void disableLiteStateBlock(const std::string& block)
+  {
+    EXIT_WITH_ERROR("Feature not supported yet");
+  }
+
+  std::string getCoreName() const override { return "quickerSnes9x"; }
+
+
+  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2)
+  {
+    MovieSetJoypad(0, controller1);
+    MovieSetJoypad(1, controller2);
+    S9xMainLoop();
+  }
 
 };

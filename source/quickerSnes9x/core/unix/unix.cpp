@@ -1918,74 +1918,15 @@ int initSnes9x (int argc, char **argv)
   S9xSetSoundMute(TRUE);
 
   S9xReportControllers();
+  NSRTControllerSetup();
 
   #ifdef GFX_MULTI_FORMAT
   S9xSetRenderPixelFormat(RGB565);
   #endif
 
-  uint32 saved_flags = CPU.Flags;
-  bool8 loaded = FALSE;
-
-  if (rom_filename)
-  {
-   loaded = Memory.LoadROM(rom_filename);
-
-   if (!loaded && rom_filename[0])
-   {
-    char s[PATH_MAX + 1];
-    char drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-    _splitpath(rom_filename, drive, dir, fname, ext);
-    snprintf(s, PATH_MAX + 1, "%s%s%s", S9xGetDirectory(ROM_DIR), SLASH_STR, fname);
-    if (ext[0] && (strlen(s) <= PATH_MAX - 1 - strlen(ext)))
-    {
-     strcat(s, ".");
-     strcat(s, ext);
-    }
-
-    loaded = Memory.LoadROM(s);
-   }
-  }
-
-  if (!loaded)
-  {
-   fprintf(stderr, "Error opening the ROM file.\n");
-   exit(1);
-  }
-
-  NSRTControllerSetup();
-  Memory.LoadSRAM(S9xGetFilename(".srm", SRAM_DIR));
-  S9xLoadCheatFile(S9xGetFilename(".cht", CHEAT_DIR));
-
-  CPU.Flags = saved_flags;
-  Settings.StopEmulation = FALSE;
-
-  if (doRendering)
-  {
-   S9xInitInputDevices();
-   S9xInitDisplay(argc, argv);
-   S9xSetupDefaultKeymap();
-   S9xTextMode();
-  }
 
   if (Settings.Port < 0)
    Settings.Port = -Settings.Port;
-
-  if (doRendering) S9xGraphicsMode();
-
-  //sprintf(String, "\"%s\" %s: %s", Memory.ROMName, TITLE, VERSION);
-  if (doRendering) S9xSetTitle(String);
-
-  if (doRendering)  InitTimer();
-//  S9xSetSoundMute(FALSE);
-
-
-//  while (1)
-//  {
-//
-//   S9xMainLoop();
-//
-//  }
 
   return (0);
 }

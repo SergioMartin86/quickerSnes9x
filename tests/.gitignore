@@ -1,4 +1,7 @@
 *.nes
+*.bin
+*.sfc
+*.smc
 *.Identifier
 *.zip
 *.fds

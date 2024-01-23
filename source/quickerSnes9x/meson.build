@@ -81,64 +81,10 @@ quickerSnes9xCompileFlags = [
 
 # quickerSnes9x Core Configuration
 
- quickerNESDependency = declare_dependency(
+ quickerSnes9xDependency = declare_dependency(
   compile_args        : [ ],
   include_directories : include_directories(quickerSnes9xIncludeDirs),
-  sources             : [ quickerSnes9x ]
+  sources             : [ quickerSnes9xSrc ]
  )
 
 
-
-# Declaring source and include dirs for a Genesis game instance / emulator
-
-srcDir = meson.current_source_dir()
-emuInstanceSrc = [ 
-
-]
-
-emuInstanceIncludes = include_directories([
-    '.',
-    'snes9x/',
-    'snes9x/unix',
-    'snes9x/apu',
-    'snes9x/apu/bapu',
-    'snes9x/filter', 
-   ])
-
-# Platform's specific includes, source files and flags for training
-commonCFlags = [ 
-                  '-DNO_DUP_MAIN',
-                  '-DHAVE_MKSTEMP',
-                  '-DHAVE_STRINGS_H',
-                  '-DHAVE_SYS_IOCTL_H',
-                  '-DHAVE_STDINT_H',
-                  '-DRIGHTSHIFT_IS_SAR',
-                  '-DUSE_XVIDEO',
-                  '-DNOSOUND'
-               ]
-                        
-
-platformTrainSrc = [ emuInstanceSrc ]
-platformTrainIncludes = [ emuInstanceIncludes ]
-platformTrainCPPFlags = [ commonCFlags,'-DPREVENT_RENDERING']
-platformTrainCFlags = platformTrainCPPFlags
-platformTrainLibs = [ ] 
-platformTrainLFlags = [ 
-            '-lz',
-            '-lm',
-            '-lncurses' ]
-platformTrainDependencies = [ 
-          dependency('x11', required : false),
-          dependency('xext', required : false),
-          dependency('xv', required : false),
-          ]
-
-# Platform's specific includes, source files and flags for playback
-
-platformPlayIncludes = [ emuInstanceIncludes ]
-platformPlaySrc = [ emuInstanceSrc ]
-platformPlayCPPFlags = [ commonCFlags ]
-platformPlayCFlags = platformPlayCPPFlags
-platformPlayLibs = [ ] 
-platformPlayLFlags = [ platformTrainLFlags ]
-platformPlayDependencies = [ platformTrainDependencies  ]

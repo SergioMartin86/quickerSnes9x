@@ -24,7 +24,7 @@ endif
 
 # Building tester tool for QuickerSnes9x
 
-quickerNESTester = executable('quickerSnes9xTester',
+quickerSnes9X = executable('quickerSnes9xTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING', '-Werror' ],
   dependencies        : [ quickerSnes9xDependency, toolDependency ],
@@ -33,12 +33,12 @@ quickerNESTester = executable('quickerSnes9xTester',
 
 # Building tester tool for the original snes9x
 
-quickNESTester = executable('snes9xTester',
-  'source/tester.cpp',
-  cpp_args            : [ commonCompileArgs,  ],
-  dependencies        : [ snes9xDependency, toolDependency ],
-  include_directories : include_directories(['../extern/json'])
-)
+#snes9X = executable('snes9xTester',
+#  'source/tester.cpp',
+#  cpp_args            : [ commonCompileArgs,  ],
+#  dependencies        : [ snes9xDependency, toolDependency ],
+#  include_directories : include_directories(['../extern/json'])
+#)
 
 # Building tests
 subdir('tests')

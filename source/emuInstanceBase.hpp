@@ -17,6 +17,8 @@
 #include "conffile.h"
 #include "statemanager.h"
 
+extern void InitTimer (void);
+
 class EmuInstanceBase
 {
   public:
@@ -74,7 +76,18 @@ class EmuInstanceBase
     return result;
   }
 
-  inline void enableRendering() { _doRendering = true; };
+  inline void enableRendering()
+   {
+    S9xInitInputDevices();
+    S9xInitDisplay(0, NULL);
+    S9xSetupDefaultKeymap();
+    S9xTextMode();
+    S9xGraphicsMode();
+    S9xSetTitle(String);
+    InitTimer();
+
+     _doRendering = true; 
+   };
   inline void disableRendering() { _doRendering = false; };
 
   inline void loadStateFile(const std::string &stateFilePath)
@@ -115,13 +128,8 @@ class EmuInstanceBase
 
   // Virtual functions
 
-  virtual bool loadROMFileImpl(const std::string &romFilePath) = 0;
+  virtual bool loadROMFileImpl(const std::string &romData) = 0;
   virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
-  virtual uint8_t *getLowMem() const = 0;
-  virtual uint8_t *getNametableMem() const = 0;
-  virtual uint8_t *getHighMem() const = 0;
-  virtual const uint8_t *getChrMem() const = 0;
-  virtual size_t getChrMemSize() const = 0;
   virtual void serializeFullState(uint8_t *state) const = 0;
   virtual void deserializeFullState(const uint8_t *state) = 0;
   virtual void serializeLiteState(uint8_t *state) const = 0;
@@ -134,7 +142,6 @@ class EmuInstanceBase
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
   virtual std::string getCoreName() const = 0;
-  virtual void *getInternalEmulatorPointer() const = 0;
 
   protected:
 
