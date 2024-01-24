@@ -66,7 +66,8 @@ class EmuInstanceBase
   inline hash_t getStateHash() const
   {
     MetroHash128 hash;
-
+    
+    hash.Update(Memory.RAM, 0x20000);
 
     hash_t result;
     hash.Finalize(reinterpret_cast<uint8_t *>(&result));

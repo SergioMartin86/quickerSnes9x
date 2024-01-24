@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
     .default_value(false)
     .implicit_value(true);
 
+  program.add_argument("--storeInterval")
+    .help("Every how many frames to store the state (to save memory)")
+    .default_value(std::string("1"));
+
   program.add_argument("--disableRender")
     .help("Do not render game window.")
     .default_value(false)
@@ -70,6 +74,9 @@ int main(int argc, char *argv[])
   // Getting controller 2 Type
   std::string controller2Type = program.get<std::string>("--controller2");
 
+  // Getting store interval
+  size_t storeInterval = std::stoi(program.get<std::string>("--storeInterval"));
+
   // Loading sequence file
   std::string inputSequence;
   auto status = loadStringFromFile(inputSequence, sequenceFilePath.c_str());
@@ -104,7 +111,7 @@ int main(int argc, char *argv[])
   if (stateFilePath != "") e.loadStateFile(stateFilePath);
 
   // Creating playback instance
-  auto p = PlaybackInstance(&e, sequence);
+  auto p = PlaybackInstance(&e, sequence, storeInterval);
 
   // Getting state size
   auto stateSize = e.getFullStateSize();

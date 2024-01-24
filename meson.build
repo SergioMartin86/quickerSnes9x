@@ -39,7 +39,7 @@ quickerSnes9xTester = executable('quickerSnes9xTester',
 
 # Building tester tool for the original snes9x
 
-snes9X = executable('snes9xTester',
+snes9xTester = executable('snes9xTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING'  ],
   dependencies        : [ snes9xDependency, toolDependency ],
@@ -47,4 +47,4 @@ snes9X = executable('snes9xTester',
 )
 
 # Building tests
-#subdir('tests')
+subdir('tests')

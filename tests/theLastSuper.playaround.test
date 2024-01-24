@@ -1,0 +1,9 @@
+{
+  "Rom File": "roms/TheLastSuper.sfc",
+  "Expected ROM SHA1": "C5CACFDBED312ACDC9D408DC2060B5B967428633",
+  "Initial State File": "",
+  "Sequence File": "theLastSuper.anyPercent.sol",
+  "Disable State Blocks": [ ],
+  "Controller 1 Type": "Joypad",
+  "Controller 2 Type": "None"
+}

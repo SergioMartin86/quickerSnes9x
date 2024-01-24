@@ -97,7 +97,7 @@ class EmuInstance : public EmuInstanceBase
     S9xReset();
   }
 
-  std::string getCoreName() const override { return "quickerSnes9x"; }
+  std::string getCoreName() const override { return "snes9x"; }
 
 
   virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2)
