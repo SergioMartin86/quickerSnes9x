@@ -15,6 +15,7 @@
 #include "display.h"
 #include "conffile.h"
 #include "statemanager.h"
+#include "snapshot.h"
 
 class EmuInstanceBase
 {

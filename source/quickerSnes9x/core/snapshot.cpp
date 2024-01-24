@@ -207,6 +207,16 @@
 #define min(a,b)	(((a) < (b)) ? (a) : (b))
 #endif
 
+__thread bool _enablePPUBlock = true;
+__thread bool _enableDMABlock = true;
+__thread bool _enableVRABlock = true;
+__thread bool _enableRAMBlock = true;
+__thread bool _enableSRABlock = true;
+__thread bool _enableFILBlock = true;
+__thread bool _enableSNDBlock = true;
+__thread bool _enableCTLBlock = true;
+__thread bool _enableTIMBlock = true;
+
 typedef struct
 {
 	int			offset;
@@ -1334,29 +1344,42 @@ void S9xFreezeToStream (STREAM stream)
 
 	FreezeStruct(stream, "REG", &Registers, SnapRegisters, COUNT(SnapRegisters));
 
-	FreezeStruct(stream, "PPU", &PPU, SnapPPU, COUNT(SnapPPU));
 
-	struct SDMASnapshot	dma_snap;
-	for (int d = 0; d < 8; d++)
-		dma_snap.dma[d] = DMA[d];
-	FreezeStruct(stream, "DMA", &dma_snap, SnapDMA, COUNT(SnapDMA));
+ if (_enablePPUBlock) FreezeStruct(stream, "PPU", &PPU, SnapPPU, COUNT(SnapPPU));
 
-	FreezeBlock (stream, "VRA", Memory.VRAM, 0x10000);
+	if (_enableDMABlock)
+	{
+			struct SDMASnapshot	dma_snap;
+			for (int d = 0; d < 8; d++)
+				dma_snap.dma[d] = DMA[d];
+			FreezeStruct(stream, "DMA", &dma_snap, SnapDMA, COUNT(SnapDMA));
+	}
 
-	FreezeBlock (stream, "RAM", Memory.RAM, 0x20000);
+ if (_enableVRABlock)	FreezeBlock (stream, "VRA", Memory.VRAM, 0x10000);
 
-	FreezeBlock (stream, "SRA", Memory.SRAM, 0x20000);
+	if (_enableRAMBlock) FreezeBlock (stream, "RAM", Memory.RAM, 0x20000);
 
-	FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
+	if (_enableSRABlock) FreezeBlock (stream, "SRA", Memory.SRAM, 0x20000);
 
-	S9xAPUSaveState(soundsnapshot);
-	FreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
+	if (_enableFILBlock)FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
 
-	struct SControlSnapshot	ctl_snap;
-	S9xControlPreSaveState(&ctl_snap);
-	FreezeStruct(stream, "CTL", &ctl_snap, SnapControls, COUNT(SnapControls));
+	if (_enableSNDBlock)
+	{
+		S9xAPUSaveState(soundsnapshot);
+		FreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
+	}
 
-	FreezeStruct(stream, "TIM", &Timings, SnapTimings, COUNT(SnapTimings));
+	if (_enableCTLBlock)
+	{
+		struct SControlSnapshot	ctl_snap;
+		S9xControlPreSaveState(&ctl_snap);
+		FreezeStruct(stream, "CTL", &ctl_snap, SnapControls, COUNT(SnapControls));
+	}
+
+	if (_enableTIMBlock)
+	{
+		FreezeStruct(stream, "TIM", &Timings, SnapTimings, COUNT(SnapTimings));
+	}
 
 	if (Settings.SuperFX)
 	{
@@ -1527,41 +1550,68 @@ int S9xUnfreezeFromStream (STREAM stream)
 		if (result != SUCCESS)
 			break;
 
-		result = UnfreezeStructCopy(stream, "PPU", &local_ppu, SnapPPU, COUNT(SnapPPU), version);
-		if (result != SUCCESS)
-			break;
+  if (_enablePPUBlock)
+		{
+			result = UnfreezeStructCopy(stream, "PPU", &local_ppu, SnapPPU, COUNT(SnapPPU), version);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeStructCopy(stream, "DMA", &local_dma, SnapDMA, COUNT(SnapDMA), version);
-		if (result != SUCCESS)
+  if (_enableDMABlock)
+		{
+			result = UnfreezeStructCopy(stream, "DMA", &local_dma, SnapDMA, COUNT(SnapDMA), version);
+			if (result != SUCCESS)
 			break;
+		}
 
-		result = UnfreezeBlockCopy (stream, "VRA", &local_vram, 0x10000);
-		if (result != SUCCESS)
-			break;
+		if (_enableVRABlock)
+		{
+			result = UnfreezeBlockCopy (stream, "VRA", &local_vram, 0x10000);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeBlockCopy (stream, "RAM", &local_ram, 0x20000);
-		if (result != SUCCESS)
-			break;
+		if (_enableRAMBlock)
+		{
+			result = UnfreezeBlockCopy (stream, "RAM", &local_ram, 0x20000);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeBlockCopy (stream, "SRA", &local_sram, 0x20000);
-		if (result != SUCCESS)
-			break;
+		if (_enableSRABlock)
+		{
+			result = UnfreezeBlockCopy (stream, "SRA", &local_sram, 0x20000);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeBlockCopy (stream, "FIL", &local_fillram, 0x8000);
-		if (result != SUCCESS)
-			break;
+		if (_enableFILBlock)
+		{
+			result = UnfreezeBlockCopy (stream, "FIL", &local_fillram, 0x8000);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeBlockCopy (stream, "SND", &local_apu_sound, SPC_SAVE_STATE_BLOCK_SIZE);
-		if (result != SUCCESS)
-			break;
+		if (_enableSNDBlock)
+		{
+			result = UnfreezeBlockCopy (stream, "SND", &local_apu_sound, SPC_SAVE_STATE_BLOCK_SIZE);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeStructCopy(stream, "CTL", &local_control_data, SnapControls, COUNT(SnapControls), version);
-		if (result != SUCCESS)
-			break;
+		if (_enableCTLBlock)
+		{
+			result = UnfreezeStructCopy(stream, "CTL", &local_control_data, SnapControls, COUNT(SnapControls), version);
+			if (result != SUCCESS)
+				break;
+		}
 
-		result = UnfreezeStructCopy(stream, "TIM", &local_timing_data, SnapTimings, COUNT(SnapTimings), version);
-		if (result != SUCCESS)
-			break;
+  if (_enableTIMBlock)
+		{
+			result = UnfreezeStructCopy(stream, "TIM", &local_timing_data, SnapTimings, COUNT(SnapTimings), version);
+			if (result != SUCCESS)
+				break;
+		}
 
 		result = UnfreezeStructCopy(stream, "SFX", &local_superfx, SnapFX, COUNT(SnapFX), version);
 		if (result != SUCCESS && Settings.SuperFX)
@@ -1664,35 +1714,42 @@ int S9xUnfreezeFromStream (STREAM stream)
 		uint32 old_flags     = CPU.Flags;
 		uint32 sa1_old_flags = SA1.Flags;
 
-		S9xReset();
+		//S9xReset();
 
 		UnfreezeStructFromCopy(&CPU, SnapCPU, COUNT(SnapCPU), local_cpu, version);
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
 
-		UnfreezeStructFromCopy(&PPU, SnapPPU, COUNT(SnapPPU), local_ppu, version);
+		if (_enablePPUBlock) UnfreezeStructFromCopy(&PPU, SnapPPU, COUNT(SnapPPU), local_ppu, version);
 
-		struct SDMASnapshot	dma_snap;
-		UnfreezeStructFromCopy(&dma_snap, SnapDMA, COUNT(SnapDMA), local_dma, version);
+	 	struct SDMASnapshot	dma_snap;
+  if (_enableDMABlock) 	UnfreezeStructFromCopy(&dma_snap, SnapDMA, COUNT(SnapDMA), local_dma, version);
 
-		memcpy(Memory.VRAM, local_vram, 0x10000);
+  if (_enableVRABlock)	memcpy(Memory.VRAM, local_vram, 0x10000);
 
-		memcpy(Memory.RAM, local_ram, 0x20000);
+		if (_enableRAMBlock) memcpy(Memory.RAM, local_ram, 0x20000);
 
-		memcpy(Memory.SRAM, local_sram, 0x20000);
+		if (_enableSRABlock) memcpy(Memory.SRAM, local_sram, 0x20000);
 
-		memcpy(Memory.FillRAM, local_fillram, 0x8000);
+		if (_enableFILBlock) memcpy(Memory.FillRAM, local_fillram, 0x8000);
 
+if (_enableSNDBlock)
+{
         if(version < SNAPSHOT_VERSION_BAPU) {
             printf("Using Blargg APU snapshot loading (snapshot version %d, current is %d)\n...", version, SNAPSHOT_VERSION);
             S9xAPULoadBlarggState(local_apu_sound);
         } else
 		    S9xAPULoadState(local_apu_sound);
+}
 
-		struct SControlSnapshot	ctl_snap;
-		UnfreezeStructFromCopy(&ctl_snap, SnapControls, COUNT(SnapControls), local_control_data, version);
+	struct SControlSnapshot	ctl_snap;
+if (_enableCTLBlock)		UnfreezeStructFromCopy(&ctl_snap, SnapControls, COUNT(SnapControls), local_control_data, version);
 
+
+if (_enableTIMBlock)
+{
 		UnfreezeStructFromCopy(&Timings, SnapTimings, COUNT(SnapTimings), local_timing_data, version);
+}
 
 		if (local_superfx)
 		{
@@ -2345,5 +2402,4 @@ static void UnfreezeStructFromCopy (void *sbase, FreezeData *fields, int num_fie
 }
 
 
-#include <snapshot_fast.cpp>
 

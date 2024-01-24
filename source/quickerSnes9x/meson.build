@@ -82,7 +82,7 @@ quickerSnes9xCompileFlags = [
 # quickerSnes9x Core Configuration
 
  quickerSnes9xDependency = declare_dependency(
-  compile_args        : [  '-DNOSOUND', '-DNO_DUP_MAIN' ],
+  compile_args        : [  '-DNOSOUND', '-DNO_DUP_MAIN'  ],
   include_directories : include_directories(quickerSnes9xIncludeDirs),
   sources             : [ quickerSnes9xSrc ]
  )

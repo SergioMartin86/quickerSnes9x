@@ -77,15 +77,42 @@ class EmuInstance : public EmuInstanceBase
     return S9xFreezeSize();
   }
 
+
   void enableLiteStateBlock(const std::string& block)
-  {
-    EXIT_WITH_ERROR("Feature not supported yet");
-  }
+  { 
+    bool recognizedBlock = false;
+    
+    if (block == "PPU") { _enablePPUBlock = true; recognizedBlock = true; }
+    if (block == "DMA") { _enableDMABlock = true; recognizedBlock = true; }
+    if (block == "VRA") { _enableVRABlock = true; recognizedBlock = true; }
+    if (block == "RAM") { _enableRAMBlock = true; recognizedBlock = true; }
+    if (block == "SRA") { _enableSRABlock = true; recognizedBlock = true; }
+    if (block == "FIL") { _enableFILBlock = true; recognizedBlock = true; }
+    if (block == "SND") { _enableSNDBlock = true; recognizedBlock = true; }
+    if (block == "CTL") { _enableCTLBlock = true; recognizedBlock = true; }
+    if (block == "TIM") { _enableTIMBlock = true; recognizedBlock = true; }
+
+    if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
+  };
+
 
   void disableLiteStateBlock(const std::string& block)
-  {
-    EXIT_WITH_ERROR("Feature not supported yet");
-  }
+  { 
+    bool recognizedBlock = false;
+    
+    if (block == "PPU") { _enablePPUBlock = false; recognizedBlock = true; }
+    if (block == "DMA") { _enableDMABlock = false; recognizedBlock = true; }
+    if (block == "VRA") { _enableVRABlock = false; recognizedBlock = true; }
+    if (block == "RAM") { _enableRAMBlock = false; recognizedBlock = true; }
+    if (block == "SRA") { _enableSRABlock = false; recognizedBlock = true; }
+    if (block == "FIL") { _enableFILBlock = false; recognizedBlock = true; }
+    if (block == "SND") { _enableSNDBlock = false; recognizedBlock = true; }
+    if (block == "CTL") { _enableCTLBlock = false; recognizedBlock = true; }
+    if (block == "TIM") { _enableTIMBlock = false; recognizedBlock = true; }
+
+    if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
+  };
+
 
   void doSoftReset() override
   {
