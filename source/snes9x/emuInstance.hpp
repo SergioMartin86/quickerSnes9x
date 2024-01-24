@@ -79,12 +79,12 @@ class EmuInstance : public EmuInstanceBase
 
   void enableLiteStateBlock(const std::string& block)
   {
-    EXIT_WITH_ERROR("Feature not supported yet");
+    // Nothing to do here
   }
 
   void disableLiteStateBlock(const std::string& block)
   {
-    EXIT_WITH_ERROR("Feature not supported yet");
+    // Nothing to do here
   }
 
   void doSoftReset() override

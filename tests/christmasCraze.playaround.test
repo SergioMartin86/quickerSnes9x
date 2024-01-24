@@ -3,7 +3,7 @@
   "Expected ROM SHA1": "7752CAA676D15D4D0C42F25548C3E86128A416DB",
   "Initial State File": "",
   "Sequence File": "christmasCraze.playaround.sol",
-  "Disable State Blocks": [ ],
+  "Disable State Blocks": [ "SRA", "VRA", "CTL", "PPU" ],
   "Controller 1 Type": "Joypad",
   "Controller 2 Type": "Joypad"
 }
