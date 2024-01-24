@@ -5,19 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "snes9x.h"
-#include "memmap.h"
-#include "apu/apu.h"
-#include "gfx.h"
-#include "snapshot.h"
-#include "controls.h"
-#include "cheats.h"
-#include "movie.h"
-#include "logger.h"
-#include "display.h"
-#include "conffile.h"
-#include "statemanager.h"
-
 #include "unix.hpp"
 #include "snes/snes.hpp"
 extern thread_local bool doRendering;

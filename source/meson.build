@@ -1,5 +1,5 @@
 # Getting core configurations
-#subdir('snes9x')
+subdir('snes9x')
 subdir('quickerSnes9x')
 
 # Tool Configuration
