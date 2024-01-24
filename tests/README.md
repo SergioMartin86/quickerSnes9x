@@ -1,3 +1,1 @@
 Some of the sequences hosted in this folder correspond to movies published in tasvideos.org under the Creative Commons 2.0 license. Some movies were created by the author of this code (Sergio Martin, a.k.a. eien86) and collaborators, unless otherwise stated. 
-
-TheLastSuper.sfc by Dr. Ludos rom is distributed freely at https://drludos.itch.io/the-last-super

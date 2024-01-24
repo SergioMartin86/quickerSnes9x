@@ -11,7 +11,8 @@ protectedTestSet = [
 
 # Tests for open source free roms (for public cloud testing)
 openSourceTestSet = [
-  'theLastSuper.playaround.test'
+  'theLastSuper.playaround.test',
+  'christmasCraze.playaround.test',
 ]
 
 # Creating test set based on whether copyrighted roms are to be used
