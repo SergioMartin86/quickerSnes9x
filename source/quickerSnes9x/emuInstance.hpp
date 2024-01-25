@@ -7,6 +7,7 @@
 
 #include "unix.hpp"
 #include "snes/snes.hpp"
+#include <lightStateConfig.h>
 extern thread_local bool doRendering;
 
 class EmuInstance : public EmuInstanceBase
