@@ -234,7 +234,7 @@ void S9xSoftReset (void);
 void S9xDoHEventProcessing (void);
 
 static inline void S9xUnpackStatus (void)
-{
+{ 
 	ICPU._Zero = (Registers.PL & Zero) == 0;
 	ICPU._Negative = (Registers.PL & Negative);
 	ICPU._Carry = (Registers.PL & Carry);

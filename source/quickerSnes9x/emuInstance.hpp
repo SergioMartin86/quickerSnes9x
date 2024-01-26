@@ -7,6 +7,7 @@
 
 #include "unix.hpp"
 #include "snes/snes.hpp"
+#include <lightStateConfig.h>
 extern thread_local bool doRendering;
 
 class EmuInstance : public EmuInstanceBase
@@ -57,14 +58,14 @@ class EmuInstance : public EmuInstanceBase
   void serializeLiteState(uint8_t *state) const override
   {
     memStream stream(state, _liteStateSize);
-    S9xFreezeToStream(&stream);
+    S9xFreezeToStreamLite(&stream);
   }
 
   void deserializeLiteState(const uint8_t *state) override
   {
     // Loading state object into the emulator
     memStream stream(state, _liteStateSize);
-    S9xUnfreezeFromStream(&stream);
+    S9xUnfreezeFromStreamLite(&stream);
   }
 
   size_t getFullStateSize() const override
@@ -74,7 +75,7 @@ class EmuInstance : public EmuInstanceBase
 
   size_t getLiteStateSize() const override
   {
-    return S9xFreezeSize();
+    return S9xFreezeSizeLite();
   }
 
 
