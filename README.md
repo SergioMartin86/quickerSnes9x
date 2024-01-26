@@ -14,7 +14,7 @@ Improvements
 Credits
 ---------
 
-- quickerSnes9x is developed by many authors under several open source free licenses. For more information see: https://github.com/snes9xgit/snes9x
+- snes9x is developed by many authors under several open source free licenses. For more information see: https://github.com/snes9xgit/snes9x
 - We use some movies from the [TASVideos](tasvideos.org) website for testing. These movies are copied into this repository with authorization under the Creative Commons Attribution 2.0 license.
 
 All base code for this project was found under open source licenses, which I preserved in their corresponding files/folders. Any non-credited work is unintentional and shall be immediately rectfied.
