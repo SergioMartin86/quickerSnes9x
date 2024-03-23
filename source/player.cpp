@@ -1,7 +1,9 @@
-#include <cstdlib>
+#include <jaffarCommon/file.hpp>
+#include <jaffarCommon/string.hpp>
+#include <jaffarCommon/exceptions.hpp>
+#include <jaffarCommon/logger.hpp>
 #include "argparse/argparse.hpp"
-#include "utils.hpp"
-#include "emuInstance.hpp"
+#include "snes9xInstance.hpp"
 #include "playbackInstance.hpp"
 
 int main(int argc, char *argv[])
@@ -44,14 +46,7 @@ int main(int argc, char *argv[])
     .default_value(std::string("None"));
 
   // Try to parse arguments
-  try
-  {
-    program.parse_args(argc, argv);
-  }
-  catch (const std::runtime_error &err)
-  {
-    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
-  }
+  try { program.parse_args(argc, argv); } catch (const std::runtime_error &err) { JAFFAR_THROW_LOGIC("%s\n%s", err.what(), program.help().str().c_str()); }
 
   // Getting ROM file path
   std::string romFilePath = program.get<std::string>("romFile");
@@ -79,26 +74,26 @@ int main(int argc, char *argv[])
 
   // Loading sequence file
   std::string inputSequence;
-  auto status = loadStringFromFile(inputSequence, sequenceFilePath.c_str());
-  if (status == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
+  auto status = jaffarCommon::file::loadStringFromFile(inputSequence, sequenceFilePath.c_str());
+  if (status == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = split(inputSequence, ' ');
+  const auto sequence = jaffarCommon::string::split(inputSequence, ' ');
 
   // Initializing terminal
-  initializeTerminal();
+  jaffarCommon::logger::initializeTerminal();
 
   // Printing provided parameters
-  LOG("[] Rom File Path:      '%s'\n", romFilePath.c_str());
-  LOG("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
-  LOG("[] Sequence Length:    %lu\n", sequence.size());
-  LOG("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
-  LOG("[] Generating Sequence...\n");
+  jaffarCommon::logger::log("[] Rom File Path:      '%s'\n", romFilePath.c_str());
+  jaffarCommon::logger::log("[] Sequence File Path: '%s'\n", sequenceFilePath.c_str());
+  jaffarCommon::logger::log("[] Sequence Length:    %lu\n", sequence.size());
+  jaffarCommon::logger::log("[] State File Path:    '%s'\n", stateFilePath.empty() ? "<Boot Start>" : stateFilePath.c_str());
+  jaffarCommon::logger::log("[] Generating Sequence...\n");
 
-  refreshTerminal();
+  jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance 
-  auto e = EmuInstance();
+  auto e = snes9x::EmuInstance();
 
   // Setting controller types
   e.setController1Type(controller1Type);
@@ -144,24 +139,24 @@ int main(int argc, char *argv[])
     // Printing data and commands
     if (showFrameInfo)
     {
-      clearTerminal();
+      jaffarCommon::logger::clearTerminal();
 
-      LOG("[] ----------------------------------------------------------------\n");
-      LOG("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      LOG("[] Input:          %s\n", input.c_str());
-      LOG("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
+      jaffarCommon::logger::log("[] ----------------------------------------------------------------\n");
+      jaffarCommon::logger::log("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
+      jaffarCommon::logger::log("[] Input:          %s\n", input.c_str());
+      jaffarCommon::logger::log("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
 
       // Only print commands if not in reproduce mode
-      if (isReproduce == false) LOG("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
+      if (isReproduce == false) jaffarCommon::logger::log("[] Commands: n: -1 m: +1 | h: -10 | j: +10 | y: -100 | u: +100 | k: -1000 | i: +1000 | s: quicksave | p: play | q: quit\n");
 
-      refreshTerminal();
+      jaffarCommon::logger::refreshTerminal();
     }
 
     // Resetting show frame info flag
     showFrameInfo = true;
 
     // Get command
-    auto command = getKeyPress();
+    auto command = jaffarCommon::logger::getKeyPress();
 
     // Advance/Rewind commands
     if (command == 'n') currentStep = currentStep - 1;
@@ -186,8 +181,8 @@ int main(int argc, char *argv[])
       std::string saveData;
       saveData.resize(stateSize);
       memcpy(saveData.data(), stateData, stateSize);
-      if (saveStringToFile(saveData, saveFileName.c_str()) == false) EXIT_WITH_ERROR("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
-      LOG("[] Saved state to %s\n", saveFileName.c_str());
+      if (jaffarCommon::file::saveStringToFile(saveData, saveFileName.c_str()) == false) JAFFAR_THROW_RUNTIME("[ERROR] Could not save state file: %s\n", saveFileName.c_str());
+      jaffarCommon::logger::log("[] Saved state to %s\n", saveFileName.c_str());
 
       // Do no show frame info again after this action
       showFrameInfo = false;
@@ -201,5 +196,5 @@ int main(int argc, char *argv[])
   }
 
   // Ending ncurses window
-  finalizeTerminal();
+  jaffarCommon::logger::finalizeTerminal();
 }

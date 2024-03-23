@@ -1,8 +1,14 @@
 #include "argparse/argparse.hpp"
-#include "nlohmann/json.hpp"
-#include "sha1/sha1.hpp"
-#include "utils.hpp"
-#include "emuInstance.hpp"
+#include <jaffarCommon/json.hpp>
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/serializers/differential.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/differential.hpp>
+#include <jaffarCommon/hash.hpp>
+#include <jaffarCommon/string.hpp>
+#include <jaffarCommon/logger.hpp>
+#include <jaffarCommon/file.hpp>
+#include "snes9xInstance.hpp"
 #include <chrono>
 #include <sstream>
 #include <vector>
@@ -27,75 +33,49 @@ int main(int argc, char *argv[])
     .default_value(std::string(""));
 
   // Try to parse arguments
-  try
-  {
-    program.parse_args(argc, argv);
-  }
-  catch (const std::runtime_error &err)
-  {
-    EXIT_WITH_ERROR("%s\n%s", err.what(), program.help().str().c_str());
-  }
+  try { program.parse_args(argc, argv); } catch (const std::runtime_error &err) { JAFFAR_THROW_LOGIC("%s\n%s", err.what(), program.help().str().c_str()); }
 
   // Getting test script file path
-  std::string scriptFilePath = program.get<std::string>("scriptFile");
+  const auto scriptFilePath = program.get<std::string>("scriptFile");
 
   // Getting path where to save the hash output (if any)
-  std::string hashOutputFile = program.get<std::string>("--hashOutputFile");
+  const auto hashOutputFile = program.get<std::string>("--hashOutputFile");
 
   // Getting reproduce flag
-  std::string cycleType = program.get<std::string>("--cycleType");
+  const auto cycleType = program.get<std::string>("--cycleType");
 
   // Loading script file
-  std::string scriptJsonRaw;
-  if (loadStringFromFile(scriptJsonRaw, scriptFilePath) == false) EXIT_WITH_ERROR("Could not find/read script file: %s\n", scriptFilePath.c_str());
+  std::string configJsRaw;
+  if (jaffarCommon::file::loadStringFromFile(configJsRaw, scriptFilePath) == false) JAFFAR_THROW_LOGIC("Could not find/read script file: %s\n", scriptFilePath.c_str());
 
   // Parsing script
-  const auto scriptJson = nlohmann::json::parse(scriptJsonRaw);
+  const auto configJs = nlohmann::json::parse(configJsRaw);
 
   // Getting rom file path
-  if (scriptJson.contains("Rom File") == false) EXIT_WITH_ERROR("Script file missing 'Rom File' entry\n");
-  if (scriptJson["Rom File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Rom File' entry is not a string\n");
-  std::string romFilePath = scriptJson["Rom File"].get<std::string>();
+  const auto romFilePath = jaffarCommon::json::getString(configJs, "Rom File");
 
   // Getting initial state file path
-  if (scriptJson.contains("Initial State File") == false) EXIT_WITH_ERROR("Script file missing 'Initial State File' entry\n");
-  if (scriptJson["Initial State File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Initial State File' entry is not a string\n");
-  std::string initialStateFilePath = scriptJson["Initial State File"].get<std::string>();
+  const auto initialStateFilePath = jaffarCommon::json::getString(configJs, "Initial State File");
 
   // Getting sequence file path
-  if (scriptJson.contains("Sequence File") == false) EXIT_WITH_ERROR("Script file missing 'Sequence File' entry\n");
-  if (scriptJson["Sequence File"].is_string() == false) EXIT_WITH_ERROR("Script file 'Sequence File' entry is not a string\n");
-  std::string sequenceFilePath = scriptJson["Sequence File"].get<std::string>();
+  const auto sequenceFilePath = jaffarCommon::json::getString(configJs, "Sequence File");
 
   // Getting expected ROM SHA1 hash
-  if (scriptJson.contains("Expected ROM SHA1") == false) EXIT_WITH_ERROR("Script file missing 'Expected ROM SHA1' entry\n");
-  if (scriptJson["Expected ROM SHA1"].is_string() == false) EXIT_WITH_ERROR("Script file 'Expected ROM SHA1' entry is not a string\n");
-  std::string expectedROMSHA1 = scriptJson["Expected ROM SHA1"].get<std::string>();
+  const auto expectedROMSHA1 = jaffarCommon::json::getString(configJs, "Expected ROM SHA1");
 
   // Parsing disabled blocks in lite state serialization
-  std::vector<std::string> stateDisabledBlocks;
+  const auto stateDisabledBlocks = jaffarCommon::json::getArray<std::string>(configJs, "Disable State Blocks");
   std::string stateDisabledBlocksOutput;
-  if (scriptJson.contains("Disable State Blocks") == false) EXIT_WITH_ERROR("Script file missing 'Disable State Blocks' entry\n");
-  if (scriptJson["Disable State Blocks"].is_array() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' is not an array\n");
-  for (const auto& entry : scriptJson["Disable State Blocks"])
-  {
-    if (entry.is_string() == false) EXIT_WITH_ERROR("Script file 'Disable State Blocks' entry is not a string\n");
-    stateDisabledBlocks.push_back(entry.get<std::string>());
-    stateDisabledBlocksOutput += entry.get<std::string>() + std::string(" ");
-  } 
+  for (const auto& entry : stateDisabledBlocks) stateDisabledBlocksOutput += entry + std::string(" ");
   
   // Getting Controller 1 type
-  if (scriptJson.contains("Controller 1 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 1 Type' entry\n");
-  if (scriptJson["Controller 1 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 1 Type' entry is not a string\n");
-  std::string controller1Type = scriptJson["Controller 1 Type"].get<std::string>();
+  const auto controller1Type = jaffarCommon::json::getString(configJs, "Controller 1 Type");
 
   // Getting Controller 2 type
-  if (scriptJson.contains("Controller 2 Type") == false) EXIT_WITH_ERROR("Script file missing 'Controller 2 Type' entry\n");
-  if (scriptJson["Controller 2 Type"].is_string() == false) EXIT_WITH_ERROR("Script file 'Controller 2 Type' entry is not a string\n");
-  std::string controller2Type = scriptJson["Controller 2 Type"].get<std::string>();
+  const auto controller2Type = jaffarCommon::json::getString(configJs, "Controller 2 Type");
 
   // Creating emulator instance
-  auto e = EmuInstance();
+  auto e = snes9x::EmuInstance();
 
   // Setting controller types
   e.setController1Type(controller1Type);
@@ -120,14 +100,14 @@ int main(int argc, char *argv[])
   auto romSHA1 = e.getRomSHA1();
 
   // Checking with the expected SHA1 hash
-  if (romSHA1 != expectedROMSHA1) EXIT_WITH_ERROR("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
+  if (romSHA1 != expectedROMSHA1) JAFFAR_THROW_LOGIC("Wrong ROM SHA1. Found: '%s', Expected: '%s'\n", romSHA1.c_str(), expectedROMSHA1.c_str());
 
   // Loading sequence file
   std::string sequenceRaw;
-  if (loadStringFromFile(sequenceRaw, sequenceFilePath) == false) EXIT_WITH_ERROR("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
+  if (jaffarCommon::file::loadStringFromFile(sequenceRaw, sequenceFilePath) == false) JAFFAR_THROW_LOGIC("[ERROR] Could not find or read from input sequence file: %s\n", sequenceFilePath.c_str());
 
   // Building sequence information
-  const auto sequence = split(sequenceRaw, ' ');
+  const auto sequence = jaffarCommon::string::split(sequenceRaw, ' ');
 
   // Getting sequence lenght
   const auto sequenceLength = sequence.size();
@@ -136,17 +116,17 @@ int main(int argc, char *argv[])
   std::string emulationCoreName = e.getCoreName();
 
   // Printing test information
-  printf("[] -----------------------------------------\n");
-  printf("[] Running Script:          '%s'\n", scriptFilePath.c_str());
-  printf("[] Cycle Type:              '%s'\n", cycleType.c_str());
-  printf("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
-  printf("[] ROM File:                '%s'\n", romFilePath.c_str());
-  printf("[] Controller Types:        '%s' / '%s'\n", controller1Type.c_str(), controller2Type.c_str());
-  //printf("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
-  printf("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
-  printf("[] Sequence Length:         %lu\n", sequenceLength);
-  printf("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getLiteStateSize(), stateDisabledBlocksOutput.c_str());
-  printf("[] ********** Running Test **********\n");
+  jaffarCommon::logger::log("[] -----------------------------------------\n");
+  jaffarCommon::logger::log("[] Running Script:          '%s'\n", scriptFilePath.c_str());
+  jaffarCommon::logger::log("[] Cycle Type:              '%s'\n", cycleType.c_str());
+  jaffarCommon::logger::log("[] Emulation Core:          '%s'\n", emulationCoreName.c_str());
+  jaffarCommon::logger::log("[] ROM File:                '%s'\n", romFilePath.c_str());
+  jaffarCommon::logger::log("[] Controller Types:        '%s' / '%s'\n", controller1Type.c_str(), controller2Type.c_str());
+  //jaffarCommon::logger::log("[] ROM SHA1:                '%s'\n", romSHA1.c_str());
+  jaffarCommon::logger::log("[] Sequence File:           '%s'\n", sequenceFilePath.c_str());
+  jaffarCommon::logger::log("[] Sequence Length:         %lu\n", sequenceLength);
+  jaffarCommon::logger::log("[] State Size:              %lu bytes - Disabled Blocks:  [ %s ]\n", e.getLiteStateSize(), stateDisabledBlocksOutput.c_str());
+  jaffarCommon::logger::log("[] ********** Running Test **********\n");
 
   fflush(stdout);
 
@@ -179,15 +159,15 @@ int main(int argc, char *argv[])
 
   // Creating hash string
   char hashStringBuffer[256];
-  sprintf(hashStringBuffer, "0x%lX%lX", finalStateHash.first, finalStateHash.second);
+  jaffarCommon::logger::log(hashStringBuffer, "0x%lX%lX", finalStateHash.first, finalStateHash.second);
 
   // Printing time information
-  printf("[] Elapsed time:            %3.3fs\n", (double)dt * 1.0e-9);
-  printf("[] Performance:             %.3f inputs / s\n", (double)sequenceLength / elapsedTimeSeconds);
-  printf("[] Final State Hash:        %s\n", hashStringBuffer);
+  jaffarCommon::logger::log("[] Elapsed time:            %3.3fs\n", (double)dt * 1.0e-9);
+  jaffarCommon::logger::log("[] Performance:             %.3f inputs / s\n", (double)sequenceLength / elapsedTimeSeconds);
+  jaffarCommon::logger::log("[] Final State Hash:        %s\n", hashStringBuffer);
 
   // If saving hash, do it now
-  if (hashOutputFile != "") saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
+  if (hashOutputFile != "") jaffarCommon::file::saveStringToFile(std::string(hashStringBuffer), hashOutputFile.c_str());
 
   // If reached this point, everything ran ok
   return 0;

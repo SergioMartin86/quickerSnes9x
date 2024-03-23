@@ -1,9 +1,9 @@
 #pragma once
 
-#include "emuInstance.hpp"
+#include "snes9xInstance.hpp"
 #include <string>
-#include <unistd.h>
-#include <utils.hpp>
+#include <jaffarCommon/hash.hpp>
+#include <jaffarCommon/exceptions.hpp>
 
 #define _INVERSE_FRAME_RATE 66667
 
@@ -11,7 +11,7 @@ struct stepData_t
 {
   std::string input;
   uint8_t *stateData;
-  hash_t hash;
+  jaffarCommon::hash::hash_t hash;
 };
 
 class PlaybackInstance
@@ -19,7 +19,7 @@ class PlaybackInstance
   public:
 
   // Initializes the playback module instance
-  PlaybackInstance(EmuInstance *emu, const std::vector<std::string> &sequence, const size_t storeInterval = 1) :
+  PlaybackInstance(snes9x::EmuInstance *emu, const std::vector<std::string> &sequence, const size_t storeInterval = 1) :
    _emu(emu),
    _storeInterval(storeInterval)
   {
@@ -67,7 +67,7 @@ class PlaybackInstance
   void renderFrame(const size_t stepId)
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting closer step interval to the one requested
     size_t newStepId = stepId;
@@ -94,7 +94,7 @@ class PlaybackInstance
   const std::string getInput(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -106,7 +106,7 @@ class PlaybackInstance
   const uint8_t *getStateData(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -115,10 +115,10 @@ class PlaybackInstance
     return step.stateData;
   }
 
-  const hash_t getStateHash(const size_t stepId) const
+  const jaffarCommon::hash::hash_t getStateHash(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -130,7 +130,7 @@ class PlaybackInstance
   const std::string getStateInput(const size_t stepId) const
   {
     // Checking the required step id does not exceed contents of the sequence
-    if (stepId > _stepSequence.size()) EXIT_WITH_ERROR("[Error] Attempting to render a step larger than the step sequence");
+    if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
     // Getting step information
     const auto &step = _stepSequence[stepId];
@@ -145,7 +145,7 @@ class PlaybackInstance
   std::vector<stepData_t> _stepSequence;
 
   // Pointer to the contained emulator instance
-  EmuInstance *const _emu;
+  snes9x::EmuInstance *const _emu;
 
   // State storage interval
   const size_t _storeInterval;

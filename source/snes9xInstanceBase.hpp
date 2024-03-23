@@ -1,7 +1,8 @@
 #pragma once
 
-#include "sha1/sha1.hpp"
-#include <utils.hpp>
+#include <jaffarCommon/hash.hpp>
+#include <jaffarCommon/exceptions.hpp>
+#include <jaffarCommon/file.hpp>
 #include "controller.hpp"
 
 #include "snes9x.h"
@@ -17,6 +18,9 @@
 #include "statemanager.h"
 #include "snapshot.h"
 
+namespace snes9x
+{
+
 class EmuInstanceBase
 {
   public:
@@ -27,10 +31,10 @@ class EmuInstanceBase
   inline void advanceState(const std::string &move)
   {
     bool isInputValid = _controller.parseInputString(move);
-    if (isInputValid == false) EXIT_WITH_ERROR("Move provided cannot be parsed: '%s'\n", move.c_str());
+    if (isInputValid == false) ("Move provided cannot be parsed: '%s'\n", move.c_str());
 
     // Parsing power
-    if (_controller.getPowerButtonState() == true) EXIT_WITH_ERROR("Power button pressed, but not supported: '%s'\n", move.c_str());
+    if (_controller.getPowerButtonState() == true) JAFFAR_THROW_RUNTIME("Power button pressed, but not supported: '%s'\n", move.c_str());
 
     // Parsing reset
     if (_controller.getResetButtonState() == true) doSoftReset();
@@ -49,7 +53,7 @@ class EmuInstanceBase
     if (type == "None") { _controller.setController1Type(Controller::controller_t::none); isTypeRecognized = true; }
     if (type == "Joypad") { _controller.setController1Type(Controller::controller_t::joypad); isTypeRecognized = true; }
 
-    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
+    if (isTypeRecognized == false) JAFFAR_THROW_RUNTIME("Input type not recognized: '%s'\n", type.c_str());
   }
 
   inline void setController2Type(const std::string& type)
@@ -59,18 +63,18 @@ class EmuInstanceBase
     if (type == "None") { _controller.setController2Type(Controller::controller_t::none); isTypeRecognized = true; }
     if (type == "Joypad") { _controller.setController2Type(Controller::controller_t::joypad); isTypeRecognized = true; }
     
-    if (isTypeRecognized == false) EXIT_WITH_ERROR("Input type not recognized: '%s'\n", type.c_str());
+    if (isTypeRecognized == false) JAFFAR_THROW_RUNTIME("Input type not recognized: '%s'\n", type.c_str());
   }
 
   inline std::string getRomSHA1() const { return _romSHA1String; }
 
-  inline hash_t getStateHash() const
+  inline jaffarCommon::hash::hash_t getStateHash() const
   {
     MetroHash128 hash;
     
     hash.Update(Memory.RAM, 0x20000);
 
-    hash_t result;
+    jaffarCommon::hash::hash_t result;
     hash.Finalize(reinterpret_cast<uint8_t *>(&result));
     return result;
   }
@@ -91,8 +95,8 @@ class EmuInstanceBase
   inline void loadStateFile(const std::string &stateFilePath)
   {
     std::string stateData;
-    bool status = loadStringFromFile(stateData, stateFilePath);
-    if (status == false) EXIT_WITH_ERROR("Could not find/read state file: %s\n", stateFilePath.c_str());
+    bool status = jaffarCommon::file::loadStringFromFile(stateData, stateFilePath);
+    if (status == false) JAFFAR_THROW_RUNTIME("Could not find/read state file: %s\n", stateFilePath.c_str());
     deserializeFullState((uint8_t *)stateData.data());
   }
 
@@ -101,21 +105,21 @@ class EmuInstanceBase
     std::string stateData;
     stateData.resize(_fullStateSize);
     serializeFullState((uint8_t *)stateData.data());
-    saveStringToFile(stateData, stateFilePath.c_str());
+    jaffarCommon::file::saveStringToFile(stateData, stateFilePath.c_str());
   }
 
   inline void loadROMFile(const std::string &romFilePath)
   {
     // Loading ROM data
-    bool status = loadStringFromFile(_romData, romFilePath);
-    if (status == false) EXIT_WITH_ERROR("Could not find/read ROM file: %s\n", romFilePath.c_str());
+    bool status = jaffarCommon::file::loadStringFromFile(_romData, romFilePath);
+    if (status == false) JAFFAR_THROW_RUNTIME("Could not find/read ROM file: %s\n", romFilePath.c_str());
 
     // Calculating ROM hash value
-    _romSHA1String = SHA1::GetHash((uint8_t *)_romData.data(), _romData.size());
+    _romSHA1String = jaffarCommon::hash::getSHA1String(_romData);
 
     // Actually loading rom file
     status = loadROMFileImpl(_romData);
-    if (status == false) EXIT_WITH_ERROR("Could not process ROM file: %s\n", romFilePath.c_str());
+    if (status == false) JAFFAR_THROW_RUNTIME("Could not process ROM file: %s\n", romFilePath.c_str());
 
     // Detecting full state size
     _fullStateSize = getFullStateSize();
@@ -162,3 +166,5 @@ class EmuInstanceBase
   // Controller class for input parsing
   Controller _controller;
 };
+
+} // namespace snes9x

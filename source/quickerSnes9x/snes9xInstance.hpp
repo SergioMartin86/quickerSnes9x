@@ -1,15 +1,17 @@
 #pragma once
 
-#include <emuInstanceBase.hpp>
-#include <utils.hpp>
+#include "../snes9xInstanceBase.hpp"
 #include <string>
 #include <vector>
-
 #include "unix.hpp"
 #include "snes/snes.hpp"
 #include <lightStateConfig.h>
+
 extern thread_local bool doRendering;
 
+namespace snes9x
+{
+  
 class EmuInstance : public EmuInstanceBase
 {
  public:
@@ -136,3 +138,5 @@ class EmuInstance : public EmuInstanceBase
   }
 
 };
+
+} // namespace snes9x

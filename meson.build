@@ -1,7 +1,8 @@
 project('quickerSnes9x','c','cpp',
   version: '1.0.0',
   license: 'GPL-3.0-only',
-  default_options : ['cpp_std=c++20', 'default_library=shared', 'buildtype=release']
+  default_options : ['cpp_std=c++20', 'default_library=shared', 'buildtype=release'],
+  subproject_dir : 'extern'
 )
 
 # Loading dependencies
@@ -9,6 +10,11 @@ subdir('source')
 
 # Common application flags
 commonCompileArgs = [ '-Wall', '-Wfatal-errors' ]
+
+# Grabbing jaffarCommon dependency
+
+jaffarCommonSubproject = subproject('jaffarCommon')
+jaffarCommonDependency = jaffarCommonSubproject.get_variable('jaffarCommonDependency')
 
 # Building playback tool
 
@@ -18,7 +24,7 @@ if get_option('buildPlayer') == true
     'source/player.cpp',
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
     dependencies        : [ quickerSnes9xDependency,
-                            toolDependency,
+                            jaffarCommonDependency,
                             dependency('x11', required : false),
                             dependency('xext', required : false),
                             dependency('xv', required : false), ],
@@ -30,7 +36,7 @@ if get_option('buildPlayer') == true
     'source/player.cpp',
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
     dependencies        : [ snes9xDependency,
-                            toolDependency,
+                            jaffarCommonDependency,
                             dependency('x11', required : false),
                             dependency('xext', required : false),
                             dependency('xv', required : false), ],
@@ -45,8 +51,7 @@ endif
 quickerSnes9xTester = executable('quickerSnes9xTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ], 
-  dependencies        : [ quickerSnes9xDependency, toolDependency ],
-  include_directories : include_directories(['../extern/json'])
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
 )
 
 # Building tester tool for the original snes9x
@@ -54,8 +59,7 @@ quickerSnes9xTester = executable('quickerSnes9xTester',
 snes9xTester = executable('snes9xTester',
   'source/tester.cpp',
   cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING'  ],
-  dependencies        : [ snes9xDependency, toolDependency ],
-  include_directories : include_directories(['../extern/json'])
+  dependencies        : [ snes9xDependency, jaffarCommonDependency ],
 )
 
 # Building tests
