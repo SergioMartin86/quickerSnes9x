@@ -4,10 +4,9 @@
 #include <utils.hpp>
 #include <string>
 #include <vector>
-
-#include "unix.hpp"
 #include "snes/snes.hpp"
-extern thread_local bool doRendering;
+
+extern void initSnes9x();
 
 class EmuInstance : public EmuInstanceBase
 {
@@ -18,12 +17,7 @@ class EmuInstance : public EmuInstanceBase
 
  EmuInstance() : EmuInstanceBase()
  {
-  int argc = 1;
-  char bin[] = "./snes9x";
-  char* argv[1] = { bin };
-
-  doRendering = false;
-  initSnes9x(argc, argv);
+  initSnes9x();
  }
 
   virtual bool loadROMFileImpl(const std::string &romData) override

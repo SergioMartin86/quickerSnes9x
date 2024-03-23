@@ -3,9 +3,9 @@
 snes9xSrc =  [
   'core/apu/apu.cpp',
   'core/apu/bapu/dsp/sdsp.cpp',
-  'core/apu/bapu/dsp/SPC_DSP.cpp',
   'core/apu/bapu/smp/smp.cpp',
   'core/apu/bapu/smp/smp_state.cpp',
+  'core/bml.cpp',
   'core/bsx.cpp',
   'core/c4.cpp',
   'core/c4emu.cpp',
@@ -24,11 +24,11 @@ snes9xSrc =  [
   'core/dsp2.cpp',
   'core/dsp3.cpp',
   'core/dsp4.cpp',
+  'core/fscompat.cpp',
   'core/fxinst.cpp',
   'core/fxemu.cpp',
   'core/gfx.cpp',
   'core/globals.cpp',
-  'core/logger.cpp',
   'core/memmap.cpp',
   'core/msu1.cpp',
   'core/movie.cpp',
@@ -44,11 +44,15 @@ snes9xSrc =  [
   'core/seta010.cpp',
   'core/seta011.cpp',
   'core/seta018.cpp',
+  'core/sha256.cpp',
   'core/snapshot.cpp',
   'core/snes9x.cpp',
   'core/spc7110.cpp',
   'core/srtc.cpp',
   'core/tile.cpp',
+  'core/tileimpl-h2x1.cpp',
+  'core/tileimpl-n1x1.cpp',
+  'core/tileimpl-n2x1.cpp',
   'core/filter/2xsai.cpp',
   'core/filter/blit.cpp',
   'core/filter/epx.cpp',
@@ -68,21 +72,11 @@ snes9xIncludeDirs = [
   'core/filter', 
 ]
 
-snes9xCompileFlags = [
-    '-DNO_DUP_MAIN',
-    '-DHAVE_MKSTEMP',
-    '-DHAVE_STRINGS_H',
-    '-DHAVE_SYS_IOCTL_H',
-    '-DHAVE_STDINT_H',
-    '-DRIGHTSHIFT_IS_SAR',
-    '-DUSE_XVIDEO',
-    '-DNOSOUND'
-]
-
 # snes9x Core Configuration
 
  snes9xDependency = declare_dependency(
   compile_args        : [  '-DNOSOUND', '-DNO_DUP_MAIN' ],
+  link_args           : [ '-lm', '-lz', '-lSM', '-lICE', '-lX11', '-lXext', '-lXv', '-lXinerama', '-lpthread', '-lasound' ],
   include_directories : include_directories(snes9xIncludeDirs),
   sources             : [ snes9xSrc ]
  )
