@@ -13,19 +13,31 @@ commonCompileArgs = [ '-Wall', '-Wfatal-errors' ]
 # Building playback tool
 
 if get_option('buildPlayer') == true
-  executable('player',
+
+  quickerSnes9xPlayer = executable('quickerSnes9xPlayer',
     'source/player.cpp',
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
     dependencies        : [ quickerSnes9xDependency,
                             toolDependency,
-                            dependency('sdl2'),
-                            dependency('SDL2_image'),
                             dependency('x11', required : false),
                             dependency('xext', required : false),
                             dependency('xv', required : false), ],
     include_directories : include_directories(['source']),
     link_args           : [ '-lncurses' ],
   )
+
+  snes9xPlayer = executable('snes9xPlayer',
+    'source/player.cpp',
+    cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
+    dependencies        : [ snes9xDependency,
+                            toolDependency,
+                            dependency('x11', required : false),
+                            dependency('xext', required : false),
+                            dependency('xv', required : false), ],
+    include_directories : include_directories(['source']),
+    link_args           : [ '-lncurses' ],
+  )
+
 endif
 
 # Building tester tool for QuickerSnes9x

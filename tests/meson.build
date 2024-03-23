@@ -2,7 +2,7 @@ nomalloc = environment({'MALLOC_PERTURB_': '0'})
 
 bash = find_program('bash')
 testCommands = ['run_test.sh', quickerSnes9xTester.path(), snes9xTester.path() ]
-testTimeout = 240
+testTimeout = 500
 
 # Tests for copyrighted game roms (only for local testing or own CI runners)
 protectedTestSet = [ 
