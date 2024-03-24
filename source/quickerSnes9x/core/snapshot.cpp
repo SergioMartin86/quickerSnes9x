@@ -174,38 +174,6 @@ static thread_local struct Obsolete
 	uint8	CPU_IRQActive;
 }	Obsolete;
 
-#define STRUCT	struct SCPUState
-
-static __thread FreezeData	SnapCPU[] =
-{
-	INT_ENTRY(6, Cycles),
-	INT_ENTRY(6, PrevCycles),
-	INT_ENTRY(6, V_Counter),
-	INT_ENTRY(6, Flags),
-	OBSOLETE_INT_ENTRY(6, 7, CPU_IRQActive),
-	INT_ENTRY(6, IRQPending),
-	INT_ENTRY(6, MemSpeed),
-	INT_ENTRY(6, MemSpeedx2),
-	INT_ENTRY(6, FastROMSpeed),
-	INT_ENTRY(6, InDMA),
-	INT_ENTRY(6, InHDMA),
-	INT_ENTRY(6, InDMAorHDMA),
-	INT_ENTRY(6, InWRAMDMAorHDMA),
-	INT_ENTRY(6, HDMARanInDMA),
-	INT_ENTRY(6, WhichEvent),
-	INT_ENTRY(6, NextEvent),
-	INT_ENTRY(6, WaitingForInterrupt),
-	DELETED_INT_ENTRY(6, 7, WaitAddress, 4),
-	DELETED_INT_ENTRY(6, 7, WaitCounter, 4),
-	DELETED_INT_ENTRY(6, 7, PBPCAtOpcodeStart, 4),
-	INT_ENTRY(7, NMILine),
-	INT_ENTRY(7, IRQLine),
-	INT_ENTRY(7, IRQTransition),
-	INT_ENTRY(7, IRQLastState),
-	INT_ENTRY(7, IRQExternal)
-};
-
-#undef STRUCT
 #define STRUCT	struct SRegisters
 
 static __thread FreezeData	SnapRegisters[] =
@@ -405,302 +373,7 @@ static __thread FreezeData	SnapSA1Registers[] =
 };
 
 #undef STRUCT
-#define STRUCT	struct SDSP1
 
-static __thread FreezeData	SnapDSP1[] =
-{
-	INT_ENTRY(6, waiting4command),
-	INT_ENTRY(6, first_parameter),
-	INT_ENTRY(6, command),
-	INT_ENTRY(6, in_count),
-	INT_ENTRY(6, in_index),
-	INT_ENTRY(6, out_count),
-	INT_ENTRY(6, out_index),
-	ARRAY_ENTRY(6, parameters, 512, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, output, 512, uint8_ARRAY_V),
-	INT_ENTRY(6, CentreX),
-	INT_ENTRY(6, CentreY),
-	INT_ENTRY(6, VOffset),
-	INT_ENTRY(6, VPlane_C),
-	INT_ENTRY(6, VPlane_E),
-	INT_ENTRY(6, SinAas),
-	INT_ENTRY(6, CosAas),
-	INT_ENTRY(6, SinAzs),
-	INT_ENTRY(6, CosAzs),
-	INT_ENTRY(6, SinAZS),
-	INT_ENTRY(6, CosAZS),
-	INT_ENTRY(6, SecAZS_C1),
-	INT_ENTRY(6, SecAZS_E1),
-	INT_ENTRY(6, SecAZS_C2),
-	INT_ENTRY(6, SecAZS_E2),
-	INT_ENTRY(6, Nx),
-	INT_ENTRY(6, Ny),
-	INT_ENTRY(6, Nz),
-	INT_ENTRY(6, Gx),
-	INT_ENTRY(6, Gy),
-	INT_ENTRY(6, Gz),
-	INT_ENTRY(6, C_Les),
-	INT_ENTRY(6, E_Les),
-	INT_ENTRY(6, G_Les),
-#define O(N) \
-	ARRAY_ENTRY(6, matrixA[N], 3, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, matrixB[N], 3, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, matrixC[N], 3, uint16_ARRAY_V)
-	O(0), O(1), O(2),
-#undef O
-	INT_ENTRY(6, Op00Multiplicand),
-	INT_ENTRY(6, Op00Multiplier),
-	INT_ENTRY(6, Op00Result),
-	INT_ENTRY(6, Op20Multiplicand),
-	INT_ENTRY(6, Op20Multiplier),
-	INT_ENTRY(6, Op20Result),
-	INT_ENTRY(6, Op10Coefficient),
-	INT_ENTRY(6, Op10Exponent),
-	INT_ENTRY(6, Op10CoefficientR),
-	INT_ENTRY(6, Op10ExponentR),
-	INT_ENTRY(6, Op04Angle),
-	INT_ENTRY(6, Op04Radius),
-	INT_ENTRY(6, Op04Sin),
-	INT_ENTRY(6, Op04Cos),
-	INT_ENTRY(6, Op0CA),
-	INT_ENTRY(6, Op0CX1),
-	INT_ENTRY(6, Op0CY1),
-	INT_ENTRY(6, Op0CX2),
-	INT_ENTRY(6, Op0CY2),
-	INT_ENTRY(6, Op02FX),
-	INT_ENTRY(6, Op02FY),
-	INT_ENTRY(6, Op02FZ),
-	INT_ENTRY(6, Op02LFE),
-	INT_ENTRY(6, Op02LES),
-	INT_ENTRY(6, Op02AAS),
-	INT_ENTRY(6, Op02AZS),
-	INT_ENTRY(6, Op02VOF),
-	INT_ENTRY(6, Op02VVA),
-	INT_ENTRY(6, Op02CX),
-	INT_ENTRY(6, Op02CY),
-	INT_ENTRY(6, Op0AVS),
-	INT_ENTRY(6, Op0AA),
-	INT_ENTRY(6, Op0AB),
-	INT_ENTRY(6, Op0AC),
-	INT_ENTRY(6, Op0AD),
-	INT_ENTRY(6, Op06X),
-	INT_ENTRY(6, Op06Y),
-	INT_ENTRY(6, Op06Z),
-	INT_ENTRY(6, Op06H),
-	INT_ENTRY(6, Op06V),
-	INT_ENTRY(6, Op06M),
-	INT_ENTRY(6, Op01m),
-	INT_ENTRY(6, Op01Zr),
-	INT_ENTRY(6, Op01Xr),
-	INT_ENTRY(6, Op01Yr),
-	INT_ENTRY(6, Op11m),
-	INT_ENTRY(6, Op11Zr),
-	INT_ENTRY(6, Op11Xr),
-	INT_ENTRY(6, Op11Yr),
-	INT_ENTRY(6, Op21m),
-	INT_ENTRY(6, Op21Zr),
-	INT_ENTRY(6, Op21Xr),
-	INT_ENTRY(6, Op21Yr),
-	INT_ENTRY(6, Op0DX),
-	INT_ENTRY(6, Op0DY),
-	INT_ENTRY(6, Op0DZ),
-	INT_ENTRY(6, Op0DF),
-	INT_ENTRY(6, Op0DL),
-	INT_ENTRY(6, Op0DU),
-	INT_ENTRY(6, Op1DX),
-	INT_ENTRY(6, Op1DY),
-	INT_ENTRY(6, Op1DZ),
-	INT_ENTRY(6, Op1DF),
-	INT_ENTRY(6, Op1DL),
-	INT_ENTRY(6, Op1DU),
-	INT_ENTRY(6, Op2DX),
-	INT_ENTRY(6, Op2DY),
-	INT_ENTRY(6, Op2DZ),
-	INT_ENTRY(6, Op2DF),
-	INT_ENTRY(6, Op2DL),
-	INT_ENTRY(6, Op2DU),
-	INT_ENTRY(6, Op03F),
-	INT_ENTRY(6, Op03L),
-	INT_ENTRY(6, Op03U),
-	INT_ENTRY(6, Op03X),
-	INT_ENTRY(6, Op03Y),
-	INT_ENTRY(6, Op03Z),
-	INT_ENTRY(6, Op13F),
-	INT_ENTRY(6, Op13L),
-	INT_ENTRY(6, Op13U),
-	INT_ENTRY(6, Op13X),
-	INT_ENTRY(6, Op13Y),
-	INT_ENTRY(6, Op13Z),
-	INT_ENTRY(6, Op23F),
-	INT_ENTRY(6, Op23L),
-	INT_ENTRY(6, Op23U),
-	INT_ENTRY(6, Op23X),
-	INT_ENTRY(6, Op23Y),
-	INT_ENTRY(6, Op23Z),
-	INT_ENTRY(6, Op14Zr),
-	INT_ENTRY(6, Op14Xr),
-	INT_ENTRY(6, Op14Yr),
-	INT_ENTRY(6, Op14U),
-	INT_ENTRY(6, Op14F),
-	INT_ENTRY(6, Op14L),
-	INT_ENTRY(6, Op14Zrr),
-	INT_ENTRY(6, Op14Xrr),
-	INT_ENTRY(6, Op14Yrr),
-	INT_ENTRY(6, Op0EH),
-	INT_ENTRY(6, Op0EV),
-	INT_ENTRY(6, Op0EX),
-	INT_ENTRY(6, Op0EY),
-	INT_ENTRY(6, Op0BX),
-	INT_ENTRY(6, Op0BY),
-	INT_ENTRY(6, Op0BZ),
-	INT_ENTRY(6, Op0BS),
-	INT_ENTRY(6, Op1BX),
-	INT_ENTRY(6, Op1BY),
-	INT_ENTRY(6, Op1BZ),
-	INT_ENTRY(6, Op1BS),
-	INT_ENTRY(6, Op2BX),
-	INT_ENTRY(6, Op2BY),
-	INT_ENTRY(6, Op2BZ),
-	INT_ENTRY(6, Op2BS),
-	INT_ENTRY(6, Op28X),
-	INT_ENTRY(6, Op28Y),
-	INT_ENTRY(6, Op28Z),
-	INT_ENTRY(6, Op28R),
-	INT_ENTRY(6, Op1CX),
-	INT_ENTRY(6, Op1CY),
-	INT_ENTRY(6, Op1CZ),
-	INT_ENTRY(6, Op1CXBR),
-	INT_ENTRY(6, Op1CYBR),
-	INT_ENTRY(6, Op1CZBR),
-	INT_ENTRY(6, Op1CXAR),
-	INT_ENTRY(6, Op1CYAR),
-	INT_ENTRY(6, Op1CZAR),
-	INT_ENTRY(6, Op1CX1),
-	INT_ENTRY(6, Op1CY1),
-	INT_ENTRY(6, Op1CZ1),
-	INT_ENTRY(6, Op1CX2),
-	INT_ENTRY(6, Op1CY2),
-	INT_ENTRY(6, Op1CZ2),
-	INT_ENTRY(6, Op0FRamsize),
-	INT_ENTRY(6, Op0FPass),
-	INT_ENTRY(6, Op2FUnknown),
-	INT_ENTRY(6, Op2FSize),
-	INT_ENTRY(6, Op08X),
-	INT_ENTRY(6, Op08Y),
-	INT_ENTRY(6, Op08Z),
-	INT_ENTRY(6, Op08Ll),
-	INT_ENTRY(6, Op08Lh),
-	INT_ENTRY(6, Op18X),
-	INT_ENTRY(6, Op18Y),
-	INT_ENTRY(6, Op18Z),
-	INT_ENTRY(6, Op18R),
-	INT_ENTRY(6, Op18D),
-	INT_ENTRY(6, Op38X),
-	INT_ENTRY(6, Op38Y),
-	INT_ENTRY(6, Op38Z),
-	INT_ENTRY(6, Op38R),
-	INT_ENTRY(6, Op38D)
-};
-
-#undef STRUCT
-#define STRUCT	struct SDSP2
-
-static __thread FreezeData	SnapDSP2[] =
-{
-	INT_ENTRY(6, waiting4command),
-	INT_ENTRY(6, command),
-	INT_ENTRY(6, in_count),
-	INT_ENTRY(6, in_index),
-	INT_ENTRY(6, out_count),
-	INT_ENTRY(6, out_index),
-	ARRAY_ENTRY(6, parameters, 512, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, output, 512, uint8_ARRAY_V),
-	INT_ENTRY(6, Op05HasLen),
-	INT_ENTRY(6, Op05Len),
-	INT_ENTRY(6, Op05Transparent),
-	INT_ENTRY(6, Op06HasLen),
-	INT_ENTRY(6, Op06Len),
-	INT_ENTRY(6, Op09Word1),
-	INT_ENTRY(6, Op09Word2),
-	INT_ENTRY(6, Op0DHasLen),
-	INT_ENTRY(6, Op0DOutLen),
-	INT_ENTRY(6, Op0DInLen)
-};
-
-#undef STRUCT
-#define STRUCT	struct SDSP4
-
-static __thread FreezeData	SnapDSP4[] =
-{
-	INT_ENTRY(6, waiting4command),
-	INT_ENTRY(6, half_command),
-	INT_ENTRY(6, command),
-	INT_ENTRY(6, in_count),
-	INT_ENTRY(6, in_index),
-	INT_ENTRY(6, out_count),
-	INT_ENTRY(6, out_index),
-	ARRAY_ENTRY(6, parameters, 512, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, output, 512, uint8_ARRAY_V),
-	INT_ENTRY(6, byte),
-	INT_ENTRY(6, address),
-	INT_ENTRY(6, Logic),
-	INT_ENTRY(6, lcv),
-	INT_ENTRY(6, distance),
-	INT_ENTRY(6, raster),
-	INT_ENTRY(6, segments),
-	INT_ENTRY(6, world_x),
-	INT_ENTRY(6, world_y),
-	INT_ENTRY(6, world_dx),
-	INT_ENTRY(6, world_dy),
-	INT_ENTRY(6, world_ddx),
-	INT_ENTRY(6, world_ddy),
-	INT_ENTRY(6, world_xenv),
-	INT_ENTRY(6, world_yofs),
-	INT_ENTRY(6, view_x1),
-	INT_ENTRY(6, view_y1),
-	INT_ENTRY(6, view_x2),
-	INT_ENTRY(6, view_y2),
-	INT_ENTRY(6, view_dx),
-	INT_ENTRY(6, view_dy),
-	INT_ENTRY(6, view_xofs1),
-	INT_ENTRY(6, view_yofs1),
-	INT_ENTRY(6, view_xofs2),
-	INT_ENTRY(6, view_yofs2),
-	INT_ENTRY(6, view_yofsenv),
-	INT_ENTRY(6, view_turnoff_x),
-	INT_ENTRY(6, view_turnoff_dx),
-	INT_ENTRY(6, viewport_cx),
-	INT_ENTRY(6, viewport_cy),
-	INT_ENTRY(6, viewport_left),
-	INT_ENTRY(6, viewport_right),
-	INT_ENTRY(6, viewport_top),
-	INT_ENTRY(6, viewport_bottom),
-	INT_ENTRY(6, sprite_x),
-	INT_ENTRY(6, sprite_y),
-	INT_ENTRY(6, sprite_attr),
-	INT_ENTRY(6, sprite_size),
-	INT_ENTRY(6, sprite_clipy),
-	INT_ENTRY(6, sprite_count),
-#define O(N) \
-	ARRAY_ENTRY(6, poly_clipLf[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_clipRt[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_ptr[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_raster[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_top[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_bottom[N], 2, uint16_ARRAY_V), \
-	ARRAY_ENTRY(6, poly_cx[N], 2, uint16_ARRAY_V)
-	O(0), O(1),
-#undef O
-	ARRAY_ENTRY(6, poly_start, 2, uint16_ARRAY_V),
-	ARRAY_ENTRY(6, poly_plane, 2, uint16_ARRAY_V),
-	ARRAY_ENTRY(6, OAM_attr, 16, uint16_ARRAY_V),
-	INT_ENTRY(6, OAM_index),
-	INT_ENTRY(6, OAM_bits),
-	INT_ENTRY(6, OAM_RowMax),
-	ARRAY_ENTRY(6, OAM_Row, 32, uint16_ARRAY_V)
-};
-
-#undef STRUCT
 #define STRUCT	struct SST010
 
 static __thread FreezeData	SnapST010[] =
@@ -723,80 +396,7 @@ static __thread FreezeData	SnapOBC1[] =
 };
 
 #undef STRUCT
-#define STRUCT	struct SSPC7110Snapshot
 
-static __thread FreezeData	SnapSPC7110Snap[] =
-{
-	INT_ENTRY(6, r4801),
-	INT_ENTRY(6, r4802),
-	INT_ENTRY(6, r4803),
-	INT_ENTRY(6, r4804),
-	INT_ENTRY(6, r4805),
-	INT_ENTRY(6, r4806),
-	INT_ENTRY(6, r4807),
-	INT_ENTRY(6, r4808),
-	INT_ENTRY(6, r4809),
-	INT_ENTRY(6, r480a),
-	INT_ENTRY(6, r480b),
-	INT_ENTRY(6, r480c),
-	INT_ENTRY(6, r4811),
-	INT_ENTRY(6, r4812),
-	INT_ENTRY(6, r4813),
-	INT_ENTRY(6, r4814),
-	INT_ENTRY(6, r4815),
-	INT_ENTRY(6, r4816),
-	INT_ENTRY(6, r4817),
-	INT_ENTRY(6, r4818),
-	INT_ENTRY(6, r481x),
-	INT_ENTRY(6, r4814_latch),
-	INT_ENTRY(6, r4815_latch),
-	INT_ENTRY(6, r4820),
-	INT_ENTRY(6, r4821),
-	INT_ENTRY(6, r4822),
-	INT_ENTRY(6, r4823),
-	INT_ENTRY(6, r4824),
-	INT_ENTRY(6, r4825),
-	INT_ENTRY(6, r4826),
-	INT_ENTRY(6, r4827),
-	INT_ENTRY(6, r4828),
-	INT_ENTRY(6, r4829),
-	INT_ENTRY(6, r482a),
-	INT_ENTRY(6, r482b),
-	INT_ENTRY(6, r482c),
-	INT_ENTRY(6, r482d),
-	INT_ENTRY(6, r482e),
-	INT_ENTRY(6, r482f),
-	INT_ENTRY(6, r4830),
-	INT_ENTRY(6, r4831),
-	INT_ENTRY(6, r4832),
-	INT_ENTRY(6, r4833),
-	INT_ENTRY(6, r4834),
-	INT_ENTRY(6, dx_offset),
-	INT_ENTRY(6, ex_offset),
-	INT_ENTRY(6, fx_offset),
-	INT_ENTRY(6, r4840),
-	INT_ENTRY(6, r4841),
-	INT_ENTRY(6, r4842),
-	INT_ENTRY(6, rtc_state),
-	INT_ENTRY(6, rtc_mode),
-	INT_ENTRY(6, rtc_index),
-	INT_ENTRY(6, decomp_mode),
-	INT_ENTRY(6, decomp_offset),
-	ARRAY_ENTRY(6, decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE, uint8_ARRAY_V),
-	INT_ENTRY(6, decomp_buffer_rdoffset),
-	INT_ENTRY(6, decomp_buffer_wroffset),
-	INT_ENTRY(6, decomp_buffer_length),
-#define O(N) \
-	INT_ENTRY(6, context[N].index), \
-	INT_ENTRY(6, context[N].invert)
-	O(  0), O(  1), O(  2), O(  3), O(  4), O(  5), O(  6), O(  7),
-	O(  8), O(  9), O( 10), O( 11), O( 12), O( 13), O( 14), O( 15),
-	O( 16), O( 17), O( 18), O( 19), O( 20), O( 21), O( 22), O( 23),
-	O( 24), O( 25), O( 26), O( 27), O( 28), O( 29), O( 30), O( 31)
-#undef O
-};
-
-#undef STRUCT
 #define STRUCT	struct SSRTCSnapshot
 
 static __thread FreezeData	SnapSRTCSnap[] =
@@ -899,19 +499,13 @@ void S9xFreezeToStream (STREAM stream)
 	sprintf(buffer, "NAM:%06d:%s%c", (int) strlen(Memory.ROMFilename) + 1, Memory.ROMFilename, 0);
 	WRITE_STREAM(buffer, strlen(buffer) + 1, stream);
 
-	FreezeStruct(stream, "CPU", &CPU, SnapCPU, COUNT(SnapCPU));
+	FreezeBlock(stream, "CPU", (uint8_t*)&CPU, sizeof(CPU));
 
 	FreezeStruct(stream, "REG", &Registers, SnapRegisters, COUNT(SnapRegisters));
 
 	if (_enablePPUBlock) FreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
 
-	if (_enableDMABlock)
-	{
-			struct SDMASnapshot	dma_snap;
-			for (int d = 0; d < 8; d++)
-				dma_snap.dma[d] = DMA[d];
-			FreezeStruct(stream, "DMA", &dma_snap, SnapDMA, COUNT(SnapDMA));
-	}
+	if (_enableDMABlock)	FreezeBlock(stream, "DMA", (uint8_t*) &DMA, sizeof(DMA));
 
  if (_enableVRABlock)	FreezeBlock (stream, "VRA", Memory.VRAM, 0x10000);
 
@@ -976,7 +570,7 @@ void S9xFreezeToStream (STREAM stream)
 	if (Settings.SPC7110)
 	{
 		S9xSPC7110PreSaveState();
-		FreezeStruct(stream, "S71", &s7snap, SnapSPC7110Snap, COUNT(SnapSPC7110Snap));
+		FreezeBlock(stream, "S71", (uint8_t*)&s7snap, sizeof(s7snap));
 	}
 
 	if (Settings.SRTC)
@@ -1018,9 +612,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 	if (result != SUCCESS)
 		return (result);
 
-	uint8	*local_cpu           = NULL;
 	uint8	*local_registers     = NULL;
-	uint8	*local_dma           = NULL;
 	uint8	*local_apu_sound     = NULL;
 	uint8	*local_control_data  = NULL;
 	uint8	*local_timing_data   = NULL;
@@ -1031,7 +623,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 	uint8	*local_st010         = NULL;
 	uint8	*local_obc1          = NULL;
 	uint8	*local_obc1_data     = NULL;
-	uint8	*local_spc7110       = NULL;
 	uint8	*local_srtc          = NULL;
 	uint8	*local_rtc_data      = NULL;
 	uint8	*local_bsx_data      = NULL;
@@ -1041,7 +632,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 	do
 	{
-		result = UnfreezeStructCopy(stream, "CPU", &local_cpu, SnapCPU, COUNT(SnapCPU), version);
+		result = UnfreezeBlock(stream, "CPU", (uint8_t*) &CPU, sizeof(CPU));
 		if (result != SUCCESS)
 			break;
 
@@ -1058,7 +649,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 
   if (_enableDMABlock)
 		{
-			result = UnfreezeStructCopy(stream, "DMA", &local_dma, SnapDMA, COUNT(SnapDMA), version);
+			result = UnfreezeBlock(stream, "DMA", (uint8_t*)&DMA, sizeof(DMA));
 			if (result != SUCCESS)
 			break;
 		}
@@ -1144,9 +735,12 @@ int S9xUnfreezeFromStream (STREAM stream)
 		if (result != SUCCESS && Settings.OBC1)
 			break;
 
-		result = UnfreezeStructCopy(stream, "S71", &local_spc7110, SnapSPC7110Snap, COUNT(SnapSPC7110Snap), version);
+	if (Settings.SPC7110)
+	{
+		result = UnfreezeBlock(stream, "S71", (uint8_t*)&s7snap, sizeof(s7snap));
 		if (result != SUCCESS && Settings.SPC7110)
 			break;
+	}
 
 		result = UnfreezeStructCopy(stream, "SRT", &local_srtc, SnapSRTCSnap, COUNT(SnapSRTCSnap), version);
 		if (result != SUCCESS && Settings.SRTC)
@@ -1207,12 +801,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 		//S9xReset();
 
-		UnfreezeStructFromCopy(&CPU, SnapCPU, COUNT(SnapCPU), local_cpu, version);
-
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-	 	struct SDMASnapshot	dma_snap;
-  if (_enableDMABlock) 	UnfreezeStructFromCopy(&dma_snap, SnapDMA, COUNT(SnapDMA), local_dma, version);
 
 if (_enableSNDBlock)
 {
@@ -1255,9 +844,6 @@ if (_enableTIMBlock)
 
 		if (local_obc1_data)
 			memcpy(Memory.OBC1RAM, local_obc1_data, 8192);
-
-		if (local_spc7110)
-			UnfreezeStructFromCopy(&s7snap, SnapSPC7110Snap, COUNT(SnapSPC7110Snap), local_spc7110, version);
 
 		if (local_srtc)
 			UnfreezeStructFromCopy(&srtcsnap, SnapSRTCSnap, COUNT(SnapSRTCSnap), local_srtc, version);
@@ -1312,8 +898,6 @@ if (_enableTIMBlock)
 		S9xUnpackStatus();
 		S9xFixCycles();
 
-		for (int d = 0; d < 8; d++)
-			DMA[d] = dma_snap.dma[d];
 		CPU.InDMA = CPU.InHDMA = FALSE;
 		CPU.InDMAorHDMA = CPU.InWRAMDMAorHDMA = FALSE;
 		CPU.HDMARanInDMA = 0;
@@ -1343,8 +927,7 @@ if (_enableTIMBlock)
 		if (Settings.SDD1)
 			S9xSDD1PostLoadState();
 
-		if (local_spc7110)
-			S9xSPC7110PostLoadState(version);
+			if (Settings.SPC7110)	S9xSPC7110PostLoadState(version);
 
 		if (local_srtc)
 			S9xSRTCPostLoadState(version);
@@ -1368,9 +951,7 @@ if (_enableTIMBlock)
 
 	}
 
-	if (local_cpu)				delete [] local_cpu;
 	if (local_registers)		delete [] local_registers;
-	if (local_dma)				delete [] local_dma;
 	if (local_apu_sound)		delete [] local_apu_sound;
 	if (local_control_data)		delete [] local_control_data;
 	if (local_timing_data)		delete [] local_timing_data;
@@ -1381,7 +962,6 @@ if (_enableTIMBlock)
 	if (local_st010)			delete [] local_st010;
 	if (local_obc1)				delete [] local_obc1;
 	if (local_obc1_data)		delete [] local_obc1_data;
-	if (local_spc7110)			delete [] local_spc7110;
 	if (local_srtc)				delete [] local_srtc;
 	if (local_rtc_data)			delete [] local_rtc_data;
 	if (local_bsx_data)			delete [] local_bsx_data;
