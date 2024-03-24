@@ -495,10 +495,7 @@ void S9xFreezeToStream (STREAM stream)
 		FreezeBlock(stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
 	}
 
-	if (_enableTIMBlock)
-	{
-		FreezeStruct(stream, "TIM", &Timings, SnapTimings, COUNT(SnapTimings));
-	}
+	if (_enableTIMBlock)	FreezeBlock(stream, "TIM", (uint8_t*)&Timings, sizeof(Timings));
 
 	if (Settings.SuperFX)
 	{
@@ -560,9 +557,8 @@ int S9xUnfreezeFromStream (STREAM stream)
 {
 
 	int version = SNAPSHOT_VERSION;
+	
 	uint8	*local_registers     = NULL;
-	uint8	*local_timing_data   = NULL;
-	uint8	*local_superfx       = NULL;
 	uint8	*local_sa1           = NULL;
 	uint8	*local_sa1_registers = NULL;
 	uint8	*local_cx4_data      = NULL;
@@ -573,8 +569,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 	uint8	*local_rtc_data      = NULL;
 	uint8	*local_bsx_data      = NULL;
 	uint8	*local_msu1_data     = NULL;
-	uint8	*local_screenshot    = NULL;
-	uint8	*local_movie_data    = NULL;
 
 struct SControlSnapshot	ctl_snap;
 
@@ -594,9 +588,14 @@ struct SControlSnapshot	ctl_snap;
 		}
 
 		if (_enableCTLBlock) UnfreezeBlock (stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
-  if (_enableTIMBlock) UnfreezeStructCopy(stream, "TIM", &local_timing_data, SnapTimings, COUNT(SnapTimings), version);
+  if (_enableTIMBlock) UnfreezeBlock(stream, "TIM", (uint8_t*)&Timings, sizeof(Timings));
 
-		if (Settings.SuperFX) UnfreezeStructCopy(stream, "SFX", &local_superfx, SnapFX, COUNT(SnapFX), version);
+		if (Settings.SuperFX)
+		{
+			 GSU.avRegAddr = (uint8 *) &GSU.avReg;
+    UnfreezeBlock(stream, "SFX", (uint8_t*) &GSU, sizeof(GSU));
+		}
+
 		if (Settings.SA1) UnfreezeStructCopy(stream, "SA1", &local_sa1, SnapSA1, COUNT(SnapSA1), version);
 		if (Settings.SA1) UnfreezeStructCopy(stream, "SAR", &local_sa1_registers, SnapSA1Registers, COUNT(SnapSA1Registers), version);
   if (Settings.DSP == 1) UnfreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
@@ -617,17 +616,6 @@ struct SControlSnapshot	ctl_snap;
 		uint32 sa1_old_flags = SA1.Flags;
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-		if (_enableTIMBlock)
-		{
-				UnfreezeStructFromCopy(&Timings, SnapTimings, COUNT(SnapTimings), local_timing_data, version);
-		}
-
-		if (local_superfx)
-		{
-			GSU.avRegAddr = (uint8 *) &GSU.avReg;
-			UnfreezeStructFromCopy(&GSU, SnapFX, COUNT(SnapFX), local_superfx, version);
-		}
 
 		if (local_sa1)
 			UnfreezeStructFromCopy(&SA1, SnapSA1, COUNT(SnapSA1), local_sa1, version);
@@ -714,12 +702,6 @@ struct SControlSnapshot	ctl_snap;
 
 		S9xControlPostLoadState(&ctl_snap);
 
-		if (local_superfx)
-		{
-			GSU.pfPlot = fx_PlotTable[GSU.vMode];
-			GSU.pfRpix = fx_PlotTable[GSU.vMode + 5];
-		}
-
 		if (local_sa1 && local_sa1_registers)
 		{
 			SA1.Flags |= sa1_old_flags & TRACE_FLAG;
@@ -740,21 +722,8 @@ struct SControlSnapshot	ctl_snap;
 		if (local_msu1_data)
 			S9xMSU1PostLoadState();
 
-		if (local_movie_data)
-		{
-			// restore last displayed pad_read status
-
-			bool8			pad_read_temp = pad_read;
-
-			pad_read = pad_read_last;
-			S9xUpdateFrameCounter(-1);
-			pad_read = pad_read_temp;
-		}
-
 
 	if (local_registers)		delete [] local_registers;
-	if (local_timing_data)		delete [] local_timing_data;
-	if (local_superfx)			delete [] local_superfx;
 	if (local_sa1)				delete [] local_sa1;
 	if (local_sa1_registers)	delete [] local_sa1_registers;
 	if (local_cx4_data)			delete [] local_cx4_data;
@@ -764,8 +733,6 @@ struct SControlSnapshot	ctl_snap;
 	if (local_srtc)				delete [] local_srtc;
 	if (local_rtc_data)			delete [] local_rtc_data;
 	if (local_bsx_data)			delete [] local_bsx_data;
-	if (local_screenshot)		delete [] local_screenshot;
-	if (local_movie_data)		delete [] local_movie_data;
 
 	return 0;
 }
