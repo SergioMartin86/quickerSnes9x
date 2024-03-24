@@ -3,12 +3,12 @@
   "Expected ROM SHA1": "7752CAA676D15D4D0C42F25548C3E86128A416DB",
   "Initial State File": "",
   "Sequence File": "christmasCraze.playaround.sol",
-  "Disable State Blocks": [ "SRA", "VRA", "CTL", "PPU" ],
+  "Disable State Blocks": [ "SRA", "VRA", "CTL"],
   "Controller 1 Type": "Joypad",
   "Controller 2 Type": "Joypad",
   "Differential Compression":
   {
-    "Enabled": true,
+    "Enabled": false,
     "Max Differences": 28672,
     "Use Zlib": true
   }

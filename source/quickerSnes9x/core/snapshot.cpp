@@ -1,190 +1,5 @@
 /***********************************************************************************
-  Snes9x - Portable Super Nintendo Entertainment System (TM) emulator.
-
-  (c) Copyright 1996 - 2002  Gary Henderson (gary.henderson@ntlworld.com),
-                             Jerremy Koot (jkoot@snes9x.com)
-
-  (c) Copyright 2002 - 2004  Matthew Kendora
-
-  (c) Copyright 2002 - 2005  Peter Bortas (peter@bortas.org)
-
-  (c) Copyright 2004 - 2005  Joel Yliluoma (http://iki.fi/bisqwit/)
-
-  (c) Copyright 2001 - 2006  John Weidman (jweidman@slip.net)
-
-  (c) Copyright 2002 - 2006  funkyass (funkyass@spam.shaw.ca),
-                             Kris Bleakley (codeviolation@hotmail.com)
-
-  (c) Copyright 2002 - 2010  Brad Jorsch (anomie@users.sourceforge.net),
-                             Nach (n-a-c-h@users.sourceforge.net),
-
-  (c) Copyright 2002 - 2011  zones (kasumitokoduck@yahoo.com)
-
-  (c) Copyright 2006 - 2007  nitsuja
-
-  (c) Copyright 2009 - 2016  BearOso,
-                             OV2
-
-  (c) Copyright 2011 - 2016  Hans-Kristian Arntzen,
-                             Daniel De Matteis
-                             (Under no circumstances will commercial rights be given)
-
-
-  BS-X C emulator code
-  (c) Copyright 2005 - 2006  Dreamer Nom,
-                             zones
-
-  C4 x86 assembler and some C emulation code
-  (c) Copyright 2000 - 2003  _Demo_ (_demo_@zsnes.com),
-                             Nach,
-                             zsKnight (zsknight@zsnes.com)
-
-  C4 C++ code
-  (c) Copyright 2003 - 2006  Brad Jorsch,
-                             Nach
-
-  DSP-1 emulator code
-  (c) Copyright 1998 - 2006  _Demo_,
-                             Andreas Naive (andreasnaive@gmail.com),
-                             Gary Henderson,
-                             Ivar (ivar@snes9x.com),
-                             John Weidman,
-                             Kris Bleakley,
-                             Matthew Kendora,
-                             Nach,
-                             neviksti (neviksti@hotmail.com)
-
-  DSP-2 emulator code
-  (c) Copyright 2003         John Weidman,
-                             Kris Bleakley,
-                             Lord Nightmare (lord_nightmare@users.sourceforge.net),
-                             Matthew Kendora,
-                             neviksti
-
-  DSP-3 emulator code
-  (c) Copyright 2003 - 2006  John Weidman,
-                             Kris Bleakley,
-                             Lancer,
-                             z80 gaiden
-
-  DSP-4 emulator code
-  (c) Copyright 2004 - 2006  Dreamer Nom,
-                             John Weidman,
-                             Kris Bleakley,
-                             Nach,
-                             z80 gaiden
-
-  OBC1 emulator code
-  (c) Copyright 2001 - 2004  zsKnight,
-                             pagefault (pagefault@zsnes.com),
-                             Kris Bleakley
-                             Ported from x86 assembler to C by sanmaiwashi
-
-  SPC7110 and RTC C++ emulator code used in 1.39-1.51
-  (c) Copyright 2002         Matthew Kendora with research by
-                             zsKnight,
-                             John Weidman,
-                             Dark Force
-
-  SPC7110 and RTC C++ emulator code used in 1.52+
-  (c) Copyright 2009         byuu,
-                             neviksti
-
-  S-DD1 C emulator code
-  (c) Copyright 2003         Brad Jorsch with research by
-                             Andreas Naive,
-                             John Weidman
-
-  S-RTC C emulator code
-  (c) Copyright 2001 - 2006  byuu,
-                             John Weidman
-
-  ST010 C++ emulator code
-  (c) Copyright 2003         Feather,
-                             John Weidman,
-                             Kris Bleakley,
-                             Matthew Kendora
-
-  Super FX x86 assembler emulator code
-  (c) Copyright 1998 - 2003  _Demo_,
-                             pagefault,
-                             zsKnight
-
-  Super FX C emulator code
-  (c) Copyright 1997 - 1999  Ivar,
-                             Gary Henderson,
-                             John Weidman
-
-  Sound emulator code used in 1.5-1.51
-  (c) Copyright 1998 - 2003  Brad Martin
-  (c) Copyright 1998 - 2006  Charles Bilyue'
-
-  Sound emulator code used in 1.52+
-  (c) Copyright 2004 - 2007  Shay Green (gblargg@gmail.com)
-
-  S-SMP emulator code used in 1.54+
-  (c) Copyright 2016         byuu
-
-  SH assembler code partly based on x86 assembler code
-  (c) Copyright 2002 - 2004  Marcus Comstedt (marcus@mc.pp.se)
-
-  2xSaI filter
-  (c) Copyright 1999 - 2001  Derek Liauw Kie Fa
-
-  HQ2x, HQ3x, HQ4x filters
-  (c) Copyright 2003         Maxim Stepin (maxim@hiend3d.com)
-
-  NTSC filter
-  (c) Copyright 2006 - 2007  Shay Green
-
-  GTK+ GUI code
-  (c) Copyright 2004 - 2016  BearOso
-
-  Win32 GUI code
-  (c) Copyright 2003 - 2006  blip,
-                             funkyass,
-                             Matthew Kendora,
-                             Nach,
-                             nitsuja
-  (c) Copyright 2009 - 2016  OV2
-
-  Mac OS GUI code
-  (c) Copyright 1998 - 2001  John Stiles
-  (c) Copyright 2001 - 2011  zones
-
-  Libretro port
-  (c) Copyright 2011 - 2016  Hans-Kristian Arntzen,
-                             Daniel De Matteis
-                             (Under no circumstances will commercial rights be given)
-
-
-  Specific ports contains the works of other authors. See headers in
-  individual files.
-
-
-  Snes9x homepage: http://www.snes9x.com/
-
-  Permission to use, copy, modify and/or distribute Snes9x in both binary
-  and source form, for non-commercial purposes, is hereby granted without
-  fee, providing that this license information and copyright notice appear
-  with all copies and any derived work.
-
-  This software is provided 'as-is', without any express or implied
-  warranty. In no event shall the authors be held liable for any damages
-  arising from the use of this software or it's derivatives.
-
-  Snes9x is freeware for PERSONAL USE only. Commercial users should
-  seek permission of the copyright holders first. Commercial use includes,
-  but is not limited to, charging money for Snes9x or software derived from
-  Snes9x, including Snes9x or derivatives in commercial game bundles, and/or
-  using Snes9x as a promotion for your commercial product.
-
-  The copyright holders request that bug fixes and improvements to the code
-  should be forwarded to them so everyone can benefit from the modifications
-  in future versions.
-
-  Super NES and Super Nintendo Entertainment System are trademarks of
-  Nintendo Co., Limited and its subsidiary companies.
+  See snapshot.h for the copyright notice
  ***********************************************************************************/
 
 
@@ -407,131 +222,7 @@ static __thread FreezeData	SnapRegisters[] =
 };
 
 #undef STRUCT
-#define STRUCT	struct SPPU
 
-static __thread FreezeData	SnapPPU[] =
-{
-	INT_ENTRY(6, VMA.High),
-	INT_ENTRY(6, VMA.Increment),
-	INT_ENTRY(6, VMA.Address),
-	INT_ENTRY(6, VMA.Mask1),
-	INT_ENTRY(6, VMA.FullGraphicCount),
-	INT_ENTRY(6, VMA.Shift),
-	INT_ENTRY(6, WRAM),
-#define O(N) \
-	INT_ENTRY(6, BG[N].SCBase), \
-	INT_ENTRY(6, BG[N].HOffset), \
-	INT_ENTRY(6, BG[N].VOffset), \
-	INT_ENTRY(6, BG[N].BGSize), \
-	INT_ENTRY(6, BG[N].NameBase), \
-	INT_ENTRY(6, BG[N].SCSize)
-	O(0), O(1), O(2), O(3),
-#undef O
-	INT_ENTRY(6, BGMode),
-	INT_ENTRY(6, BG3Priority),
-	INT_ENTRY(6, CGFLIP),
-	INT_ENTRY(6, CGFLIPRead),
-	INT_ENTRY(6, CGADD),
-	ARRAY_ENTRY(6, CGDATA, 256, uint16_ARRAY_V),
-#define O(N) \
-	INT_ENTRY(6, OBJ[N].HPos), \
-	INT_ENTRY(6, OBJ[N].VPos), \
-	INT_ENTRY(6, OBJ[N].HFlip), \
-	INT_ENTRY(6, OBJ[N].VFlip), \
-	INT_ENTRY(6, OBJ[N].Name), \
-	INT_ENTRY(6, OBJ[N].Priority), \
-	INT_ENTRY(6, OBJ[N].Palette), \
-	INT_ENTRY(6, OBJ[N].Size)
-	O(  0), O(  1), O(  2), O(  3), O(  4), O(  5), O(  6), O(  7),
-	O(  8), O(  9), O( 10), O( 11), O( 12), O( 13), O( 14), O( 15),
-	O( 16), O( 17), O( 18), O( 19), O( 20), O( 21), O( 22), O( 23),
-	O( 24), O( 25), O( 26), O( 27), O( 28), O( 29), O( 30), O( 31),
-	O( 32), O( 33), O( 34), O( 35), O( 36), O( 37), O( 38), O( 39),
-	O( 40), O( 41), O( 42), O( 43), O( 44), O( 45), O( 46), O( 47),
-	O( 48), O( 49), O( 50), O( 51), O( 52), O( 53), O( 54), O( 55),
-	O( 56), O( 57), O( 58), O( 59), O( 60), O( 61), O( 62), O( 63),
-	O( 64), O( 65), O( 66), O( 67), O( 68), O( 69), O( 70), O( 71),
-	O( 72), O( 73), O( 74), O( 75), O( 76), O( 77), O( 78), O( 79),
-	O( 80), O( 81), O( 82), O( 83), O( 84), O( 85), O( 86), O( 87),
-	O( 88), O( 89), O( 90), O( 91), O( 92), O( 93), O( 94), O( 95),
-	O( 96), O( 97), O( 98), O( 99), O(100), O(101), O(102), O(103),
-	O(104), O(105), O(106), O(107), O(108), O(109), O(110), O(111),
-	O(112), O(113), O(114), O(115), O(116), O(117), O(118), O(119),
-	O(120), O(121), O(122), O(123), O(124), O(125), O(126), O(127),
-#undef O
-	INT_ENTRY(6, OBJThroughMain),
-	INT_ENTRY(6, OBJThroughSub),
-	INT_ENTRY(6, OBJAddition),
-	INT_ENTRY(6, OBJNameBase),
-	INT_ENTRY(6, OBJNameSelect),
-	INT_ENTRY(6, OBJSizeSelect),
-	INT_ENTRY(6, OAMAddr),
-	INT_ENTRY(6, SavedOAMAddr),
-	INT_ENTRY(6, OAMPriorityRotation),
-	INT_ENTRY(6, OAMFlip),
-	INT_ENTRY(6, OAMReadFlip),
-	INT_ENTRY(6, OAMTileAddress),
-	INT_ENTRY(6, OAMWriteRegister),
-	ARRAY_ENTRY(6, OAMData, 512 + 32, uint8_ARRAY_V),
-	INT_ENTRY(6, FirstSprite),
-	INT_ENTRY(6, LastSprite),
-	INT_ENTRY(6, HTimerEnabled),
-	INT_ENTRY(6, VTimerEnabled),
-	INT_ENTRY(6, HTimerPosition),
-	INT_ENTRY(6, VTimerPosition),
-	INT_ENTRY(6, IRQHBeamPos),
-	INT_ENTRY(6, IRQVBeamPos),
-	INT_ENTRY(6, HBeamFlip),
-	INT_ENTRY(6, VBeamFlip),
-	INT_ENTRY(6, HBeamPosLatched),
-	INT_ENTRY(6, VBeamPosLatched),
-	INT_ENTRY(6, GunHLatch),
-	INT_ENTRY(6, GunVLatch),
-	INT_ENTRY(6, HVBeamCounterLatched),
-	INT_ENTRY(6, Mode7HFlip),
-	INT_ENTRY(6, Mode7VFlip),
-	INT_ENTRY(6, Mode7Repeat),
-	INT_ENTRY(6, MatrixA),
-	INT_ENTRY(6, MatrixB),
-	INT_ENTRY(6, MatrixC),
-	INT_ENTRY(6, MatrixD),
-	INT_ENTRY(6, CentreX),
-	INT_ENTRY(6, CentreY),
-	INT_ENTRY(6, M7HOFS),
-	INT_ENTRY(6, M7VOFS),
-	INT_ENTRY(6, Mosaic),
-	INT_ENTRY(6, MosaicStart),
-	ARRAY_ENTRY(6, BGMosaic, 4, uint8_ARRAY_V),
-	INT_ENTRY(6, Window1Left),
-	INT_ENTRY(6, Window1Right),
-	INT_ENTRY(6, Window2Left),
-	INT_ENTRY(6, Window2Right),
-	INT_ENTRY(6, RecomputeClipWindows),
-#define O(N) \
-	INT_ENTRY(6, ClipCounts[N]), \
-	INT_ENTRY(6, ClipWindowOverlapLogic[N]), \
-	INT_ENTRY(6, ClipWindow1Enable[N]), \
-	INT_ENTRY(6, ClipWindow2Enable[N]), \
-	INT_ENTRY(6, ClipWindow1Inside[N]), \
-	INT_ENTRY(6, ClipWindow2Inside[N])
-	O(0), O(1), O(2), O(3), O(4), O(5),
-#undef O
-	INT_ENTRY(6, ForcedBlanking),
-	INT_ENTRY(6, FixedColourRed),
-	INT_ENTRY(6, FixedColourGreen),
-	INT_ENTRY(6, FixedColourBlue),
-	INT_ENTRY(6, Brightness),
-	INT_ENTRY(6, ScreenHeight),
-	INT_ENTRY(6, Need16x8Mulitply),
-	INT_ENTRY(6, BGnxOFSbyte),
-	INT_ENTRY(6, M7byte),
-	INT_ENTRY(6, HDMA),
-	INT_ENTRY(6, HDMAEnded),
-	INT_ENTRY(6, OpenBus1),
-	INT_ENTRY(6, OpenBus2)
-};
-
-#undef STRUCT
 #define STRUCT	struct SDMASnapshot
 
 static __thread FreezeData	SnapDMA[] =
@@ -1212,8 +903,7 @@ void S9xFreezeToStream (STREAM stream)
 
 	FreezeStruct(stream, "REG", &Registers, SnapRegisters, COUNT(SnapRegisters));
 
-
- if (_enablePPUBlock) FreezeStruct(stream, "PPU", &PPU, SnapPPU, COUNT(SnapPPU));
+	if (_enablePPUBlock) FreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
 
 	if (_enableDMABlock)
 	{
@@ -1330,7 +1020,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 	uint8	*local_cpu           = NULL;
 	uint8	*local_registers     = NULL;
-	uint8	*local_ppu           = NULL;
 	uint8	*local_dma           = NULL;
 	uint8	*local_vram          = NULL;
 	uint8	*local_ram           = NULL;
@@ -1369,7 +1058,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 
   if (_enablePPUBlock)
 		{
-			result = UnfreezeStructCopy(stream, "PPU", &local_ppu, SnapPPU, COUNT(SnapPPU), version);
+			result = UnfreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
 			if (result != SUCCESS)
 				break;
 		}
@@ -1536,8 +1225,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 		UnfreezeStructFromCopy(&CPU, SnapCPU, COUNT(SnapCPU), local_cpu, version);
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-		if (_enablePPUBlock) UnfreezeStructFromCopy(&PPU, SnapPPU, COUNT(SnapPPU), local_ppu, version);
 
 	 	struct SDMASnapshot	dma_snap;
   if (_enableDMABlock) 	UnfreezeStructFromCopy(&dma_snap, SnapDMA, COUNT(SnapDMA), local_dma, version);
@@ -1715,7 +1402,6 @@ if (_enableTIMBlock)
 
 	if (local_cpu)				delete [] local_cpu;
 	if (local_registers)		delete [] local_registers;
-	if (local_ppu)				delete [] local_ppu;
 	if (local_dma)				delete [] local_dma;
 	if (local_vram)				delete [] local_vram;
 	if (local_ram)				delete [] local_ram;
