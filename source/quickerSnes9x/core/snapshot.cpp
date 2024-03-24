@@ -919,7 +919,7 @@ void S9xFreezeToStream (STREAM stream)
 
 	if (_enableSRABlock) FreezeBlock (stream, "SRA", Memory.SRAM, 0x20000);
 
-	if (_enableFILBlock)FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
+	if (_enableFILBlock) FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
 
 	if (_enableSNDBlock)
 	{
@@ -953,13 +953,13 @@ void S9xFreezeToStream (STREAM stream)
 	}
 
 	if (Settings.DSP == 1)
-		FreezeStruct(stream, "DP1", &DSP1, SnapDSP1, COUNT(SnapDSP1));
+	 FreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
 
 	if (Settings.DSP == 2)
-		FreezeStruct(stream, "DP2", &DSP2, SnapDSP2, COUNT(SnapDSP2));
+	 FreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
 
 	if (Settings.DSP == 4)
-		FreezeStruct(stream, "DP4", &DSP4, SnapDSP4, COUNT(SnapDSP4));
+	 FreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
 
 	if (Settings.C4)
 		FreezeBlock (stream, "CX4", Memory.C4RAM, 8192);
@@ -1021,19 +1021,12 @@ int S9xUnfreezeFromStream (STREAM stream)
 	uint8	*local_cpu           = NULL;
 	uint8	*local_registers     = NULL;
 	uint8	*local_dma           = NULL;
-	uint8	*local_vram          = NULL;
-	uint8	*local_ram           = NULL;
-	uint8	*local_sram          = NULL;
-	uint8	*local_fillram       = NULL;
 	uint8	*local_apu_sound     = NULL;
 	uint8	*local_control_data  = NULL;
 	uint8	*local_timing_data   = NULL;
 	uint8	*local_superfx       = NULL;
 	uint8	*local_sa1           = NULL;
 	uint8	*local_sa1_registers = NULL;
-	uint8	*local_dsp1          = NULL;
-	uint8	*local_dsp2          = NULL;
-	uint8	*local_dsp4          = NULL;
 	uint8	*local_cx4_data      = NULL;
 	uint8	*local_st010         = NULL;
 	uint8	*local_obc1          = NULL;
@@ -1072,28 +1065,28 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 		if (_enableVRABlock)
 		{
-			result = UnfreezeBlockCopy (stream, "VRA", &local_vram, 0x10000);
+			result = UnfreezeBlock(stream, "VRA", (uint8_t*)Memory.VRAM, 0x10000);
 			if (result != SUCCESS)
 				break;
 		}
 
 		if (_enableRAMBlock)
 		{
-			result = UnfreezeBlockCopy (stream, "RAM", &local_ram, 0x20000);
+			result = UnfreezeBlock(stream, "RAM", (uint8_t*)Memory.RAM, 0x20000);
 			if (result != SUCCESS)
 				break;
 		}
 
 		if (_enableSRABlock)
 		{
-			result = UnfreezeBlockCopy (stream, "SRA", &local_sram, 0x20000);
+			result = UnfreezeBlock(stream, "SRA", (uint8_t*)Memory.SRAM, 0x20000);
 			if (result != SUCCESS)
 				break;
 		}
 
 		if (_enableFILBlock)
 		{
-			result = UnfreezeBlockCopy (stream, "FIL", &local_fillram, 0x8000);
+			result = UnfreezeBlock(stream, "FIL", (uint8_t*)Memory.FillRAM, 0x8000);
 			if (result != SUCCESS)
 				break;
 		}
@@ -1131,17 +1124,9 @@ int S9xUnfreezeFromStream (STREAM stream)
 		if (result != SUCCESS && Settings.SA1)
 			break;
 
-		result = UnfreezeStructCopy(stream, "DP1", &local_dsp1, SnapDSP1, COUNT(SnapDSP1), version);
-		if (result != SUCCESS && Settings.DSP == 1)
-			break;
-
-		result = UnfreezeStructCopy(stream, "DP2", &local_dsp2, SnapDSP2, COUNT(SnapDSP2), version);
-		if (result != SUCCESS && Settings.DSP == 2)
-			break;
-
-		result = UnfreezeStructCopy(stream, "DP4", &local_dsp4, SnapDSP4, COUNT(SnapDSP4), version);
-		if (result != SUCCESS && Settings.DSP == 4)
-			break;
+  if (Settings.DSP == 1) UnfreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
+		if (Settings.DSP == 2) UnfreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
+		if (Settings.DSP == 4) UnfreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
 
 		result = UnfreezeBlockCopy (stream, "CX4", &local_cx4_data, 8192);
 		if (result != SUCCESS && Settings.C4)
@@ -1229,14 +1214,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 	 	struct SDMASnapshot	dma_snap;
   if (_enableDMABlock) 	UnfreezeStructFromCopy(&dma_snap, SnapDMA, COUNT(SnapDMA), local_dma, version);
 
-  if (_enableVRABlock)	memcpy(Memory.VRAM, local_vram, 0x10000);
-
-		if (_enableRAMBlock) memcpy(Memory.RAM, local_ram, 0x20000);
-
-		if (_enableSRABlock) memcpy(Memory.SRAM, local_sram, 0x20000);
-
-		if (_enableFILBlock) memcpy(Memory.FillRAM, local_fillram, 0x8000);
-
 if (_enableSNDBlock)
 {
         if(version < SNAPSHOT_VERSION_BAPU) {
@@ -1266,15 +1243,6 @@ if (_enableTIMBlock)
 
 		if (local_sa1_registers)
 			UnfreezeStructFromCopy(&SA1Registers, SnapSA1Registers, COUNT(SnapSA1Registers), local_sa1_registers, version);
-
-		if (local_dsp1)
-			UnfreezeStructFromCopy(&DSP1, SnapDSP1, COUNT(SnapDSP1), local_dsp1, version);
-
-		if (local_dsp2)
-			UnfreezeStructFromCopy(&DSP2, SnapDSP2, COUNT(SnapDSP2), local_dsp2, version);
-
-		if (local_dsp4)
-			UnfreezeStructFromCopy(&DSP4, SnapDSP4, COUNT(SnapDSP4), local_dsp4, version);
 
 		if (local_cx4_data)
 			memcpy(Memory.C4RAM, local_cx4_data, 8192);
@@ -1403,19 +1371,12 @@ if (_enableTIMBlock)
 	if (local_cpu)				delete [] local_cpu;
 	if (local_registers)		delete [] local_registers;
 	if (local_dma)				delete [] local_dma;
-	if (local_vram)				delete [] local_vram;
-	if (local_ram)				delete [] local_ram;
-	if (local_sram)				delete [] local_sram;
-	if (local_fillram)			delete [] local_fillram;
 	if (local_apu_sound)		delete [] local_apu_sound;
 	if (local_control_data)		delete [] local_control_data;
 	if (local_timing_data)		delete [] local_timing_data;
 	if (local_superfx)			delete [] local_superfx;
 	if (local_sa1)				delete [] local_sa1;
 	if (local_sa1_registers)	delete [] local_sa1_registers;
-	if (local_dsp1)				delete [] local_dsp1;
-	if (local_dsp2)				delete [] local_dsp2;
-	if (local_dsp4)				delete [] local_dsp4;
 	if (local_cx4_data)			delete [] local_cx4_data;
 	if (local_st010)			delete [] local_st010;
 	if (local_obc1)				delete [] local_obc1;
