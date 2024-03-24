@@ -295,58 +295,6 @@ static __thread FreezeData	SnapFX[] =
 };
 
 #undef STRUCT
-#define STRUCT	struct SSA1
-
-static __thread FreezeData	SnapSA1[] =
-{
-	DELETED_INT_ENTRY(6, 7, CPUExecuting, 1),
-	INT_ENTRY(6, ShiftedPB),
-	INT_ENTRY(6, ShiftedDB),
-	INT_ENTRY(6, Flags),
-	DELETED_INT_ENTRY(6, 7, IRQActive, 1),
-	DELETED_INT_ENTRY(6, 7, Waiting, 1),
-	INT_ENTRY(6, WaitingForInterrupt),
-	DELETED_INT_ENTRY(6, 7, WaitAddress, 4),
-	DELETED_INT_ENTRY(6, 7, WaitCounter, 4),
-	DELETED_INT_ENTRY(6, 7, PBPCAtOpcodeStart, 4),
-	DELETED_INT_ENTRY(6, 7, Executing, 1),
-	INT_ENTRY(6, overflow),
-	INT_ENTRY(6, in_char_dma),
-	INT_ENTRY(6, op1),
-	INT_ENTRY(6, op2),
-	INT_ENTRY(6, arithmetic_op),
-	INT_ENTRY(6, sum),
-	INT_ENTRY(6, VirtualBitmapFormat),
-	INT_ENTRY(6, variable_bit_pos),
-	INT_ENTRY(7, Cycles),
-	INT_ENTRY(7, PrevCycles),
-	INT_ENTRY(7, TimerIRQLastState),
-	INT_ENTRY(7, HTimerIRQPos),
-	INT_ENTRY(7, VTimerIRQPos),
-	INT_ENTRY(7, HCounter),
-	INT_ENTRY(7, VCounter),
-	INT_ENTRY(7, PrevHCounter),
-	INT_ENTRY(7, MemSpeed),
-	INT_ENTRY(7, MemSpeedx2)
-};
-
-#undef STRUCT
-#define STRUCT	struct SSA1Registers
-
-static __thread FreezeData	SnapSA1Registers[] =
-{
-	INT_ENTRY(6, PB),
-	INT_ENTRY(6, DB),
-	INT_ENTRY(6, P.W),
-	INT_ENTRY(6, A.W),
-	INT_ENTRY(6, D.W),
-	INT_ENTRY(6, S.W),
-	INT_ENTRY(6, X.W),
-	INT_ENTRY(6, Y.W),
-	INT_ENTRY(6, PCw)
-};
-
-#undef STRUCT
 
 #define STRUCT	struct SST010
 
@@ -471,15 +419,10 @@ void S9xFreezeToStream (STREAM stream)
 	FreezeStruct(stream, "REG", &Registers, SnapRegisters, COUNT(SnapRegisters));
 
 	if (_enablePPUBlock) FreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
-
 	if (_enableDMABlock)	FreezeBlock(stream, "DMA", (uint8_t*) &DMA, sizeof(DMA));
-
  if (_enableVRABlock)	FreezeBlock (stream, "VRA", Memory.VRAM, 0x10000);
-
 	if (_enableRAMBlock) FreezeBlock (stream, "RAM", Memory.RAM, 0x20000);
-
 	if (_enableSRABlock) FreezeBlock (stream, "SRA", Memory.SRAM, 0x20000);
-
 	if (_enableFILBlock) FreezeBlock (stream, "FIL", Memory.FillRAM, 0x8000);
 
 	if (_enableSNDBlock)
@@ -500,34 +443,25 @@ void S9xFreezeToStream (STREAM stream)
 	if (Settings.SuperFX)
 	{
 		GSU.avRegAddr = (uint8 *) &GSU.avReg;
-		FreezeStruct(stream, "SFX", &GSU, SnapFX, COUNT(SnapFX));
+		FreezeBlock(stream, "SFX", (uint8_t*) &GSU, sizeof(GSU));
 	}
 
 	if (Settings.SA1)
 	{
 		S9xSA1PackStatus();
-		FreezeStruct(stream, "SA1", &SA1, SnapSA1, COUNT(SnapSA1));
-		FreezeStruct(stream, "SAR", &SA1Registers, SnapSA1Registers, COUNT(SnapSA1Registers));
+		FreezeBlock(stream, "SA1", (uint8_t*) &SA1, sizeof(SA1));
+		FreezeBlock(stream, "SAR", (uint8_t*) &SA1Registers, sizeof(SA1Registers));
 	}
 
-	if (Settings.DSP == 1)
-	 FreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
-
-	if (Settings.DSP == 2)
-	 FreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
-
-	if (Settings.DSP == 4)
-	 FreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
-
-	if (Settings.C4)
-		FreezeBlock (stream, "CX4", Memory.C4RAM, 8192);
-
-	if (Settings.SETA == ST_010)
-		FreezeStruct(stream, "ST0", &ST010, SnapST010, COUNT(SnapST010));
+	if (Settings.DSP == 1) FreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
+	if (Settings.DSP == 2) FreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
+	if (Settings.DSP == 4)FreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
+	if (Settings.C4)	FreezeBlock (stream, "CX4", Memory.C4RAM, 8192);
+	if (Settings.SETA == ST_010)	FreezeBlock(stream, "ST0", (uint8_t*) &ST010, sizeof(ST010));
 
 	if (Settings.OBC1)
 	{
-		FreezeStruct(stream, "OBC", &OBC1, SnapOBC1, COUNT(SnapOBC1));
+		FreezeBlock(stream, "OBC", (uint8_t*) &OBC1, sizeof(OBC1));
 		FreezeBlock (stream, "OBM", Memory.OBC1RAM, 8192);
 	}
 
@@ -540,17 +474,12 @@ void S9xFreezeToStream (STREAM stream)
 	if (Settings.SRTC)
 	{
 		S9xSRTCPreSaveState();
-		FreezeStruct(stream, "SRT", &srtcsnap, SnapSRTCSnap, COUNT(SnapSRTCSnap));
+		FreezeBlock(stream, "SRT", (uint8_t*) &srtcsnap, sizeof(srtcsnap));
 	}
 
-	if (Settings.SRTC || Settings.SPC7110RTC)
-		FreezeBlock (stream, "CLK", RTCData.reg, 20);
-
-	if (Settings.BS)
-		FreezeStruct(stream, "BSX", &BSX, SnapBSX, COUNT(SnapBSX));
-
-	if (Settings.MSU1)
-		FreezeStruct(stream, "MSU", &MSU1, SnapMSU1, COUNT(SnapMSU1));
+	if (Settings.SRTC || Settings.SPC7110RTC) FreezeBlock (stream, "CLK", RTCData.reg, 20);
+	if (Settings.BS) FreezeBlock(stream, "BSX", (uint8_t*)&BSX, sizeof(BSX));
+	if (Settings.MSU1)	FreezeBlock(stream, "MSU", (uint8_t*)&MSU1, sizeof(MSU1));
 }
 
 int S9xUnfreezeFromStream (STREAM stream)
@@ -559,15 +488,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 	int version = SNAPSHOT_VERSION;
 	
 	uint8	*local_registers     = NULL;
-	uint8	*local_sa1_registers = NULL;
-	uint8	*local_cx4_data      = NULL;
-	uint8	*local_st010         = NULL;
-	uint8	*local_obc1          = NULL;
-	uint8	*local_obc1_data     = NULL;
-	uint8	*local_srtc          = NULL;
-	uint8	*local_rtc_data      = NULL;
-	uint8	*local_bsx_data      = NULL;
-	uint8	*local_msu1_data     = NULL;
 
 struct SControlSnapshot	ctl_snap;
 
@@ -579,6 +499,7 @@ struct SControlSnapshot	ctl_snap;
 		if (_enableRAMBlock) UnfreezeBlock(stream, "RAM", (uint8_t*)Memory.RAM, 0x20000);
 		if (_enableSRABlock) UnfreezeBlock(stream, "SRA", (uint8_t*)Memory.SRAM, 0x20000);
 		if (_enableFILBlock) UnfreezeBlock(stream, "FIL", (uint8_t*)Memory.FillRAM, 0x8000);
+
 		if (_enableSNDBlock)
 		{
 			uint8_t soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
@@ -619,44 +540,24 @@ struct SControlSnapshot	ctl_snap;
   if (Settings.DSP == 1) UnfreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
 		if (Settings.DSP == 2) UnfreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
 		if (Settings.DSP == 4) UnfreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
-		if (Settings.C4) UnfreezeBlockCopy (stream, "CX4", &local_cx4_data, 8192);
-		if (Settings.SETA == ST_010) UnfreezeStructCopy(stream, "ST0", &local_st010, SnapST010, COUNT(SnapST010), version);
+		if (Settings.C4) UnfreezeBlock (stream, "CX4", (uint8_t*) Memory.C4RAM, 8192);
+		if (Settings.SETA == ST_010) UnfreezeBlock(stream, "ST0", (uint8_t*) &ST010, sizeof(ST010));
 
-		if (Settings.OBC1) UnfreezeStructCopy(stream, "OBC", &local_obc1, SnapOBC1, COUNT(SnapOBC1), version);
-	 if (Settings.OBC1) UnfreezeBlockCopy (stream, "OBM", &local_obc1_data, 8192);
+		if (Settings.OBC1)
+		{
+    UnfreezeBlock(stream, "OBC", (uint8_t*)&OBC1, sizeof(OBC1));
+	   UnfreezeBlock(stream, "OBM", Memory.OBC1RAM, 8192);
+		}
+		
 	 if (Settings.SPC7110) UnfreezeBlock(stream, "S71", (uint8_t*)&s7snap, sizeof(s7snap));
-  if (Settings.SRTC) UnfreezeStructCopy(stream, "SRT", &local_srtc, SnapSRTCSnap, COUNT(SnapSRTCSnap), version);
-  if (Settings.SPC7110RTC) UnfreezeBlockCopy (stream, "CLK", &local_rtc_data, 20);
-		if (Settings.BS) UnfreezeStructCopy(stream, "BSX", &local_bsx_data, SnapBSX, COUNT(SnapBSX), version);
-  if (Settings.MSU1) UnfreezeStructCopy(stream, "MSU", &local_msu1_data, SnapMSU1, COUNT(SnapMSU1), version);
+  if (Settings.SRTC) UnfreezeBlock(stream, "SRT", (uint8_t*) &srtcsnap, sizeof(srtcsnap));
+  if (Settings.SRTC || Settings.SPC7110RTC) UnfreezeBlock (stream, "CLK", (uint8_t*) RTCData.reg, 20);
+		if (Settings.BS) UnfreezeBlock(stream, "BSX", (uint8_t*) &BSX, sizeof(BSX));
+  if (Settings.MSU1) UnfreezeBlock(stream, "MSU", (uint8_t*) &MSU1, sizeof(MSU1));
 		
 		uint32 old_flags     = CPU.Flags;
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-		if (local_cx4_data)
-			memcpy(Memory.C4RAM, local_cx4_data, 8192);
-
-		if (local_st010)
-			UnfreezeStructFromCopy(&ST010, SnapST010, COUNT(SnapST010), local_st010, version);
-
-		if (local_obc1)
-			UnfreezeStructFromCopy(&OBC1, SnapOBC1, COUNT(SnapOBC1), local_obc1, version);
-
-		if (local_obc1_data)
-			memcpy(Memory.OBC1RAM, local_obc1_data, 8192);
-
-		if (local_srtc)
-			UnfreezeStructFromCopy(&srtcsnap, SnapSRTCSnap, COUNT(SnapSRTCSnap), local_srtc, version);
-
-		if (local_rtc_data)
-			memcpy(RTCData.reg, local_rtc_data, 20);
-
-		if (local_bsx_data)
-			UnfreezeStructFromCopy(&BSX, SnapBSX, COUNT(SnapBSX), local_bsx_data, version);
-
-		if (local_msu1_data)
-			UnfreezeStructFromCopy(&MSU1, SnapMSU1, COUNT(SnapMSU1), local_msu1_data, version);
 
 		if (version < SNAPSHOT_VERSION_IRQ)
 		{
@@ -700,30 +601,14 @@ struct SControlSnapshot	ctl_snap;
 
 		S9xControlPostLoadState(&ctl_snap);
 
-		if (Settings.SDD1)
-			S9xSDD1PostLoadState();
-
-			if (Settings.SPC7110)	S9xSPC7110PostLoadState(version);
-
-		if (local_srtc)
-			S9xSRTCPostLoadState(version);
-
-		if (local_bsx_data)
-			S9xBSXPostLoadState();
-
-		if (local_msu1_data)
-			S9xMSU1PostLoadState();
+		if (Settings.SDD1)	S9xSDD1PostLoadState();
+		if (Settings.SPC7110)	S9xSPC7110PostLoadState(version);
+		if (Settings.SRTC) S9xSRTCPostLoadState(version);
+		if (Settings.BS)	S9xBSXPostLoadState();
+		if (Settings.MSU1)	S9xMSU1PostLoadState();
 
 
 	if (local_registers)		delete [] local_registers;
-	if (local_sa1_registers)	delete [] local_sa1_registers;
-	if (local_cx4_data)			delete [] local_cx4_data;
-	if (local_st010)			delete [] local_st010;
-	if (local_obc1)				delete [] local_obc1;
-	if (local_obc1_data)		delete [] local_obc1_data;
-	if (local_srtc)				delete [] local_srtc;
-	if (local_rtc_data)			delete [] local_rtc_data;
-	if (local_bsx_data)			delete [] local_bsx_data;
 
 	return 0;
 }
