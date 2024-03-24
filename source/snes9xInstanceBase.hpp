@@ -3,6 +3,10 @@
 #include <jaffarCommon/hash.hpp>
 #include <jaffarCommon/exceptions.hpp>
 #include <jaffarCommon/file.hpp>
+#include <jaffarCommon/serializers/base.hpp>
+#include <jaffarCommon/deserializers/base.hpp>
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
 #include "controller.hpp"
 
 #include "snes9x.h"
@@ -31,7 +35,7 @@ class EmuInstanceBase
   inline void advanceState(const std::string &move)
   {
     bool isInputValid = _controller.parseInputString(move);
-    if (isInputValid == false) ("Move provided cannot be parsed: '%s'\n", move.c_str());
+    if (isInputValid == false) JAFFAR_THROW_LOGIC("Move provided cannot be parsed: '%s'\n", move.c_str());
 
     // Parsing power
     if (_controller.getPowerButtonState() == true) JAFFAR_THROW_RUNTIME("Power button pressed, but not supported: '%s'\n", move.c_str());
@@ -66,8 +70,6 @@ class EmuInstanceBase
     if (isTypeRecognized == false) JAFFAR_THROW_RUNTIME("Input type not recognized: '%s'\n", type.c_str());
   }
 
-  inline std::string getRomSHA1() const { return _romSHA1String; }
-
   inline jaffarCommon::hash::hash_t getStateHash() const
   {
     MetroHash128 hash;
@@ -79,47 +81,14 @@ class EmuInstanceBase
     return result;
   }
 
-  inline void enableRendering()
-   {
-      S9xInitInputDevices();
-      S9xInitDisplay(0, NULL);
-      S9xSetupDefaultKeymap();
-      S9xTextMode();
-      S9xGraphicsMode();
-      S9xSetTitle(String);
+  virtual void enableRendering() = 0;
+  virtual void disableRendering() = 0;
 
-     _doRendering = true; 
-   };
-  inline void disableRendering() { _doRendering = false; };
-
-  inline void loadStateFile(const std::string &stateFilePath)
+  inline void loadROMFile(const std::string &romData)
   {
-    std::string stateData;
-    bool status = jaffarCommon::file::loadStringFromFile(stateData, stateFilePath);
-    if (status == false) JAFFAR_THROW_RUNTIME("Could not find/read state file: %s\n", stateFilePath.c_str());
-    deserializeFullState((uint8_t *)stateData.data());
-  }
-
-  inline void saveStateFile(const std::string &stateFilePath) const
-  {
-    std::string stateData;
-    stateData.resize(_fullStateSize);
-    serializeFullState((uint8_t *)stateData.data());
-    jaffarCommon::file::saveStringToFile(stateData, stateFilePath.c_str());
-  }
-
-  inline void loadROMFile(const std::string &romFilePath)
-  {
-    // Loading ROM data
-    bool status = jaffarCommon::file::loadStringFromFile(_romData, romFilePath);
-    if (status == false) JAFFAR_THROW_RUNTIME("Could not find/read ROM file: %s\n", romFilePath.c_str());
-
-    // Calculating ROM hash value
-    _romSHA1String = jaffarCommon::hash::getSHA1String(_romData);
-
     // Actually loading rom file
-    status = loadROMFileImpl(_romData);
-    if (status == false) JAFFAR_THROW_RUNTIME("Could not process ROM file: %s\n", romFilePath.c_str());
+    auto status = loadROMFileImpl(romData);
+    if (status == false) JAFFAR_THROW_RUNTIME("Could not process ROM file");
 
     // Detecting full state size
     _fullStateSize = getFullStateSize();
@@ -132,10 +101,12 @@ class EmuInstanceBase
 
   virtual bool loadROMFileImpl(const std::string &romData) = 0;
   virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
-  virtual void serializeFullState(uint8_t *state) const = 0;
-  virtual void deserializeFullState(const uint8_t *state) = 0;
-  virtual void serializeLiteState(uint8_t *state) const = 0;
-  virtual void deserializeLiteState(const uint8_t *state) = 0;
+
+  virtual size_t getDifferentialStateSize() const = 0;
+  virtual void serializeFullState(jaffarCommon::serializer::Base& s) const = 0;
+  virtual void deserializeFullState(jaffarCommon::deserializer::Base& d) = 0;
+  virtual void serializeLiteState(jaffarCommon::serializer::Base& s) const = 0;
+  virtual void deserializeLiteState(jaffarCommon::deserializer::Base& d) = 0;
   virtual size_t getFullStateSize() const = 0;
   virtual size_t getLiteStateSize() const = 0;
   virtual void enableLiteStateBlock(const std::string& block) = 0;
@@ -153,15 +124,8 @@ class EmuInstanceBase
   // Storage for the full state size
   size_t _fullStateSize;
 
-  // Flag to determine whether to enable/disable rendering
-  bool _doRendering = true;
-
   private:
-  // Storage for the ROM data
-  std::string _romData;
 
-  // SHA1 rom hash
-  std::string _romSHA1String;
 
   // Controller class for input parsing
   Controller _controller;

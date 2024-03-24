@@ -5,5 +5,11 @@
   "Sequence File": "princeOfPersia.anyPercent.sol",
   "Disable State Blocks": [ "SRA", "VRA", "CTL" ],
   "Controller 1 Type": "Joypad",
-  "Controller 2 Type": "None"
+  "Controller 2 Type": "None",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
 }

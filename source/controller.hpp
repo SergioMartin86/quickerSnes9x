@@ -8,6 +8,9 @@
 #include <sstream>
 #include <snes9x.h>
 
+namespace snes9x 
+{
+
 class Controller
 {
 public:
@@ -192,3 +195,5 @@ public:
   controller_t _controller1Type;
   controller_t _controller2Type;
 };
+
+} // namespace snes9x

@@ -23,8 +23,8 @@ class PlaybackInstance
    _emu(emu),
    _storeInterval(storeInterval)
   {
-    // Enabling emulation rendering
-    _emu->enableRendering();
+    // Getting full state size
+    _fullStateSize = _emu->getFullStateSize();  
 
     // Building sequence information
     for (size_t i = 0; i < sequence.size(); i++)
@@ -34,15 +34,16 @@ class PlaybackInstance
       step.input = sequence[i];
 
       // Serializing state
-      uint8_t stateData[_emu->getFullStateSize()];
-      _emu->serializeFullState(stateData);
+      uint8_t stateData[_fullStateSize];
+      jaffarCommon::serializer::Contiguous s(stateData, _fullStateSize);
+      _emu->serializeFullState(s);
       step.hash = _emu->getStateHash();
 
       // Only save data if within store interval
       if (i % storeInterval == 0)
       {
-        step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
-        memcpy(step.stateData, stateData, _emu->getFullStateSize());
+        step.stateData = (uint8_t *)malloc(_fullStateSize);
+        memcpy(step.stateData, stateData, _fullStateSize);
       }
 
       // Adding the step into the sequence
@@ -55,8 +56,10 @@ class PlaybackInstance
     // Adding last step with no input
     stepData_t step;
     step.input = "<End Of Sequence>";
-    step.stateData = (uint8_t *)malloc(_emu->getFullStateSize());
-    _emu->serializeFullState(step.stateData);
+    step.stateData = (uint8_t *)malloc(_fullStateSize);
+    jaffarCommon::serializer::Contiguous s(step.stateData, _fullStateSize);
+
+    _emu->serializeFullState(s);
     step.hash = _emu->getStateHash();
 
     // Adding the step into the sequence
@@ -78,7 +81,8 @@ class PlaybackInstance
 
     // Else we load the requested step
     const auto stateData = getStateData(newStepId);
-    _emu->deserializeFullState(stateData);
+    jaffarCommon::deserializer::Contiguous d(stateData, _fullStateSize);
+    _emu->deserializeFullState(d);
 
     // Updating image
      doRendering = true;
@@ -149,4 +153,7 @@ class PlaybackInstance
 
   // State storage interval
   const size_t _storeInterval;
+
+  // Full size of the game state
+  size_t _fullStateSize;
 };

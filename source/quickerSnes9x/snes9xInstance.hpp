@@ -44,29 +44,55 @@ class EmuInstance : public EmuInstanceBase
     return true;
   }
 
-  void serializeFullState(uint8_t *state) const override
+  void enableRendering() override
   {
-    memStream stream(state, _fullStateSize);
-    S9xFreezeToStream(&stream);
+    doRendering = true;
+    S9xInitInputDevices();
+    S9xInitDisplay(0, NULL);
+    S9xSetupDefaultKeymap();
+    S9xTextMode();
+    S9xGraphicsMode();
+    S9xSetTitle(String);
   }
 
-  void deserializeFullState(const uint8_t *state) override
+  void disableRendering() override
   {
-    // Loading state object into the emulator
-    memStream stream(state, _fullStateSize);
+    doRendering = false;
+  }
+
+  void serializeFullState(jaffarCommon::serializer::Base& s) const override
+  {
+    std::string stateData;
+    stateData.resize(_fullStateSize);
+    memStream stream((uint8_t*)stateData.data(), stateData.size());
+    S9xFreezeToStream(&stream);
+    s.push(stateData.data(), _fullStateSize);
+  }
+
+  void deserializeFullState(jaffarCommon::deserializer::Base& d) override
+  {
+    std::string stateData;
+    stateData.resize(_fullStateSize);
+    d.pop(stateData.data(),stateData.size());
+    memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xUnfreezeFromStream(&stream);
   }
 
-  void serializeLiteState(uint8_t *state) const override
+  void serializeLiteState(jaffarCommon::serializer::Base& s) const override
   {
-    memStream stream(state, _liteStateSize);
+    std::string stateData;
+    stateData.resize(_liteStateSize);
+    memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xFreezeToStreamLite(&stream);
+    s.push(stateData.data(), stateData.size());
   }
 
-  void deserializeLiteState(const uint8_t *state) override
+  void deserializeLiteState(jaffarCommon::deserializer::Base& d) override
   {
-    // Loading state object into the emulator
-    memStream stream(state, _liteStateSize);
+    std::string stateData;
+    stateData.resize(_liteStateSize);
+    d.pop(stateData.data(),stateData.size());
+    memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xUnfreezeFromStreamLite(&stream);
   }
 
@@ -80,6 +106,7 @@ class EmuInstance : public EmuInstanceBase
     return S9xFreezeSizeLite();
   }
 
+  inline size_t getDifferentialStateSize() const override { return getFullStateSize(); }
 
   void enableLiteStateBlock(const std::string& block)
   { 

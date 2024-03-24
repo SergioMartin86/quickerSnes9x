@@ -5,5 +5,11 @@
   "Sequence File": "christmasCraze.playaround.sol",
   "Disable State Blocks": [ "SRA", "VRA", "CTL", "PPU" ],
   "Controller 1 Type": "Joypad",
-  "Controller 2 Type": "Joypad"
+  "Controller 2 Type": "Joypad",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
 }
