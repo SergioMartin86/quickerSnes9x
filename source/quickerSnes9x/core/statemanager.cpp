@@ -97,39 +97,9 @@ bool StateManager::init(size_t buffer_size) {
 
 int StateManager::pop()
 { 
-    if(!init_done)
         return 0;
 
-    if (first_pop)
-    {
-      first_pop = false;
-      return S9xUnfreezeGameMem((uint8 *)tmp_state,real_state_size);
-    }
 
-    top_ptr = (top_ptr - 1) & buf_size_mask;
-
-    if (top_ptr == bottom_ptr) // Our stack is completely empty... :v
-    {
-      top_ptr = (top_ptr + 1) & buf_size_mask;
-      return 0;
-    }
-
-    while (buffer[top_ptr])
-    {
-      // Apply the xor patch.
-      uint32_t addr = buffer[top_ptr] >> 32;
-      uint32_t xor_ = buffer[top_ptr] & 0xFFFFFFFFU;
-      tmp_state[addr] ^= xor_;
-
-      top_ptr = (top_ptr - 1) & buf_size_mask;
-    }
-
-    if (top_ptr == bottom_ptr) // Our stack is completely empty... :v
-    {
-      top_ptr = (top_ptr + 1) & buf_size_mask; 
-    }
-
-    return S9xUnfreezeGameMem((uint8 *)tmp_state,real_state_size);
 }
 
 void StateManager::reassign_bottom()
@@ -176,16 +146,5 @@ void StateManager::generate_delta(const void *data)
 
 bool StateManager::push()
 {
-    if(!init_done)
         return false;
-    if(!S9xFreezeGameMem((uint8 *)in_state,real_state_size))
-        return false;
-    generate_delta(in_state);
-    uint32 *tmp = tmp_state;
-    tmp_state = in_state;
-    in_state = tmp;
-
-    first_pop = true;
-
-    return true;
 }

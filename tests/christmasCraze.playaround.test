@@ -8,8 +8,8 @@
   "Controller 2 Type": "Joypad",
   "Differential Compression":
   {
-    "Enabled": false,
-    "Max Differences": 2200,
+    "Enabled": true,
+    "Max Differences": 28672,
     "Use Zlib": true
   }
 }

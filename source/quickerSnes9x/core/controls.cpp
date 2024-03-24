@@ -2328,33 +2328,6 @@ void S9xApplyCommand (s9xcommand_t cmd, int16 data1, int16 data2)
 						S9xSetInfoString(buf);
 						break;
 
-					case LoadFreezeFile:
-						S9xUnfreezeGame(S9xChooseFilename(TRUE));
-						break;
-
-					case SaveFreezeFile:
-						S9xFreezeGame(S9xChooseFilename(FALSE));
-						break;
-
-					case LoadOopsFile:
-					{
-						char	filename[PATH_MAX + 1];
-						char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], def[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-						_splitpath(Memory.ROMFilename, drive, dir, def, ext);
-						snprintf(filename, PATH_MAX + 1, "%s%s%s.%.*s", S9xGetDirectory(SNAPSHOT_DIR), SLASH_STR, def, _MAX_EXT - 1, "oops");
-
-						if (S9xUnfreezeGame(filename))
-						{
-							sprintf(buf, "%s.%.*s loaded", def, _MAX_EXT - 1, "oops");
-							S9xSetInfoString (buf);
-						}
-						else
-							S9xMessage(S9X_ERROR, S9X_FREEZE_FILE_NOT_FOUND, "Oops file not found");
-
-						break;
-					}
-
 					case Pause:
 						Settings.Paused = !Settings.Paused;
 						DisplayStateChange("Pause", Settings.Paused);
@@ -2362,60 +2335,6 @@ void S9xApplyCommand (s9xcommand_t cmd, int16 data1, int16 data2)
 						S9xNPSendPause(Settings.Paused);
 					#endif
 						break;
-
-					case QuickLoad000:
-					case QuickLoad001:
-					case QuickLoad002:
-					case QuickLoad003:
-					case QuickLoad004:
-					case QuickLoad005:
-					case QuickLoad006:
-					case QuickLoad007:
-					case QuickLoad008:
-					case QuickLoad009:
-					case QuickLoad010:
-					{
-						char	filename[PATH_MAX + 1];
-						char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], def[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-						_splitpath(Memory.ROMFilename, drive, dir, def, ext);
-						snprintf(filename, PATH_MAX + 1, "%s%s%s.%03d", S9xGetDirectory(SNAPSHOT_DIR), SLASH_STR, def, i - QuickLoad000);
-
-						if (S9xUnfreezeGame(filename))
-						{
-							sprintf(buf, "%s.%03d loaded", def, i - QuickLoad000);
-							S9xSetInfoString(buf);
-						}
-						else
-							S9xMessage(S9X_ERROR, S9X_FREEZE_FILE_NOT_FOUND, "Freeze file not found");
-
-						break;
-					}
-
-					case QuickSave000:
-					case QuickSave001:
-					case QuickSave002:
-					case QuickSave003:
-					case QuickSave004:
-					case QuickSave005:
-					case QuickSave006:
-					case QuickSave007:
-					case QuickSave008:
-					case QuickSave009:
-					case QuickSave010:
-					{
-						char	filename[PATH_MAX + 1];
-						char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], def[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-						_splitpath(Memory.ROMFilename, drive, dir, def, ext);
-						snprintf(filename, PATH_MAX + 1, "%s%s%s.%03d", S9xGetDirectory(SNAPSHOT_DIR), SLASH_STR, def, i - QuickSave000);
-
-						sprintf(buf, "%s.%03d saved", def, i - QuickSave000);
-						S9xSetInfoString(buf);
-
-						S9xFreezeGame(filename);
-						break;
-					}
 
 					case SaveSPC:
 						S9xDumpSPCSnapshot();

@@ -1731,13 +1731,6 @@ int __MAIN (int argc, char **argv)
 	}
 	else
 	{
-		if (snapshot_filename)
-		{
-			uint32	flags = CPU.Flags & (DEBUG_MODE_FLAG | TRACE_FLAG);
-			if (!S9xUnfreezeGame(snapshot_filename))
-				exit(1);
-			CPU.Flags |= flags;
-		}
 		if (unixSettings.rewindBufferSize)
 		{
 			stateMan.init(unixSettings.rewindBufferSize * 1024 * 1024);

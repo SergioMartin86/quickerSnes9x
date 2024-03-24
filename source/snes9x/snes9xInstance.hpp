@@ -59,60 +59,37 @@ class EmuInstance : public EmuInstanceBase
     doRendering = false;
   }
 
-  void serializeFullState(jaffarCommon::serializer::Base& s) const override
+  void serializeState(jaffarCommon::serializer::Base& s) const override
   {
     std::string stateData;
-    stateData.resize(_fullStateSize);
+    stateData.resize(_stateSize);
     memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xFreezeToStream(&stream);
-    s.push(stateData.data(), _fullStateSize);
+    s.pushContiguous(stateData.data(), stateData.size());
   }
 
-  void deserializeFullState(jaffarCommon::deserializer::Base& d) override
+  void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
     std::string stateData;
-    stateData.resize(_fullStateSize);
-    d.pop(stateData.data(),stateData.size());
+    stateData.resize(_stateSize);
+    d.popContiguous(stateData.data(),stateData.size());
     memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xUnfreezeFromStream(&stream);
   }
 
-  void serializeLiteState(jaffarCommon::serializer::Base& s) const override
-  {
-    std::string stateData;
-    stateData.resize(_liteStateSize);
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xFreezeToStream(&stream);
-    s.push(stateData.data(), stateData.size());
-  }
-
-  void deserializeLiteState(jaffarCommon::deserializer::Base& d) override
-  {
-    std::string stateData;
-    stateData.resize(_liteStateSize);
-    d.pop(stateData.data(),stateData.size());
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xUnfreezeFromStream(&stream);
-  }
-
-  size_t getFullStateSize() const override
+  size_t getStateSizeImpl() const override
   {
     return S9xFreezeSize();
   }
 
-  size_t getLiteStateSize() const override
-  {
-    return S9xFreezeSize();
-  }
+  inline size_t getDifferentialStateSizeImpl() const override { return getStateSizeImpl(); }
 
-  inline size_t getDifferentialStateSize() const override { return getFullStateSize(); }
-
-  void enableLiteStateBlock(const std::string& block)
+  void enableLiteStateBlockImpl(const std::string& block)
   {
     // Nothing to do here
   }
 
-  void disableLiteStateBlock(const std::string& block)
+  void disableLiteStateBlockImpl(const std::string& block)
   {
     // Nothing to do here
   }

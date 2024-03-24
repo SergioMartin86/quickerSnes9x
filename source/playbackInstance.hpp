@@ -24,7 +24,7 @@ class PlaybackInstance
    _storeInterval(storeInterval)
   {
     // Getting full state size
-    _fullStateSize = _emu->getFullStateSize();  
+    _fullStateSize = _emu->getStateSize();  
 
     // Building sequence information
     for (size_t i = 0; i < sequence.size(); i++)
@@ -36,7 +36,7 @@ class PlaybackInstance
       // Serializing state
       uint8_t stateData[_fullStateSize];
       jaffarCommon::serializer::Contiguous s(stateData, _fullStateSize);
-      _emu->serializeFullState(s);
+      _emu->serializeState(s);
       step.hash = _emu->getStateHash();
 
       // Only save data if within store interval
@@ -59,7 +59,7 @@ class PlaybackInstance
     step.stateData = (uint8_t *)malloc(_fullStateSize);
     jaffarCommon::serializer::Contiguous s(step.stateData, _fullStateSize);
 
-    _emu->serializeFullState(s);
+    _emu->serializeState(s);
     step.hash = _emu->getStateHash();
 
     // Adding the step into the sequence
@@ -82,7 +82,7 @@ class PlaybackInstance
     // Else we load the requested step
     const auto stateData = getStateData(newStepId);
     jaffarCommon::deserializer::Contiguous d(stateData, _fullStateSize);
-    _emu->deserializeFullState(d);
+    _emu->deserializeState(d);
 
     // Updating image
      doRendering = true;

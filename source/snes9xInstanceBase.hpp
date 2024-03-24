@@ -90,27 +90,38 @@ class EmuInstanceBase
     auto status = loadROMFileImpl(romData);
     if (status == false) JAFFAR_THROW_RUNTIME("Could not process ROM file");
 
-    // Detecting full state size
-    _fullStateSize = getFullStateSize();
-
-    // Detecting lite state size
-    _liteStateSize = getLiteStateSize();
+    _stateSize = getStateSizeImpl();
+    _differentialStateSize = getDifferentialStateSizeImpl();
   }
 
+  void enableStateBlock(const std::string& block) 
+  {
+    enableStateBlockImpl(block);
+    _stateSize = getStateSizeImpl();
+    _differentialStateSize = getDifferentialStateSizeImpl();
+  }
+
+  void disableStateBlock(const std::string& block)
+  {
+     disableStateBlockImpl(block);
+    _stateSize = getStateSizeImpl();
+    _differentialStateSize = getDifferentialStateSizeImpl();
+  }
+
+  inline size_t getStateSize() const 
+  {
+    return _stateSize;
+  }
+
+  inline size_t getDifferentialStateSize() const
+  {
+    return _differentialStateSize;
+  }
+  
   // Virtual functions
 
-  virtual bool loadROMFileImpl(const std::string &romData) = 0;
-  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
-
-  virtual size_t getDifferentialStateSize() const = 0;
-  virtual void serializeFullState(jaffarCommon::serializer::Base& s) const = 0;
-  virtual void deserializeFullState(jaffarCommon::deserializer::Base& d) = 0;
-  virtual void serializeLiteState(jaffarCommon::serializer::Base& s) const = 0;
-  virtual void deserializeLiteState(jaffarCommon::deserializer::Base& d) = 0;
-  virtual size_t getFullStateSize() const = 0;
-  virtual size_t getLiteStateSize() const = 0;
-  virtual void enableLiteStateBlock(const std::string& block) = 0;
-  virtual void disableLiteStateBlock(const std::string& block) = 0;
+  virtual void serializeState(jaffarCommon::serializer::Base& s) const = 0;
+  virtual void deserializeState(jaffarCommon::deserializer::Base& d) = 0;
 
   virtual void doSoftReset() = 0;
   virtual void doHardReset() = 0;
@@ -118,17 +129,25 @@ class EmuInstanceBase
 
   protected:
 
-  // Storage for the light state size
-  size_t _liteStateSize;
+  virtual bool loadROMFileImpl(const std::string &romData) = 0;
+  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
 
-  // Storage for the full state size
-  size_t _fullStateSize;
+  virtual void enableStateBlockImpl(const std::string& block) {};
+  virtual void disableStateBlockImpl(const std::string& block) {};
+
+  virtual size_t getStateSizeImpl() const = 0;
+  virtual size_t getDifferentialStateSizeImpl() const = 0;
+
+  // State size
+  size_t _stateSize;
 
   private:
 
-
   // Controller class for input parsing
   Controller _controller;
+
+  // Differential state size
+  size_t _differentialStateSize;
 };
 
 } // namespace snes9x

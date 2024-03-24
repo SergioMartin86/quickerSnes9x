@@ -124,14 +124,14 @@ int main(int argc, char *argv[])
     std::string stateFileData;
     if (jaffarCommon::file::loadStringFromFile(stateFileData, initialStateFilePath) == false) JAFFAR_THROW_LOGIC("Could not initial state file: %s\n", initialStateFilePath.c_str());
     jaffarCommon::deserializer::Contiguous d(stateFileData.data());
-    e.deserializeFullState(d);
+    e.deserializeState(d);
   }
 
   // Creating playback instance
   auto p = PlaybackInstance(&e, sequence, storeInterval);
 
   // Getting state size
-  auto stateSize = e.getFullStateSize();
+  auto stateSize = e.getStateSize();
 
   // Flag to continue running playback
   bool continueRunning = true;

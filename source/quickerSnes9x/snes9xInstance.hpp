@@ -60,55 +60,32 @@ class EmuInstance : public EmuInstanceBase
     doRendering = false;
   }
 
-  void serializeFullState(jaffarCommon::serializer::Base& s) const override
+  void serializeState(jaffarCommon::serializer::Base& s) const override
   {
     std::string stateData;
-    stateData.resize(_fullStateSize);
+    stateData.resize(_stateSize);
     memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xFreezeToStream(&stream);
-    s.push(stateData.data(), _fullStateSize);
+    s.push(stateData.data(), stateData.size());
   }
 
-  void deserializeFullState(jaffarCommon::deserializer::Base& d) override
+  void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
     std::string stateData;
-    stateData.resize(_fullStateSize);
+    stateData.resize(_stateSize);
     d.pop(stateData.data(),stateData.size());
     memStream stream((uint8_t*)stateData.data(), stateData.size());
     S9xUnfreezeFromStream(&stream);
   }
 
-  void serializeLiteState(jaffarCommon::serializer::Base& s) const override
-  {
-    std::string stateData;
-    stateData.resize(_liteStateSize);
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xFreezeToStreamLite(&stream);
-    s.push(stateData.data(), stateData.size());
-  }
-
-  void deserializeLiteState(jaffarCommon::deserializer::Base& d) override
-  {
-    std::string stateData;
-    stateData.resize(_liteStateSize);
-    d.pop(stateData.data(),stateData.size());
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xUnfreezeFromStreamLite(&stream);
-  }
-
-  size_t getFullStateSize() const override
+  size_t getStateSizeImpl() const override
   {
     return S9xFreezeSize();
   }
 
-  size_t getLiteStateSize() const override
-  {
-    return S9xFreezeSizeLite();
-  }
+  inline size_t getDifferentialStateSizeImpl() const override { return 0; }
 
-  inline size_t getDifferentialStateSize() const override { return getFullStateSize(); }
-
-  void enableLiteStateBlock(const std::string& block)
+  void enableStateBlockImpl(const std::string& block)
   { 
     bool recognizedBlock = false;
     
@@ -126,7 +103,7 @@ class EmuInstance : public EmuInstanceBase
   };
 
 
-  void disableLiteStateBlock(const std::string& block)
+  void disableStateBlockImpl(const std::string& block)
   { 
     bool recognizedBlock = false;
     
