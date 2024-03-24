@@ -464,14 +464,7 @@ extern thread_local bool8 pad_read, pad_read_last;
 
 void S9xFreezeToStream (STREAM stream)
 {
-	char	buffer[1024];
-	uint8	*soundsnapshot = new uint8[SPC_SAVE_STATE_BLOCK_SIZE];
-
-	sprintf(buffer, "%s:%04d\n", SNAPSHOT_MAGIC, SNAPSHOT_VERSION);
-	WRITE_STREAM(buffer, strlen(buffer), stream);
-
-	sprintf(buffer, "NAM:%06d:%s%c", (int) strlen(Memory.ROMFilename) + 1, Memory.ROMFilename, 0);
-	WRITE_STREAM(buffer, strlen(buffer) + 1, stream);
+	uint8	soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
 
 	FreezeBlock(stream, "CPU", (uint8_t*)&CPU, sizeof(CPU));
 
@@ -561,31 +554,12 @@ void S9xFreezeToStream (STREAM stream)
 
 	if (Settings.MSU1)
 		FreezeStruct(stream, "MSU", &MSU1, SnapMSU1, COUNT(SnapMSU1));
-
-	delete [] soundsnapshot;
 }
 
 int S9xUnfreezeFromStream (STREAM stream)
 {
-	int		result = SUCCESS;
-	int		version, len;
-	char	buffer[PATH_MAX + 1];
 
-	len = strlen(SNAPSHOT_MAGIC) + 1 + 4 + 1;
-	if (READ_STREAM(buffer, len, stream) != len)
-		return (WRONG_FORMAT);
-
-	if (strncmp(buffer, SNAPSHOT_MAGIC, strlen(SNAPSHOT_MAGIC)) != 0)
-		return (WRONG_FORMAT);
-
-	version = atoi(&buffer[strlen(SNAPSHOT_MAGIC) + 1]);
-	if (version > SNAPSHOT_VERSION)
-		return (WRONG_VERSION);
-
-	result = UnfreezeBlock(stream, "NAM", (uint8 *) buffer, PATH_MAX);
-	if (result != SUCCESS)
-		return (result);
-
+	int version = SNAPSHOT_VERSION;
 	uint8	*local_registers     = NULL;
 	uint8	*local_timing_data   = NULL;
 	uint8	*local_superfx       = NULL;
@@ -604,187 +578,50 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 struct SControlSnapshot	ctl_snap;
 
-	do
-	{
-		result = UnfreezeBlock(stream, "CPU", (uint8_t*) &CPU, sizeof(CPU));
-		if (result != SUCCESS)
-			break;
-
-		result = UnfreezeStructCopy(stream, "REG", &local_registers, SnapRegisters, COUNT(SnapRegisters), version);
-		if (result != SUCCESS)
-			break;
-
-  if (_enablePPUBlock)
-		{
-			result = UnfreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
-			if (result != SUCCESS)
-				break;
-		}
-
-  if (_enableDMABlock)
-		{
-			result = UnfreezeBlock(stream, "DMA", (uint8_t*)&DMA, sizeof(DMA));
-			if (result != SUCCESS)
-			break;
-		}
-
-		if (_enableVRABlock)
-		{
-			result = UnfreezeBlock(stream, "VRA", (uint8_t*)Memory.VRAM, 0x10000);
-			if (result != SUCCESS)
-				break;
-		}
-
-		if (_enableRAMBlock)
-		{
-			result = UnfreezeBlock(stream, "RAM", (uint8_t*)Memory.RAM, 0x20000);
-			if (result != SUCCESS)
-				break;
-		}
-
-		if (_enableSRABlock)
-		{
-			result = UnfreezeBlock(stream, "SRA", (uint8_t*)Memory.SRAM, 0x20000);
-			if (result != SUCCESS)
-				break;
-		}
-
-		if (_enableFILBlock)
-		{
-			result = UnfreezeBlock(stream, "FIL", (uint8_t*)Memory.FillRAM, 0x8000);
-			if (result != SUCCESS)
-				break;
-		}
-
+		UnfreezeBlock(stream, "CPU", (uint8_t*) &CPU, sizeof(CPU));
+		UnfreezeStructCopy(stream, "REG", &local_registers, SnapRegisters, COUNT(SnapRegisters), version);
+  if (_enablePPUBlock)	UnfreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
+  if (_enableDMABlock) UnfreezeBlock(stream, "DMA", (uint8_t*)&DMA, sizeof(DMA));
+		if (_enableVRABlock) UnfreezeBlock(stream, "VRA", (uint8_t*)Memory.VRAM, 0x10000);
+		if (_enableRAMBlock) UnfreezeBlock(stream, "RAM", (uint8_t*)Memory.RAM, 0x20000);
+		if (_enableSRABlock) UnfreezeBlock(stream, "SRA", (uint8_t*)Memory.SRAM, 0x20000);
+		if (_enableFILBlock) UnfreezeBlock(stream, "FIL", (uint8_t*)Memory.FillRAM, 0x8000);
 		if (_enableSNDBlock)
 		{
 			uint8_t soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
-			result = UnfreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
+			UnfreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
    S9xAPULoadState(soundsnapshot);
-
-			if (result != SUCCESS)
-				break;
 		}
 
-		if (_enableCTLBlock)
-		{
-			result = UnfreezeBlock (stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
-			if (result != SUCCESS)
-				break;
-		}
+		if (_enableCTLBlock) UnfreezeBlock (stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
+  if (_enableTIMBlock) UnfreezeStructCopy(stream, "TIM", &local_timing_data, SnapTimings, COUNT(SnapTimings), version);
 
-  if (_enableTIMBlock)
-		{
-			result = UnfreezeStructCopy(stream, "TIM", &local_timing_data, SnapTimings, COUNT(SnapTimings), version);
-			if (result != SUCCESS)
-				break;
-		}
-
-		result = UnfreezeStructCopy(stream, "SFX", &local_superfx, SnapFX, COUNT(SnapFX), version);
-		if (result != SUCCESS && Settings.SuperFX)
-			break;
-
-		result = UnfreezeStructCopy(stream, "SA1", &local_sa1, SnapSA1, COUNT(SnapSA1), version);
-		if (result != SUCCESS && Settings.SA1)
-			break;
-
-		result = UnfreezeStructCopy(stream, "SAR", &local_sa1_registers, SnapSA1Registers, COUNT(SnapSA1Registers), version);
-		if (result != SUCCESS && Settings.SA1)
-			break;
-
+		if (Settings.SuperFX) UnfreezeStructCopy(stream, "SFX", &local_superfx, SnapFX, COUNT(SnapFX), version);
+		if (Settings.SA1) UnfreezeStructCopy(stream, "SA1", &local_sa1, SnapSA1, COUNT(SnapSA1), version);
+		if (Settings.SA1) UnfreezeStructCopy(stream, "SAR", &local_sa1_registers, SnapSA1Registers, COUNT(SnapSA1Registers), version);
   if (Settings.DSP == 1) UnfreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
 		if (Settings.DSP == 2) UnfreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
 		if (Settings.DSP == 4) UnfreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
+		if (Settings.C4) UnfreezeBlockCopy (stream, "CX4", &local_cx4_data, 8192);
+		if (Settings.SETA == ST_010) UnfreezeStructCopy(stream, "ST0", &local_st010, SnapST010, COUNT(SnapST010), version);
 
-		result = UnfreezeBlockCopy (stream, "CX4", &local_cx4_data, 8192);
-		if (result != SUCCESS && Settings.C4)
-			break;
-
-		result = UnfreezeStructCopy(stream, "ST0", &local_st010, SnapST010, COUNT(SnapST010), version);
-		if (result != SUCCESS && Settings.SETA == ST_010)
-			break;
-
-		result = UnfreezeStructCopy(stream, "OBC", &local_obc1, SnapOBC1, COUNT(SnapOBC1), version);
-		if (result != SUCCESS && Settings.OBC1)
-			break;
-
-		result = UnfreezeBlockCopy (stream, "OBM", &local_obc1_data, 8192);
-		if (result != SUCCESS && Settings.OBC1)
-			break;
-
-	if (Settings.SPC7110)
-	{
-		result = UnfreezeBlock(stream, "S71", (uint8_t*)&s7snap, sizeof(s7snap));
-		if (result != SUCCESS && Settings.SPC7110)
-			break;
-	}
-
-		result = UnfreezeStructCopy(stream, "SRT", &local_srtc, SnapSRTCSnap, COUNT(SnapSRTCSnap), version);
-		if (result != SUCCESS && Settings.SRTC)
-			break;
-
-		result = UnfreezeBlockCopy (stream, "CLK", &local_rtc_data, 20);
-		if (result != SUCCESS && (Settings.SRTC || Settings.SPC7110RTC))
-			break;
-
-		result = UnfreezeStructCopy(stream, "BSX", &local_bsx_data, SnapBSX, COUNT(SnapBSX), version);
-		if (result != SUCCESS && Settings.BS)
-			break;
-
-		result = UnfreezeStructCopy(stream, "MSU", &local_msu1_data, SnapMSU1, COUNT(SnapMSU1), version);
-		if (result != SUCCESS && Settings.MSU1)
-			break;
-
-		result = UnfreezeStructCopy(stream, "SHO", &local_screenshot, SnapScreenshot, COUNT(SnapScreenshot), version);
-
-		SnapshotMovieInfo	mi;
-
-		result = UnfreezeStruct(stream, "MOV", &mi, SnapMovie, COUNT(SnapMovie), version);
-		if (result != SUCCESS)
-		{
-			if (S9xMovieActive())
-			{
-				result = NOT_A_MOVIE_SNAPSHOT;
-				break;
-			}
-		}
-		else
-		{
-			result = UnfreezeBlockCopy(stream, "MID", &local_movie_data, mi.MovieInputDataSize);
-			if (result != SUCCESS)
-			{
-				if (S9xMovieActive())
-				{
-					result = NOT_A_MOVIE_SNAPSHOT;
-					break;
-				}
-			}
-
-			if (S9xMovieActive())
-			{
-				result = S9xMovieUnfreeze(local_movie_data, mi.MovieInputDataSize);
-				if (result != SUCCESS)
-					break;
-			}
-		}
-
-		result = SUCCESS;
-	} while (false);
-
-	if (result == SUCCESS)
-	{
+		if (Settings.OBC1) UnfreezeStructCopy(stream, "OBC", &local_obc1, SnapOBC1, COUNT(SnapOBC1), version);
+	 if (Settings.OBC1) UnfreezeBlockCopy (stream, "OBM", &local_obc1_data, 8192);
+	 if (Settings.SPC7110) UnfreezeBlock(stream, "S71", (uint8_t*)&s7snap, sizeof(s7snap));
+  if (Settings.SRTC) UnfreezeStructCopy(stream, "SRT", &local_srtc, SnapSRTCSnap, COUNT(SnapSRTCSnap), version);
+  if (Settings.SPC7110RTC) UnfreezeBlockCopy (stream, "CLK", &local_rtc_data, 20);
+		if (Settings.BS) UnfreezeStructCopy(stream, "BSX", &local_bsx_data, SnapBSX, COUNT(SnapBSX), version);
+  if (Settings.MSU1) UnfreezeStructCopy(stream, "MSU", &local_msu1_data, SnapMSU1, COUNT(SnapMSU1), version);
+		
 		uint32 old_flags     = CPU.Flags;
 		uint32 sa1_old_flags = SA1.Flags;
 
-		//S9xReset();
-
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
 
-
-if (_enableTIMBlock)
-{
-		UnfreezeStructFromCopy(&Timings, SnapTimings, COUNT(SnapTimings), local_timing_data, version);
-}
+		if (_enableTIMBlock)
+		{
+				UnfreezeStructFromCopy(&Timings, SnapTimings, COUNT(SnapTimings), local_timing_data, version);
+		}
 
 		if (local_superfx)
 		{
@@ -914,7 +751,6 @@ if (_enableTIMBlock)
 			pad_read = pad_read_temp;
 		}
 
-	}
 
 	if (local_registers)		delete [] local_registers;
 	if (local_timing_data)		delete [] local_timing_data;
@@ -931,7 +767,7 @@ if (_enableTIMBlock)
 	if (local_screenshot)		delete [] local_screenshot;
 	if (local_movie_data)		delete [] local_movie_data;
 
-	return (result);
+	return 0;
 }
 
 static int FreezeSize (int size, int type)
