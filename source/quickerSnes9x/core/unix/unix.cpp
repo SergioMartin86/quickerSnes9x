@@ -1485,7 +1485,6 @@ void S9xExit (void)
 
 	Memory.SaveSRAM(S9xGetFilename(".srm", SRAM_DIR));
 	S9xSaveCheatFile(S9xGetFilename(".cht", CHEAT_DIR));
-	S9xResetSaveTimer(FALSE);
 
 	S9xUnmapAllControls();
 	S9xDeinitDisplay();

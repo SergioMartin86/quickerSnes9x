@@ -935,8 +935,6 @@ int S9xMovieCreate (const char *filename, uint8 controllers_mask, uint8 opts, co
 		reset_controllers();
 		WRITE_STREAM(Memory.SRAM, 0x20000, stream);
 	}
-	else
-		S9xFreezeToStream(stream);
 
 	CLOSE_STREAM(stream);
 

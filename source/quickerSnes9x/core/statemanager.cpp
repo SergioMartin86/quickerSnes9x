@@ -65,7 +65,6 @@ bool StateManager::init(size_t buffer_size) {
 
     deallocate();
 
-    real_state_size = S9xFreezeSize();
     state_size = real_state_size / sizeof(uint32_t); // Works in multiple of 4.
 
     // We need 4-byte aligned state_size to avoid having to enforce this with unneeded memcpy's!

@@ -5,6 +5,8 @@
 #include <vector>
 #include "unix.hpp"
 #include "snes/snes.hpp"
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
 
 extern thread_local bool doRendering;
 
@@ -61,6 +63,14 @@ class EmuInstance : public EmuInstanceBase
 
   void serializeState(jaffarCommon::serializer::Base& s) const override
   {
+    auto contiguousSerializer = dynamic_cast<jaffarCommon::serializer::Contiguous*>(&s);
+    if (contiguousSerializer != nullptr)
+    {
+      memStream stream(contiguousSerializer->getOutputDataBuffer(), _stateSize);
+      S9xFreezeToStream(&stream);
+      return;
+    }
+
     std::string stateData;
     stateData.resize(_stateSize);
     memStream stream((uint8_t*)stateData.data(), stateData.size());
@@ -70,6 +80,14 @@ class EmuInstance : public EmuInstanceBase
 
   void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
+    auto contiguousDeserializer = dynamic_cast<jaffarCommon::deserializer::Contiguous*>(&d);
+    if (contiguousDeserializer != nullptr)
+    {
+      memStream stream((uint8_t*)contiguousDeserializer->getInputDataBuffer(), _stateSize);
+      S9xUnfreezeFromStream(&stream);
+      return;
+    }
+
     std::string stateData;
     stateData.resize(_stateSize);
     d.popContiguous(stateData.data(),stateData.size());

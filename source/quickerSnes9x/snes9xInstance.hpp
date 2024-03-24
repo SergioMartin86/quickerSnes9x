@@ -6,6 +6,8 @@
 #include "unix.hpp"
 #include "snes/snes.hpp"
 #include <lightStateConfig.h>
+#include <jaffarCommon/serializers/contiguous.hpp>
+#include <jaffarCommon/deserializers/contiguous.hpp>
 
 extern thread_local bool doRendering;
 
@@ -62,25 +64,19 @@ class EmuInstance : public EmuInstanceBase
 
   void serializeState(jaffarCommon::serializer::Base& s) const override
   {
-    std::string stateData;
-    stateData.resize(_stateSize);
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xFreezeToStream(&stream);
-    s.push(stateData.data(), stateData.size());
+    S9xFreezeToStream(s);
   }
 
   void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
-    std::string stateData;
-    stateData.resize(_stateSize);
-    d.pop(stateData.data(),stateData.size());
-    memStream stream((uint8_t*)stateData.data(), stateData.size());
-    S9xUnfreezeFromStream(&stream);
+    S9xUnfreezeFromStream(d);
   }
 
   size_t getStateSizeImpl() const override
   {
-    return S9xFreezeSize();
+    jaffarCommon::serializer::Contiguous s;
+    S9xFreezeToStream(s);
+    return s.getOutputSize();
   }
 
   inline size_t getDifferentialStateSizeImpl() const override { return 0; }
