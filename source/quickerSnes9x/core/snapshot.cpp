@@ -559,7 +559,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 	int version = SNAPSHOT_VERSION;
 	
 	uint8	*local_registers     = NULL;
-	uint8	*local_sa1           = NULL;
 	uint8	*local_sa1_registers = NULL;
 	uint8	*local_cx4_data      = NULL;
 	uint8	*local_st010         = NULL;
@@ -596,8 +595,27 @@ struct SControlSnapshot	ctl_snap;
     UnfreezeBlock(stream, "SFX", (uint8_t*) &GSU, sizeof(GSU));
 		}
 
-		if (Settings.SA1) UnfreezeStructCopy(stream, "SA1", &local_sa1, SnapSA1, COUNT(SnapSA1), version);
-		if (Settings.SA1) UnfreezeStructCopy(stream, "SAR", &local_sa1_registers, SnapSA1Registers, COUNT(SnapSA1Registers), version);
+		if (Settings.SA1)
+		{
+				uint32 sa1_old_flags = SA1.Flags;
+
+    UnfreezeBlock(stream, "SA1", (uint8_t*)&SA1, sizeof(SA1));
+		  UnfreezeBlock(stream, "SAR", (uint8_t*)&SA1Registers, sizeof(SA1Registers));
+
+				SA1.Cycles = SA1.PrevCycles = 0;
+				SA1.TimerIRQLastState = FALSE;
+				SA1.HTimerIRQPos = Memory.FillRAM[0x2212] | (Memory.FillRAM[0x2213] << 8);
+				SA1.VTimerIRQPos = Memory.FillRAM[0x2214] | (Memory.FillRAM[0x2215] << 8);
+				SA1.HCounter = 0;
+				SA1.VCounter = 0;
+				SA1.PrevHCounter = 0;
+				SA1.MemSpeed = SLOW_ONE_CYCLE;
+				SA1.MemSpeedx2 = SLOW_ONE_CYCLE * 2;
+
+				SA1.Flags |= sa1_old_flags & TRACE_FLAG;
+			 S9xSA1PostLoadState();
+		}
+		
   if (Settings.DSP == 1) UnfreezeBlock(stream, "DP1", (uint8_t*)&DSP1, sizeof(DSP1));
 		if (Settings.DSP == 2) UnfreezeBlock(stream, "DP2", (uint8_t*)&DSP2, sizeof(DSP2));
 		if (Settings.DSP == 4) UnfreezeBlock(stream, "DP4", (uint8_t*)&DSP4, sizeof(DSP4));
@@ -613,15 +631,8 @@ struct SControlSnapshot	ctl_snap;
   if (Settings.MSU1) UnfreezeStructCopy(stream, "MSU", &local_msu1_data, SnapMSU1, COUNT(SnapMSU1), version);
 		
 		uint32 old_flags     = CPU.Flags;
-		uint32 sa1_old_flags = SA1.Flags;
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-		if (local_sa1)
-			UnfreezeStructFromCopy(&SA1, SnapSA1, COUNT(SnapSA1), local_sa1, version);
-
-		if (local_sa1_registers)
-			UnfreezeStructFromCopy(&SA1Registers, SnapSA1Registers, COUNT(SnapSA1Registers), local_sa1_registers, version);
 
 		if (local_cx4_data)
 			memcpy(Memory.C4RAM, local_cx4_data, 8192);
@@ -666,19 +677,6 @@ struct SControlSnapshot	ctl_snap;
 				case  8:	case   9:	CPU.WhichEvent = 5; break;
 				case 10:	case  11:	CPU.WhichEvent = 6; break;
 			}
-
-			if (local_sa1) // FIXME
-			{
-				SA1.Cycles = SA1.PrevCycles = 0;
-				SA1.TimerIRQLastState = FALSE;
-				SA1.HTimerIRQPos = Memory.FillRAM[0x2212] | (Memory.FillRAM[0x2213] << 8);
-				SA1.VTimerIRQPos = Memory.FillRAM[0x2214] | (Memory.FillRAM[0x2215] << 8);
-				SA1.HCounter = 0;
-				SA1.VCounter = 0;
-				SA1.PrevHCounter = 0;
-				SA1.MemSpeed = SLOW_ONE_CYCLE;
-				SA1.MemSpeedx2 = SLOW_ONE_CYCLE * 2;
-			}
 		}
 
 		CPU.Flags |= old_flags & (DEBUG_MODE_FLAG | TRACE_FLAG | SINGLE_STEP_FLAG | FRAME_ADVANCE_FLAG);
@@ -702,12 +700,6 @@ struct SControlSnapshot	ctl_snap;
 
 		S9xControlPostLoadState(&ctl_snap);
 
-		if (local_sa1 && local_sa1_registers)
-		{
-			SA1.Flags |= sa1_old_flags & TRACE_FLAG;
-			S9xSA1PostLoadState();
-		}
-
 		if (Settings.SDD1)
 			S9xSDD1PostLoadState();
 
@@ -724,7 +716,6 @@ struct SControlSnapshot	ctl_snap;
 
 
 	if (local_registers)		delete [] local_registers;
-	if (local_sa1)				delete [] local_sa1;
 	if (local_sa1_registers)	delete [] local_sa1_registers;
 	if (local_cx4_data)			delete [] local_cx4_data;
 	if (local_st010)			delete [] local_st010;
