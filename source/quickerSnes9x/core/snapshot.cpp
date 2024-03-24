@@ -191,32 +191,6 @@ static __thread FreezeData	SnapRegisters[] =
 
 #undef STRUCT
 
-#define STRUCT	struct SDMASnapshot
-
-static __thread FreezeData	SnapDMA[] =
-{
-#define O(N) \
-	INT_ENTRY(6, dma[N].ReverseTransfer), \
-	INT_ENTRY(6, dma[N].HDMAIndirectAddressing), \
-	INT_ENTRY(6, dma[N].UnusedBit43x0), \
-	INT_ENTRY(6, dma[N].AAddressFixed), \
-	INT_ENTRY(6, dma[N].AAddressDecrement), \
-	INT_ENTRY(6, dma[N].TransferMode), \
-	INT_ENTRY(6, dma[N].BAddress), \
-	INT_ENTRY(6, dma[N].AAddress), \
-	INT_ENTRY(6, dma[N].ABank), \
-	INT_ENTRY(6, dma[N].DMACount_Or_HDMAIndirectAddress), \
-	INT_ENTRY(6, dma[N].IndirectBank), \
-	INT_ENTRY(6, dma[N].Address), \
-	INT_ENTRY(6, dma[N].Repeat), \
-	INT_ENTRY(6, dma[N].LineCount), \
-	INT_ENTRY(6, dma[N].UnknownByte), \
-	INT_ENTRY(6, dma[N].DoTransfer)
-	O(0), O(1), O(2), O(3), O(4), O(5), O(6), O(7)
-#undef O
-};
-
-#undef STRUCT
 #define STRUCT	struct SControlSnapshot
 
 static __thread FreezeData	SnapControls[] =
@@ -525,7 +499,7 @@ void S9xFreezeToStream (STREAM stream)
 	{
 		struct SControlSnapshot	ctl_snap;
 		S9xControlPreSaveState(&ctl_snap);
-		FreezeStruct(stream, "CTL", &ctl_snap, SnapControls, COUNT(SnapControls));
+		FreezeBlock(stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
 	}
 
 	if (_enableTIMBlock)
@@ -613,7 +587,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 		return (result);
 
 	uint8	*local_registers     = NULL;
-	uint8	*local_control_data  = NULL;
 	uint8	*local_timing_data   = NULL;
 	uint8	*local_superfx       = NULL;
 	uint8	*local_sa1           = NULL;
@@ -628,6 +601,8 @@ int S9xUnfreezeFromStream (STREAM stream)
 	uint8	*local_msu1_data     = NULL;
 	uint8	*local_screenshot    = NULL;
 	uint8	*local_movie_data    = NULL;
+
+struct SControlSnapshot	ctl_snap;
 
 	do
 	{
@@ -693,7 +668,7 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 		if (_enableCTLBlock)
 		{
-			result = UnfreezeStructCopy(stream, "CTL", &local_control_data, SnapControls, COUNT(SnapControls), version);
+			result = UnfreezeBlock (stream, "CTL", (uint8_t*)&ctl_snap, sizeof(ctl_snap));
 			if (result != SUCCESS)
 				break;
 		}
@@ -804,9 +779,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 		//S9xReset();
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-	struct SControlSnapshot	ctl_snap;
-if (_enableCTLBlock)		UnfreezeStructFromCopy(&ctl_snap, SnapControls, COUNT(SnapControls), local_control_data, version);
 
 
 if (_enableTIMBlock)
@@ -945,7 +917,6 @@ if (_enableTIMBlock)
 	}
 
 	if (local_registers)		delete [] local_registers;
-	if (local_control_data)		delete [] local_control_data;
 	if (local_timing_data)		delete [] local_timing_data;
 	if (local_superfx)			delete [] local_superfx;
 	if (local_sa1)				delete [] local_sa1;
