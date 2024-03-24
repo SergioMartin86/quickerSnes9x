@@ -613,7 +613,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 		return (result);
 
 	uint8	*local_registers     = NULL;
-	uint8	*local_apu_sound     = NULL;
 	uint8	*local_control_data  = NULL;
 	uint8	*local_timing_data   = NULL;
 	uint8	*local_superfx       = NULL;
@@ -684,7 +683,10 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 		if (_enableSNDBlock)
 		{
-			result = UnfreezeBlockCopy (stream, "SND", &local_apu_sound, SPC_SAVE_STATE_BLOCK_SIZE);
+			uint8_t soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
+			result = UnfreezeBlock (stream, "SND", soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
+   S9xAPULoadState(soundsnapshot);
+
 			if (result != SUCCESS)
 				break;
 		}
@@ -802,15 +804,6 @@ int S9xUnfreezeFromStream (STREAM stream)
 		//S9xReset();
 
 		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
-
-if (_enableSNDBlock)
-{
-        if(version < SNAPSHOT_VERSION_BAPU) {
-            printf("Using Blargg APU snapshot loading (snapshot version %d, current is %d)\n...", version, SNAPSHOT_VERSION);
-            S9xAPULoadBlarggState(local_apu_sound);
-        } else
-		    S9xAPULoadState(local_apu_sound);
-}
 
 	struct SControlSnapshot	ctl_snap;
 if (_enableCTLBlock)		UnfreezeStructFromCopy(&ctl_snap, SnapControls, COUNT(SnapControls), local_control_data, version);
@@ -952,7 +945,6 @@ if (_enableTIMBlock)
 	}
 
 	if (local_registers)		delete [] local_registers;
-	if (local_apu_sound)		delete [] local_apu_sound;
 	if (local_control_data)		delete [] local_control_data;
 	if (local_timing_data)		delete [] local_timing_data;
 	if (local_superfx)			delete [] local_superfx;
