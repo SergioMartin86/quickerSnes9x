@@ -46,344 +46,12 @@ enum
 	POINTER_V
 };
 
-#define COUNT(ARRAY)				(sizeof(ARRAY) / sizeof(ARRAY[0]))
-#define Offset(field, structure)	((int) (((char *) (&(((structure) NULL)->field))) - ((char *) NULL)))
-#define OFFSET(f)					Offset(f, STRUCT *)
-#define DUMMY(f)					Offset(f, struct Obsolete *)
-#define DELETED(f)					(-1)
-
-#define INT_ENTRY(save_version_introduced, field) \
-{ \
-	OFFSET(field), \
-	0, \
-	sizeof(((STRUCT *) NULL)->field), \
-	INT_V, \
-	save_version_introduced, \
-	9999, \
-	#field \
-}
-
-#define ARRAY_ENTRY(save_version_introduced, field, count, elemType) \
-{ \
-	OFFSET(field), \
-	0, \
-	count, \
-	elemType, \
-	save_version_introduced, \
-	9999, \
-	#field \
-}
-
-#define POINTER_ENTRY(save_version_introduced, field, relativeToField) \
-{ \
-	OFFSET(field), \
-	OFFSET(relativeToField), \
-	4, \
-	POINTER_V, \
-	save_version_introduced, \
-	9999, \
-	#field \
-}
-
-#define OBSOLETE_INT_ENTRY(save_version_introduced, save_version_removed, field) \
-{ \
-	DUMMY(field), \
-	0, \
-	sizeof(((struct Obsolete *) NULL)->field), \
-	INT_V, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-#define OBSOLETE_ARRAY_ENTRY(save_version_introduced, save_version_removed, field, count, elemType) \
-{ \
-	DUMMY(field), \
-	0, \
-	count, \
-	elemType, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-#define OBSOLETE_POINTER_ENTRY(save_version_introduced, save_version_removed, field, relativeToField) \
-{ \
-	DUMMY(field), \
-	DUMMY(relativeToField), \
-	4, \
-	POINTER_V, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-#define DELETED_INT_ENTRY(save_version_introduced, save_version_removed, field, size) \
-{ \
-	DELETED(field), \
-	0, \
-	size, \
-	INT_V, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-#define DELETED_ARRAY_ENTRY(save_version_introduced, save_version_removed, field, count, elemType) \
-{ \
-	DELETED(field), \
-	0, \
-	count, \
-	elemType, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-#define DELETED_POINTER_ENTRY(save_version_introduced, save_version_removed, field, relativeToField) \
-{ \
-	DELETED(field), \
-	DELETED(relativeToField), \
-	4, \
-	POINTER_V, \
-	save_version_introduced, \
-	save_version_removed, \
-	#field \
-}
-
-struct SDMASnapshot
-{
-	struct SDMA	dma[8];
-};
-
-struct SnapshotMovieInfo
-{
-	uint32	MovieInputDataSize;
-};
-
-struct SnapshotScreenshotInfo
-{
-	uint16	Width;
-	uint16	Height;
-	uint8	Interlaced;
-	uint8	Data[MAX_SNES_WIDTH * MAX_SNES_HEIGHT * 3];
-};
 
 static thread_local struct Obsolete
 {
 	uint8	CPU_IRQActive;
 }	Obsolete;
 
-#define STRUCT	struct SRegisters
-
-static __thread FreezeData	SnapRegisters[] =
-{
-	INT_ENTRY(6, PB),
-	INT_ENTRY(6, DB),
-	INT_ENTRY(6, P.W),
-	INT_ENTRY(6, A.W),
-	INT_ENTRY(6, D.W),
-	INT_ENTRY(6, S.W),
-	INT_ENTRY(6, X.W),
-	INT_ENTRY(6, Y.W),
-	INT_ENTRY(6, PCw)
-};
-
-#undef STRUCT
-
-#define STRUCT	struct SControlSnapshot
-
-static __thread FreezeData	SnapControls[] =
-{
-	INT_ENTRY(6, ver),
-	ARRAY_ENTRY(6, port1_read_idx, 2, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, dummy1, 4, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, port2_read_idx, 2, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, dummy2, 4, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, mouse_speed, 2, uint8_ARRAY_V),
-	INT_ENTRY(6, justifier_select),
-	ARRAY_ENTRY(6, dummy3, 8, uint8_ARRAY_V),
-	INT_ENTRY(6, pad_read),
-	INT_ENTRY(6, pad_read_last),
-	ARRAY_ENTRY(6, internal, 60, uint8_ARRAY_V)
-};
-
-#undef STRUCT
-#define STRUCT	struct STimings
-
-static __thread FreezeData	SnapTimings[] =
-{
-	INT_ENTRY(6, H_Max_Master),
-	INT_ENTRY(6, H_Max),
-	INT_ENTRY(6, V_Max_Master),
-	INT_ENTRY(6, V_Max),
-	INT_ENTRY(6, HBlankStart),
-	INT_ENTRY(6, HBlankEnd),
-	INT_ENTRY(6, HDMAInit),
-	INT_ENTRY(6, HDMAStart),
-	INT_ENTRY(6, NMITriggerPos),
-	INT_ENTRY(6, WRAMRefreshPos),
-	INT_ENTRY(6, RenderPos),
-	INT_ENTRY(6, InterlaceField),
-	INT_ENTRY(6, DMACPUSync),
-	INT_ENTRY(6, NMIDMADelay),
-	INT_ENTRY(6, IRQPendCount),
-	INT_ENTRY(6, APUSpeedup),
-	INT_ENTRY(7, IRQTriggerCycles),
-	INT_ENTRY(7, APUAllowTimeOverflow)
-};
-
-#undef STRUCT
-#define STRUCT	struct FxRegs_s
-
-static __thread FreezeData	SnapFX[] =
-{
-	ARRAY_ENTRY(6, avReg, 16, uint32_ARRAY_V),
-	INT_ENTRY(6, vColorReg),
-	INT_ENTRY(6, vPlotOptionReg),
-	INT_ENTRY(6, vStatusReg),
-	INT_ENTRY(6, vPrgBankReg),
-	INT_ENTRY(6, vRomBankReg),
-	INT_ENTRY(6, vRamBankReg),
-	INT_ENTRY(6, vCacheBaseReg),
-	INT_ENTRY(6, vCacheFlags),
-	INT_ENTRY(6, vLastRamAdr),
-	POINTER_ENTRY(6, pvDreg, avRegAddr),
-	POINTER_ENTRY(6, pvSreg, avRegAddr),
-	INT_ENTRY(6, vRomBuffer),
-	INT_ENTRY(6, vPipe),
-	INT_ENTRY(6, vPipeAdr),
-	INT_ENTRY(6, vSign),
-	INT_ENTRY(6, vZero),
-	INT_ENTRY(6, vCarry),
-	INT_ENTRY(6, vOverflow),
-	INT_ENTRY(6, vErrorCode),
-	INT_ENTRY(6, vIllegalAddress),
-	INT_ENTRY(6, bBreakPoint),
-	INT_ENTRY(6, vBreakPoint),
-	INT_ENTRY(6, vStepPoint),
-	INT_ENTRY(6, nRamBanks),
-	INT_ENTRY(6, nRomBanks),
-	INT_ENTRY(6, vMode),
-	INT_ENTRY(6, vPrevMode),
-	POINTER_ENTRY(6, pvScreenBase, pvRam),
-#define O(N) \
-	POINTER_ENTRY(6, apvScreen[N], pvRam)
-	O(  0), O(  1), O(  2), O(  3), O(  4), O(  5), O(  6), O(  7),
-	O(  8), O(  9), O( 10), O( 11), O( 12), O( 13), O( 14), O( 15),
-	O( 16), O( 17), O( 18), O( 19), O( 20), O( 21), O( 22), O( 23),
-	O( 24), O( 25), O( 26), O( 27), O( 28), O( 29), O( 30), O( 31),
-#undef O
-	ARRAY_ENTRY(6, x, 32, uint32_ARRAY_V),
-	INT_ENTRY(6, vScreenHeight),
-	INT_ENTRY(6, vScreenRealHeight),
-	INT_ENTRY(6, vPrevScreenHeight),
-	INT_ENTRY(6, vScreenSize),
-	POINTER_ENTRY(6, pvRamBank, apvRamBank),
-	POINTER_ENTRY(6, pvRomBank, apvRomBank),
-	POINTER_ENTRY(6, pvPrgBank, apvRomBank),
-#define O(N) \
-	POINTER_ENTRY(6, apvRamBank[N], pvRam)
-	O(0), O(1), O(2), O(3),
-#undef O
-	INT_ENTRY(6, bCacheActive),
-	POINTER_ENTRY(6, pvCache, pvRegisters),
-	ARRAY_ENTRY(6, avCacheBackup, 512, uint8_ARRAY_V),
-	INT_ENTRY(6, vCounter),
-	INT_ENTRY(6, vInstCount),
-	INT_ENTRY(6, vSCBRDirty)
-};
-
-#undef STRUCT
-
-#define STRUCT	struct SST010
-
-static __thread FreezeData	SnapST010[] =
-{
-	ARRAY_ENTRY(6, input_params, 16, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, output_params, 16, uint8_ARRAY_V),
-	INT_ENTRY(6, op_reg),
-	INT_ENTRY(6, execute),
-	INT_ENTRY(6, control_enable)
-};
-
-#undef STRUCT
-#define STRUCT	struct SOBC1
-
-static __thread FreezeData	SnapOBC1[] =
-{
-	INT_ENTRY(6, address),
-	INT_ENTRY(6, basePtr),
-	INT_ENTRY(6, shift)
-};
-
-#undef STRUCT
-
-#define STRUCT	struct SSRTCSnapshot
-
-static __thread FreezeData	SnapSRTCSnap[] =
-{
-	INT_ENTRY(6, rtc_mode),
-	INT_ENTRY(6, rtc_index)
-};
-
-#undef STRUCT
-#define STRUCT	struct SBSX
-
-static __thread FreezeData	SnapBSX[] =
-{
-	INT_ENTRY(6, dirty),
-	INT_ENTRY(6, dirty2),
-	INT_ENTRY(6, bootup),
-	INT_ENTRY(6, flash_enable),
-	INT_ENTRY(6, write_enable),
-	INT_ENTRY(6, read_enable),
-	INT_ENTRY(6, flash_command),
-	INT_ENTRY(6, old_write),
-	INT_ENTRY(6, new_write),
-	INT_ENTRY(6, out_index),
-	ARRAY_ENTRY(6, output, 32, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, PPU, 32, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, MMC, 16, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, prevMMC, 16, uint8_ARRAY_V),
-	ARRAY_ENTRY(6, test2192, 32, uint8_ARRAY_V)
-};
-
-#undef STRUCT
-#define STRUCT	struct SMSU1
-
-static __thread FreezeData	SnapMSU1[] =
-{
-	INT_ENTRY(9, MSU1_STATUS),
-	INT_ENTRY(9, MSU1_DATA_SEEK),
-	INT_ENTRY(9, MSU1_DATA_POS),
-	INT_ENTRY(9, MSU1_TRACK_SEEK),
-	INT_ENTRY(9, MSU1_CURRENT_TRACK),
-	INT_ENTRY(9, MSU1_RESUME_TRACK),
-	INT_ENTRY(9, MSU1_VOLUME),
-	INT_ENTRY(9, MSU1_CONTROL),
-	INT_ENTRY(9, MSU1_AUDIO_POS),
-	INT_ENTRY(9, MSU1_RESUME_POS)
-};
-
-#undef STRUCT
-#define STRUCT	struct SnapshotScreenshotInfo
-
-static __thread FreezeData	SnapScreenshot[] =
-{
-	INT_ENTRY(6, Width),
-	INT_ENTRY(6, Height),
-	INT_ENTRY(6, Interlaced),
-	ARRAY_ENTRY(6, Data, MAX_SNES_WIDTH * MAX_SNES_HEIGHT * 3, uint8_ARRAY_V)
-};
-
-#undef STRUCT
-#define STRUCT	struct SnapshotMovieInfo
-
-static __thread FreezeData	SnapMovie[] =
-{
-	INT_ENTRY(6, MovieInputDataSize)
-};
 
 static int UnfreezeBlock (STREAM, const char *, uint8 *, int);
 static int UnfreezeBlockCopy (STREAM, const char *, uint8 **, int);
@@ -416,7 +84,7 @@ void S9xFreezeToStream (STREAM stream)
 
 	FreezeBlock(stream, "CPU", (uint8_t*)&CPU, sizeof(CPU));
 
-	FreezeStruct(stream, "REG", &Registers, SnapRegisters, COUNT(SnapRegisters));
+	FreezeBlock(stream, "REG", (uint8_t*) &Registers, sizeof(Registers));
 
 	if (_enablePPUBlock) FreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
 	if (_enableDMABlock)	FreezeBlock(stream, "DMA", (uint8_t*) &DMA, sizeof(DMA));
@@ -487,12 +155,12 @@ int S9xUnfreezeFromStream (STREAM stream)
 
 	int version = SNAPSHOT_VERSION;
 	
-	uint8	*local_registers     = NULL;
-
 struct SControlSnapshot	ctl_snap;
 
 		UnfreezeBlock(stream, "CPU", (uint8_t*) &CPU, sizeof(CPU));
-		UnfreezeStructCopy(stream, "REG", &local_registers, SnapRegisters, COUNT(SnapRegisters), version);
+		
+		UnfreezeBlock(stream, "REG", (uint8_t*)&Registers, sizeof(Registers));
+
   if (_enablePPUBlock)	UnfreezeBlock(stream, "PPU", (uint8_t*)&PPU, sizeof(PPU));
   if (_enableDMABlock) UnfreezeBlock(stream, "DMA", (uint8_t*)&DMA, sizeof(DMA));
 		if (_enableVRABlock) UnfreezeBlock(stream, "VRA", (uint8_t*)Memory.VRAM, 0x10000);
@@ -557,7 +225,6 @@ struct SControlSnapshot	ctl_snap;
 		
 		uint32 old_flags     = CPU.Flags;
 
-		UnfreezeStructFromCopy(&Registers, SnapRegisters, COUNT(SnapRegisters), local_registers, version);
 
 		if (version < SNAPSHOT_VERSION_IRQ)
 		{
@@ -607,8 +274,6 @@ struct SControlSnapshot	ctl_snap;
 		if (Settings.BS)	S9xBSXPostLoadState();
 		if (Settings.MSU1)	S9xMSU1PostLoadState();
 
-
-	if (local_registers)		delete [] local_registers;
 
 	return 0;
 }
