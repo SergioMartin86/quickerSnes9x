@@ -27,7 +27,7 @@ public:
         start = 0;
     }
 
-    ~ring_buffer (void)
+    virtual ~ring_buffer (void)
     {
         delete[] buffer;
     }

@@ -338,7 +338,7 @@ bool8 S9xMixSamples (uint8 *buffer, int sample_count)
 				{
 					uint8 *msu_sample = new uint8[sample_count * 2];
 					msu::resampler->read((short *)msu_sample, sample_count);
-					for (uint32 i = 0; i < sample_count; ++i)
+					for (int32 i = 0; i < sample_count; ++i)
 						*((int16*)(dest+(i * 2))) += *((int16*)(msu_sample+(i * 2)));
 				}
 			}

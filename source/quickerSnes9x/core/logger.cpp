@@ -251,30 +251,8 @@ void S9xVideoLogger (void *pixels, int width, int height, int depth, int bytes_p
 	else
 		framecounter++;
 
-	if (video)
-	{
-		char	*data = (char *) pixels;
-		size_t	ignore;
-
-		for (int i = 0; i < height; i++)
-			ignore = fwrite(data + i * bytes_per_line, depth, width, video);
-		fflush(video);
-		fflush(audio);
-
-		if (Settings.DumpStreamsMaxFrames > 0 && framecounter >= Settings.DumpStreamsMaxFrames)
-		{
-			printf("Logging ended.\n");
-			S9xCloseLogger();
-		}
-
-	}
 }
 
 void S9xAudioLogger (void *samples, int length)
 {
-	if (audio)
-	{
-		size_t	ignore;
-		ignore = fwrite(samples, 1, length, audio);
-	}
 }

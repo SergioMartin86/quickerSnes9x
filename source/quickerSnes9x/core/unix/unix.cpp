@@ -340,8 +340,6 @@ bool S9xDisplayPollButton (uint32, bool *);
 bool S9xDisplayPollAxis (uint32, int16 *);
 bool S9xDisplayPollPointer (uint32, int16 *, int16 *);
 
-static long log2 (long);
-static void SoundTrigger (void);
 static void InitTimer (void);
 static void NSRTControllerSetup (void);
 static int make_snes9x_dirs (void);
@@ -412,16 +410,6 @@ void _makepath (char *path, const char *, const char *dir, const char *fname, co
 		strcat(path, ".");
 		strcat(path, ext);
 	}
-}
-
-static long log2 (long num)
-{
-	long	n = 0;
-
-	while (num >>= 1)
-		n++;
-
-	return (n);
 }
 
 void S9xExtraUsage (void)
@@ -794,104 +782,32 @@ const char * S9xGetDirectory (enum s9x_getdirtype dirtype)
 
 const char * S9xGetFilename (const char *ex, enum s9x_getdirtype dirtype)
 {
-	static thread_local char	s[PATH_MAX + 1];
-	char		drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-	_splitpath(Memory.ROMFilename, drive, dir, fname, ext);
-	snprintf(s, PATH_MAX + 1, "%s%s%s%s", S9xGetDirectory(dirtype), SLASH_STR, fname, ex);
-
-	return (s);
+	return (nullptr);
 }
 
 const char * S9xGetFilenameInc (const char *ex, enum s9x_getdirtype dirtype)
 {
-	static thread_local char	s[PATH_MAX + 1];
-	char		drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-	unsigned int	i = 0;
-	const char		*d;
-	struct stat		buf;
-
-	_splitpath(Memory.ROMFilename, drive, dir, fname, ext);
-	d = S9xGetDirectory(dirtype);
-
-	do
-		snprintf(s, PATH_MAX + 1, "%s%s%s.%03d%s", d, SLASH_STR, fname, i++, ex);
-	while (stat(s, &buf) == 0 && i < 1000);
-
-	return (s);
+return (nullptr);
 }
 
 const char * S9xBasename (const char *f)
 {
-	const char	*p;
-
-	if ((p = strrchr(f, '/')) != NULL || (p = strrchr(f, '\\')) != NULL)
-		return (p + 1);
-
-	return (f);
+return (nullptr);
 }
 
 const char * S9xChooseFilename (bool8 read_only)
 {
-	char	s[PATH_MAX + 1];
-	char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-	const char	*filename;
-	char		title[64];
-
-	_splitpath(Memory.ROMFilename, drive, dir, fname, ext);
-	snprintf(s, PATH_MAX + 1, "%s.frz", fname);
-	sprintf(title, "%s snapshot filename", read_only ? "Select load" : "Choose save");
-
-	S9xSetSoundMute(TRUE);
-	filename = S9xSelectFilename(s, S9xGetDirectory(SNAPSHOT_DIR), "frz", title);
-	S9xSetSoundMute(FALSE);
-
-	return (filename);
+return (nullptr);
 }
 
 const char * S9xChooseMovieFilename (bool8 read_only)
 {
-	char	s[PATH_MAX + 1];
-	char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-	const char	*filename;
-	char		title[64];
-
-	_splitpath(Memory.ROMFilename, drive, dir, fname, ext);
-	snprintf(s, PATH_MAX + 1, "%s.smv", fname);
-	sprintf(title, "Choose movie %s filename", read_only ? "playback" : "record");
-
-	S9xSetSoundMute(TRUE);
-	filename = S9xSelectFilename(s, S9xGetDirectory(HOME_DIR), "smv", title);
-	S9xSetSoundMute(FALSE);
-
-	return (filename);
+return (nullptr);
 }
 
 bool8 S9xOpenSnapshotFile (const char *filename, bool8 read_only, STREAM *file)
 {
-	char	s[PATH_MAX + 1];
-	char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-	_splitpath(filename, drive, dir, fname, ext);
-
-	if (*drive || *dir == SLASH_CHAR || (strlen(dir) > 1 && *dir == '.' && *(dir + 1) == SLASH_CHAR))
-	{
-		strncpy(s, filename, PATH_MAX + 1);
-		s[PATH_MAX] = 0;
-	}
-	else
-		snprintf(s, PATH_MAX + 1, "%s%s%s", S9xGetDirectory(SNAPSHOT_DIR), SLASH_STR, fname);
-
-	if (!*ext && strlen(s) <= PATH_MAX - 4)
-		strcat(s, ".frz");
-
-	if ((*file = OPEN_STREAM(s, read_only ? "rb" : "wb")))
-		return (TRUE);
-
-	return (FALSE);
+	return false;
 }
 
 void S9xCloseSnapshotFile (STREAM file)
@@ -1305,19 +1221,11 @@ static void ReadJoysticks (void)
 
 #endif
 
-static void SoundTrigger (void)
-{
-#ifndef NOSOUND
-	S9xProcessSound(NULL);
-#endif
-}
-
 static void InitTimer (void)
 {
 #ifndef NOSOUND
 	struct itimerval	timeout;
 #endif
-	struct sigaction	sa;
 
 #ifdef USE_THREADS
 	if (unixSettings.ThreadSound)
@@ -1328,13 +1236,6 @@ static void InitTimer (void)
 	}
 #endif
 
-	sa.sa_handler = (SIG_PF) SoundTrigger;
-
-#ifdef SA_RESTART
-	sa.sa_flags = SA_RESTART;
-#else
-	sa.sa_flags = 0;
-#endif
 
 #ifndef NOSOUND // FIXME: Kludge to get calltree running. Remove later.
 	sigemptyset(&sa.sa_mask);
@@ -1594,59 +1495,6 @@ int __MAIN (int argc, char **argv)
 	if (Settings.Multi)
 	{
 		loaded = Memory.LoadMultiCart(Settings.CartAName, Settings.CartBName);
-
-		if (!loaded)
-		{
-			char	s1[PATH_MAX + 1], s2[PATH_MAX + 1];
-			char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-			s1[0] = s2[0] = 0;
-
-			if (Settings.CartAName[0])
-			{
-				_splitpath(Settings.CartAName, drive, dir, fname, ext);
-				snprintf(s1, PATH_MAX + 1, "%s%s%s", S9xGetDirectory(ROM_DIR), SLASH_STR, fname);
-				if (ext[0] && (strlen(s1) <= PATH_MAX - 1 - strlen(ext)))
-				{
-					strcat(s1, ".");
-					strcat(s1, ext);
-				}
-			}
-
-			if (Settings.CartBName[0])
-			{
-				_splitpath(Settings.CartBName, drive, dir, fname, ext);
-				snprintf(s2, PATH_MAX + 1, "%s%s%s", S9xGetDirectory(ROM_DIR), SLASH_STR, fname);
-				if (ext[0] && (strlen(s2) <= PATH_MAX - 1 - strlen(ext)))
-				{
-					strcat(s2, ".");
-					strcat(s2, ext);
-				}
-			}
-
-			loaded = Memory.LoadMultiCart(s1, s2);
-		}
-	}
-	else
-	if (rom_filename)
-	{
-		loaded = Memory.LoadROM(rom_filename);
-
-		if (!loaded && rom_filename[0])
-		{
-			char	s[PATH_MAX + 1];
-			char	drive[_MAX_DRIVE + 1], dir[_MAX_DIR + 1], fname[_MAX_FNAME + 1], ext[_MAX_EXT + 1];
-
-			_splitpath(rom_filename, drive, dir, fname, ext);
-			snprintf(s, PATH_MAX + 1, "%s%s%s", S9xGetDirectory(ROM_DIR), SLASH_STR, fname);
-			if (ext[0] && (strlen(s) <= PATH_MAX - 1 - strlen(ext)))
-			{
-				strcat(s, ".");
-				strcat(s, ext);
-			}
-
-			loaded = Memory.LoadROM(s);
-		}
 	}
 
 	if (!loaded)

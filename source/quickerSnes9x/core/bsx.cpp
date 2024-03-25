@@ -266,10 +266,7 @@ static void BSX_Map_SRAM (void);
 static void BSX_Map_PSRAM (void);
 static void BSX_Map_BIOS (void);
 static void BSX_Map_RAM (void);
-static void BSX_Map_Dirty (void);
 static void BSX_Map (void);
-static void BSX_Set_Bypass_FlashIO (uint16, uint8);
-static uint8 BSX_Get_Bypass_FlashIO (uint16);
 static bool8 BSX_LoadBIOS (void);
 static void map_psram_mirror_sub (uint32);
 static int is_bsx (unsigned char *);
@@ -448,7 +445,7 @@ static void map_psram_mirror_sub (uint32 bank)
 
 static void BSX_Map_PSRAM(void)
 {
-	int	c, i;
+	int	c;
 
 	if (!BSX.MMC[0x02])
 	{
@@ -617,39 +614,6 @@ static void BSX_Map_RAM (void)
 	}
 }
 
-static void BSX_Map_Dirty (void)
-{
-	// for the quick bank change
-
-	int i, c;
-
-	// Banks 00->1F and 80->9F:8000-FFFF
-	if (BSX.MMC[0x02])
-	{
-		for (c = 0; c < 0x200; c += 16)
-		{
-			for (i = c + 8; i < c + 16; i++)
-			{
-				Map[i] = Map[i + 0x800] = &MapROM[(c << 12) % FlashSize];
-				BlockIsRAM[i] = BlockIsRAM[i + 0x800] = BSX.write_enable;
-				BlockIsROM[i] = BlockIsROM[i + 0x800] = !BSX.write_enable;
-			}
-		}
-	}
-	else
-	{
-		for (c = 0; c < 0x200; c += 16)
-		{
-			for (i = c + 8; i < c + 16; i++)
-			{
-				Map[i] = Map[i + 0x800] = &MapROM[(c << 11) % FlashSize] - 0x8000;
-				BlockIsRAM[i] = BlockIsRAM[i + 0x800] = BSX.write_enable;
-				BlockIsROM[i] = BlockIsROM[i + 0x800] = !BSX.write_enable;
-			}
-		}
-	}
-}
-
 static void BSX_Map (void)
 {
 #ifdef BSX_DEBUG
@@ -771,7 +735,6 @@ uint8 S9xGetBSX (uint32 address)
 void S9xSetBSX (uint8 byte, uint32 address)
 {
 	uint8	bank = (address >> 16) & 0xFF;
-	uint16	offset = address & 0xFFFF;
 
 	// MMC
 	if ((bank >= 0x01 && bank <= 0x0E))
@@ -900,8 +863,7 @@ void S9xSetBSX (uint8 byte, uint32 address)
 
 void S9xBSXSetStream1 (uint8 count)
 {
-    if (BSX.sat_stream1.is_open())
-        BSX.sat_stream1.close(); //If Stream1 already opened for one file: Close it.
+    if (BSX.sat_stream1.is_open()){        BSX.sat_stream1.close();  }
 
 	char path[PATH_MAX + 1], name[PATH_MAX + 1];
 
@@ -932,8 +894,7 @@ void S9xBSXSetStream1 (uint8 count)
 
 void S9xBSXSetStream2 (uint8 count)
 {
-    if (BSX.sat_stream2.is_open())
-        BSX.sat_stream2.close(); //If Stream1 already opened for one file: Close it.
+    if (BSX.sat_stream2.is_open()){    BSX.sat_stream2.close(); } //If Stream1 already opened for one file: Close it.
 
 	char path[PATH_MAX + 1], name[PATH_MAX + 1];
 

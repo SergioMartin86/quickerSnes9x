@@ -304,7 +304,7 @@ struct GUIData
 #endif
 };
 
-static thread_local struct GUIData	GUI;
+thread_local struct GUIData	GUI;
 
 typedef	std::pair<std::string, std::string>	strpair_t;
 extern	thread_local std::vector<strpair_t>				keymaps;
@@ -336,20 +336,19 @@ enum
 	VIDEOMODE_HQ2X
 };
 
-static int ErrorHandler (Display *, XErrorEvent *);
-static bool8 CheckForPendingXEvents (Display *);
-static void SetXRepeat (bool8);
-static void SetupImage (void);
-static void TakedownImage (void);
-static void SetupXImage (void);
-static void TakedownXImage (void);
+bool8 CheckForPendingXEvents (Display *);
+void SetXRepeat (bool8);
+void SetupImage (void);
+void TakedownImage (void);
+void SetupXImage (void);
+void TakedownXImage (void);
 #ifdef USE_XVIDEO
-static void SetupXvImage (void);
-static void TakedownXvImage (void);
+void SetupXvImage (void);
+void TakedownXvImage (void);
 #endif
-static void Repaint (bool8);
-static void Convert16To24 (int, int);
-static void Convert16To24Packed (int, int);
+void Repaint (bool8);
+void Convert16To24 (int, int);
+void Convert16To24Packed (int, int);
 
 #ifdef PREVENT_RENDERING
 
@@ -367,29 +366,29 @@ const char * S9xParseDisplayConfig (ConfigFile &conf, int pass)
  return ("Unix/X11");
 }
 
-static void FatalError (const char *str)
+void FatalError (const char *str)
 {
 }
 
-static int ErrorHandler (Display *display, XErrorEvent *event)
+int ErrorHandler (Display *display, XErrorEvent *event)
 {
  return (0);
 }
 
 #ifdef USE_XVIDEO
-static int get_inv_shift (uint32 mask, int bpp)
+int get_inv_shift (uint32 mask, int bpp)
 {
     return (0);
 }
 
-static unsigned char CLAMP (int v, int min, int max)
+unsigned char CLAMP (int v, int min, int max)
 {
  if (v < min) return min;
  if (v > max) return max;
  return v;
 }
 
-static bool8 SetupXvideo()
+bool8 SetupXvideo()
 {
 
  return TRUE;
@@ -404,19 +403,19 @@ void S9xDeinitDisplay (void)
 {
 }
 
-static void TakedownImage (void)
+void TakedownImage (void)
 {
 }
 
-static void SetupXImage (void)
+void SetupXImage (void)
 {
 }
 
-static void TakedownXImage (void)
+void TakedownXImage (void)
 {
 }
 
-static void TakedownXvImage (void)
+void TakedownXvImage (void)
 {
 }
 
@@ -424,15 +423,15 @@ void S9xPutImage (int width, int height)
 {
 }
 
-static void Convert16To24 (int width, int height)
+void Convert16To24 (int width, int height)
 {
 }
 
-static void Convert16To24Packed (int width, int height)
+void Convert16To24Packed (int width, int height)
 {
 }
 
-static void Repaint (bool8 isFrameBoundry)
+void Repaint (bool8 isFrameBoundry)
 {
 }
 
@@ -442,11 +441,6 @@ void S9xTextMode (void)
 
 void S9xGraphicsMode (void)
 {
-}
-
-static bool8 CheckForPendingXEvents (Display *display)
-{
- return 0;
 }
 
 void S9xProcessEvents (bool8 block)
@@ -471,9 +465,6 @@ void S9xSetTitle (const char *string)
 {
 }
 
-static void SetXRepeat (bool8 state)
-{
-}
 
 s9xcommand_t S9xGetDisplayCommandT (const char *n)
 {
@@ -744,22 +735,15 @@ const char * S9xParseDisplayConfig (ConfigFile &conf, int pass)
 	return ("Unix/X11");
 }
 
-static void FatalError (const char *str)
+void FatalError (const char *str)
 {
 	fprintf(stderr, "%s\n", str);
 	S9xExit();
 }
 
-static int ErrorHandler (Display *display, XErrorEvent *event)
-{
-#ifdef MITSHM
-	GUI.use_shared_memory = FALSE;
-#endif
-	return (0);
-}
 
 #ifdef USE_XVIDEO
-static int get_inv_shift (uint32 mask, int bpp)
+int get_inv_shift (uint32 mask, int bpp)
 {
     int i;
 
@@ -772,14 +756,14 @@ static int get_inv_shift (uint32 mask, int bpp)
     return (bpp - i);
 }
 
-static unsigned char CLAMP (int v, int min, int max)
+unsigned char CLAMP (int v, int min, int max)
 {
 	if (v < min) return min;
 	if (v > max) return max;
 	return v;
 }
 
-static bool8 SetupXvideo()
+bool8 SetupXvideo()
 {
 	int ret;
 
@@ -1109,8 +1093,8 @@ void S9xInitDisplay (int argc, char **argv)
 	}
 
 	/* Load UI cursors */
-	static thread_local XColor	bg, fg;
-	static thread_local  char		data[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	thread_local XColor	bg, fg;
+	thread_local  char		data[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	Pixmap			bitmap;
 
 	bitmap = XCreateBitmapFromData(GUI.display, GUI.window, data, 8, 8);
@@ -1241,7 +1225,7 @@ void S9xDeinitDisplay (void)
 	S9xBlitHQ2xFilterDeinit();
 }
 
-static void SetupImage (void)
+void SetupImage (void)
 {
 	TakedownImage();
 
@@ -1288,7 +1272,7 @@ static void SetupImage (void)
 	S9xGraphicsInit();
 }
 
-static void TakedownImage (void)
+void TakedownImage (void)
 {
 	if (GUI.snes_buffer)
 	{
@@ -1318,7 +1302,7 @@ static void TakedownImage (void)
 	S9xGraphicsDeinit();
 }
 
-static void SetupXImage (void)
+void SetupXImage (void)
 {
 #ifdef MITSHM
 	GUI.use_shared_memory = TRUE;
@@ -1404,7 +1388,7 @@ static void SetupXImage (void)
 #endif
 }
 
-static void TakedownXImage (void)
+void TakedownXImage (void)
 {
 	if (GUI.image->ximage)
 	{
@@ -1430,7 +1414,7 @@ static void TakedownXImage (void)
 }
 
 #ifdef USE_XVIDEO
-static void SetupXvImage (void)
+void SetupXvImage (void)
 {
 #ifdef MITSHM
 	GUI.use_shared_memory = TRUE;
@@ -1510,7 +1494,7 @@ static void SetupXvImage (void)
 	GUI.image->data = GUI.image->xvimage->data;
 }
 
-static void TakedownXvImage (void)
+void TakedownXvImage (void)
 {
 	if (GUI.image->xvimage)
 	{
@@ -1540,7 +1524,7 @@ static void TakedownXvImage (void)
 
 void S9xPutImage (int width, int height)
 {
-	static thread_local int	prevWidth = 0, prevHeight = 0;
+	thread_local int	prevWidth = 0, prevHeight = 0;
 	int			copyWidth, copyHeight;
 	Blitter		blitFn = NULL;
 
@@ -1656,7 +1640,7 @@ void S9xPutImage (int width, int height)
 	prevHeight = height;
 }
 
-static void Convert16To24 (int width, int height)
+void Convert16To24 (int width, int height)
 {
 	if (GUI.pixel_format == 565)
 	{
@@ -1688,7 +1672,7 @@ static void Convert16To24 (int width, int height)
 	}
 }
 
-static void Convert16To24Packed (int width, int height)
+void Convert16To24Packed (int width, int height)
 {
 	if (GUI.pixel_format == 565)
 	{
@@ -1758,7 +1742,7 @@ static void Convert16To24Packed (int width, int height)
 	}
 }
 
-static void Repaint (bool8 isFrameBoundry)
+void Repaint (bool8 isFrameBoundry)
 {
 #ifdef USE_XVIDEO
 	if (GUI.use_xvideo)
@@ -1830,7 +1814,7 @@ void S9xGraphicsMode (void)
 	SetXRepeat(FALSE);
 }
 
-static bool8 CheckForPendingXEvents (Display *display)
+bool8 CheckForPendingXEvents (Display *display)
 {
 #ifdef SELECT_BROKEN_FOR_SIGNALS
 	int	arg = 0;
@@ -1856,13 +1840,6 @@ void S9xProcessEvents (bool8 block)
 			case KeyPress:
 			case KeyRelease:
 				S9xReportButton(((event.xkey.state & (ShiftMask | Mod1Mask | ControlMask | Mod4Mask)) << 8) | event.xkey.keycode, event.type == KeyPress);
-			#if 1
-				{
-					KeyCode	kc = XKeysymToKeycode(GUI.display, XKeycodeToKeysym(GUI.display, event.xkey.keycode, 0));
-					if (event.xkey.keycode != kc)
-						S9xReportButton(((event.xkey.state & (ShiftMask | Mod1Mask | ControlMask | Mod4Mask)) << 8) | kc, event.type == KeyPress);
-				}
-			#endif
 				break;
 
 			case FocusIn:
@@ -1892,7 +1869,7 @@ void S9xProcessEvents (bool8 block)
 
 const char * S9xSelectFilename (const char *def, const char *dir1, const char *ext1, const char *title)
 {
-	static thread_local char	s[PATH_MAX + 1];
+	thread_local char	s[PATH_MAX + 1];
 	char		thread_local  buffer[PATH_MAX + 1];
 
 	SetXRepeat(TRUE);
@@ -1932,7 +1909,7 @@ const char * S9xSelectFilename (const char *def, const char *dir1, const char *e
 void S9xMessage (int type, int number, const char *message)
 {
 	const thread_local int	max = 36 * 3;
-	static thread_local char	buffer[max + 1];
+	thread_local char	buffer[max + 1];
 
 	fprintf(stdout, "%s\n", message);
 	strncpy(buffer, message, max + 1);
@@ -1942,7 +1919,7 @@ void S9xMessage (int type, int number, const char *message)
 
 const char * S9xStringInput (const char *message)
 {
-	static thread_local char	buffer[256];
+	thread_local char	buffer[256];
 
 	printf("%s: ", message);
 	fflush(stdout);
@@ -1959,7 +1936,7 @@ void S9xSetTitle (const char *string)
 	XFlush(GUI.display);
 }
 
-static void SetXRepeat (bool8 state)
+void SetXRepeat (bool8 state)
 {
 	if (state)
 		XAutoRepeatOn(GUI.display);

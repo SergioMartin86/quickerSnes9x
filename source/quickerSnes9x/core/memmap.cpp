@@ -958,11 +958,9 @@ static bool8 allASCII (uint8 *, int);
 static bool8 is_SufamiTurbo_BIOS (const uint8 *, uint32);
 static bool8 is_SufamiTurbo_Cart (const uint8 *, uint32);
 static bool8 is_BSCart_BIOS (const uint8 *, uint32);
-static bool8 is_SameGame_Add_On (const uint8 *, uint32);
 static bool8 is_BSCartSA1_BIOS(const uint8 *, uint32);
 static bool8 is_GNEXT_Add_On (const uint8 *, uint32);
 static uint32 caCRC32 (uint8 *, uint32, uint32 crc32 = 0xffffffff);
-static uint32 ReadUPSPointer (const uint8 *, unsigned &, unsigned);
 static bool8 ReadUPSPatch (Stream *, long, int32 &);
 static long ReadInt (Stream *, unsigned);
 static bool8 ReadIPSPatch (Stream *, long, int32 &);
@@ -1250,14 +1248,6 @@ static bool8 is_BSCart_BIOS(const uint8 *data, uint32 size)
 
 		return (TRUE);
 	}
-	else
-		return (FALSE);
-}
-
-static bool8 is_SameGame_Add_On (const uint8 *data, uint32 size)
-{
-	if (size == 0x80000)
-		return (TRUE);
 	else
 		return (FALSE);
 }
@@ -2007,7 +1997,7 @@ bool8 CMemory::LoadBSCart ()
 
 	CalculatedSize = Multi.cartSizeA;
 
-	if (Multi.cartSizeB == 0 && Multi.cartSizeA <= (MAX_ROM_SIZE - 0x100000 - Multi.cartOffsetA))
+	if (Multi.cartSizeB == 0 && (int64_t)Multi.cartSizeA <= (int64_t)(MAX_ROM_SIZE - 0x100000 - Multi.cartOffsetA))
 	{
 		//Initialize 1MB Empty Memory Pack only if cart B is cleared
 		//It does not make a Memory Pack if game is loaded like a normal ROM
@@ -2045,13 +2035,13 @@ bool8 CMemory::LoadGNEXT ()
 bool8 CMemory::LoadSRTC (void)
 {
 	FILE	*fp;
-	size_t	ignore;
 
 	fp = fopen(S9xGetFilename(".rtc", SRAM_DIR), "rb");
 	if (!fp)
 		return (FALSE);
 
-	ignore = fread(RTCData.reg, 1, 20, fp);
+	int read = fread(RTCData.reg, 1, 20, fp);
+	if (read < 0) printf("Error reading file");
 	fclose(fp);
 
 	return (TRUE);
@@ -2060,13 +2050,12 @@ bool8 CMemory::LoadSRTC (void)
 bool8 CMemory::SaveSRTC (void)
 {
 	FILE	*fp;
-	size_t	ignore;
 
 	fp = fopen(S9xGetFilename(".rtc", SRAM_DIR), "wb");
 	if (!fp)
 		return (FALSE);
 
-	ignore = fwrite(RTCData.reg, 1, 20, fp);
+	fwrite(RTCData.reg, 1, 20, fp);
 	fclose(fp);
 
 	return (TRUE);
@@ -2193,8 +2182,7 @@ bool8 CMemory::SaveSRAM (const char *filename)
 		file = fopen(name, "wb");
 		if (file)
 		{
-			size_t	ignore;
-			ignore = fwrite((char *) Multi.sramB, size, 1, file);
+			fwrite((char *) Multi.sramB, size, 1, file);
 			fclose(file);
 		}
 
@@ -2210,8 +2198,7 @@ bool8 CMemory::SaveSRAM (const char *filename)
 		file = fopen(sramName, "wb");
 		if (file)
 		{
-			size_t	ignore;
-			ignore = fwrite((char *) SRAM, size, 1, file);
+			fwrite((char *) SRAM, size, 1, file);
 			fclose(file);
 
 			if (Settings.SRTC || Settings.SPC7110RTC)
@@ -2239,8 +2226,7 @@ bool8 CMemory::SaveMPAK (const char *filename)
 			file = fopen(mempakName, "wb");
 			if (file)
 			{
-				size_t	ignore;
-				ignore = fwrite((char *)Memory.ROM + Multi.cartOffsetB, size, 1, file);
+				fwrite((char *)Memory.ROM + Multi.cartOffsetB, size, 1, file);
 				fclose(file);
 
 				return (TRUE);
@@ -2919,7 +2905,7 @@ void CMemory::map_index (uint32 bank_s, uint32 bank_e, uint32 addr_s, uint32 add
 		for (i = addr_s; i <= addr_e; i += 0x1000)
 		{
 			p = (c << 4) | (i >> 12);
-			Map[p] = (uint8 *) index;
+			Map[p] = (uint8 *) (uint64_t)index;
 			BlockIsROM[p] = isROM;
 			BlockIsRAM[p] = isRAM;
 		}
@@ -3878,20 +3864,6 @@ void CMemory::ApplyROMFixes (void)
 
 // BPS % UPS % IPS
 
-// number decoding used for both BPS and UPS
-static uint32 XPSdecode (const uint8 *data, unsigned &addr, unsigned size)
-{
-	uint32 offset = 0, shift = 1;
-	while(addr < size) {
-		uint8 x = data[addr++];
-		offset += (x & 0x7f) * shift;
-		if(x & 0x80) break;
-		shift <<= 7;
-		offset += shift;
-	}
-	return offset;
-}
-
 //NOTE: UPS patches are *never* created against a headered ROM!
 //this is per the UPS file specification. however, do note that it is
 //technically possible for a non-compliant patcher to ignore this requirement.
@@ -3903,80 +3875,7 @@ static uint32 XPSdecode (const uint8 *data, unsigned &addr, unsigned size)
 
 static bool8 ReadUPSPatch (Stream *r, long, int32 &rom_size)
 {
-	//Reader lacks size() and rewind(), so we need to read in the file to get its size
-	uint8 *data = new uint8[8 * 1024 * 1024];  //allocate a lot of memory, better safe than sorry ...
-	uint32 size = 0;
-	while(true) {
-		int value = r->get_char();
-		if(value == EOF) break;
-		data[size++] = value;
-		if(size >= 8 * 1024 * 1024) {
-			//prevent buffer overflow: SNES-made UPS patches should never be this big anyway ...
-			delete[] data;
-			return false;
-		}
-	}
-
-	//4-byte header + 1-byte input size + 1-byte output size + 4-byte patch CRC32 + 4-byte unpatched CRC32 + 4-byte patched CRC32
-	if(size < 18) { delete[] data; return false; }  //patch is too small
-
-	uint32 addr = 0;
-	if(data[addr++] != 'U') { delete[] data; return false; }  //patch has an invalid header
-	if(data[addr++] != 'P') { delete[] data; return false; }  //...
-	if(data[addr++] != 'S') { delete[] data; return false; }  //...
-	if(data[addr++] != '1') { delete[] data; return false; }  //...
-
-	uint32 patch_crc32 = caCRC32(data, size - 4);  //don't include patch CRC32 itself in CRC32 calculation
-	uint32 rom_crc32 = caCRC32(Memory.ROM, rom_size);
-	uint32 px_crc32 = (data[size - 12] << 0) + (data[size - 11] << 8) + (data[size - 10] << 16) + (data[size -  9] << 24);
-	uint32 py_crc32 = (data[size -  8] << 0) + (data[size -  7] << 8) + (data[size -  6] << 16) + (data[size -  5] << 24);
-	uint32 pp_crc32 = (data[size -  4] << 0) + (data[size -  3] << 8) + (data[size -  2] << 16) + (data[size -  1] << 24);
-	if(patch_crc32 != pp_crc32) { delete[] data; return false; }  //patch is corrupted
-	if((rom_crc32 != px_crc32) && (rom_crc32 != py_crc32)) { delete[] data; return false; }  //patch is for a different ROM
-
-	uint32 px_size = XPSdecode(data, addr, size);
-	uint32 py_size = XPSdecode(data, addr, size);
-	uint32 out_size = ((uint32) rom_size == px_size) ? py_size : px_size;
-	if(out_size > CMemory::MAX_ROM_SIZE) { delete[] data; return false; }  //applying this patch will overflow Memory.ROM buffer
-
-	//fill expanded area with 0x00s; so that XORing works as expected below.
-	//note that this is needed (and works) whether output ROM is larger or smaller than pre-patched ROM
-	for(unsigned i = min((uint32) rom_size, out_size); i < max((uint32) rom_size, out_size); i++) {
-		Memory.ROM[i] = 0x00;
-	}
-
-	uint32 relative = 0;
-	while(addr < size - 12) {
-		relative += XPSdecode(data, addr, size);
-		while(addr < size - 12) {
-			uint8 x = data[addr++];
-			Memory.ROM[relative++] ^= x;
-			if(!x) break;
-		}
-	}
-
-	rom_size = out_size;
-	delete[] data;
-
-	uint32 out_crc32 = caCRC32(Memory.ROM, rom_size);
-	if(((rom_crc32 == px_crc32) && (out_crc32 == py_crc32))
-	|| ((rom_crc32 == py_crc32) && (out_crc32 == px_crc32))
-	) {
-		return true;
-	} else {
-		//technically, reaching here means that patching has failed.
-		//we should return false, but unfortunately Memory.ROM has already
-		//been modified above and cannot be undone. to do this properly, we
-		//would need to make a copy of Memory.ROM, apply the patch, and then
-		//copy that back to Memory.ROM.
-		//
-		//however, the only way for this case to happen is if the UPS patch file
-		//itself is corrupted, which should be detected by the patch CRC32 check
-		//above anyway. errors due to the wrong ROM or patch file being used are
-		//already caught above.
-		fprintf(stderr, "WARNING: UPS patching appears to have failed.\nGame may not be playable.\n");
-		return true;
-	}
+	return false;
 }
 
 // header notes for UPS patches also apply to BPS
@@ -3985,93 +3884,7 @@ static bool8 ReadUPSPatch (Stream *r, long, int32 &rom_size)
 //
 static bool8 ReadBPSPatch (Stream *r, long, int32 &rom_size)
 {
-	uint8 *data = new uint8[8 * 1024 * 1024];  //allocate a lot of memory, better safe than sorry ...
-	uint32 size = 0;
-	while(true) {
-		int value = r->get_char();
-		if(value == EOF) break;
-		data[size++] = value;
-		if(size >= 8 * 1024 * 1024) {
-			//prevent buffer overflow: SNES-made BPS patches should never be this big anyway ...
-			delete[] data;
-			return false;
-		}
-	}
-
-	/* 4-byte header + 1-byte input size + 1-byte output size + 1-byte metadata size
-	   + 4-byte unpatched CRC32 + 4-byte patched CRC32 + 4-byte patch CRC32 */
-	if(size < 19) { delete[] data; return false; }  //patch is too small
-
-	uint32 addr = 0;
-	if(data[addr++] != 'B') { delete[] data; return false; }  //patch has an invalid header
-	if(data[addr++] != 'P') { delete[] data; return false; }  //...
-	if(data[addr++] != 'S') { delete[] data; return false; }  //...
-	if(data[addr++] != '1') { delete[] data; return false; }  //...
-
-	uint32 patch_crc32 = caCRC32(data, size - 4);  //don't include patch CRC32 itself in CRC32 calculation
-	uint32 rom_crc32 = caCRC32(Memory.ROM, rom_size);
-	uint32 source_crc32 = (data[size - 12] << 0) + (data[size - 11] << 8) + (data[size - 10] << 16) + (data[size -  9] << 24);
-	uint32 target_crc32 = (data[size -  8] << 0) + (data[size -  7] << 8) + (data[size -  6] << 16) + (data[size -  5] << 24);
-	uint32 pp_crc32 = (data[size -  4] << 0) + (data[size -  3] << 8) + (data[size -  2] << 16) + (data[size -  1] << 24);
-	if(patch_crc32 != pp_crc32) { delete[] data; return false; }  //patch is corrupted
-	if(rom_crc32 != source_crc32) { delete[] data; return false; }  //patch is for a different ROM
-
-	uint32 source_size = XPSdecode(data, addr, size);
-	uint32 target_size = XPSdecode(data, addr, size);
-	uint32 metadata_size = XPSdecode(data, addr, size);
-	addr += metadata_size;
-
-	if(target_size > CMemory::MAX_ROM_SIZE) { delete[] data; return false; }  //applying this patch will overflow Memory.ROM buffer
-
-	enum { SourceRead, TargetRead, SourceCopy, TargetCopy };
-	uint32 outputOffset = 0, sourceRelativeOffset = 0, targetRelativeOffset = 0;
-
-	uint8 *patched_rom = new uint8[target_size];
-	memset(patched_rom,0,target_size);
-
-	while(addr < size - 12) {
-		uint32 length = XPSdecode(data, addr, size);
-		uint32 mode = length & 3;
-		length = (length >> 2) + 1;
-
-		switch((int)mode) {
-			case SourceRead:
-				while(length--) patched_rom[outputOffset++] = Memory.ROM[outputOffset];
-				break;
-			case TargetRead:
-				while(length--) patched_rom[outputOffset++] = data[addr++];
-				break;
-			case SourceCopy:
-			case TargetCopy:
-				int32 offset = XPSdecode(data, addr, size);
-				bool negative = offset & 1;
-				offset >>= 1;
-				if(negative) offset = -offset;
-
-				if(mode == SourceCopy) {
-					sourceRelativeOffset += offset;
-					while(length--) patched_rom[outputOffset++] = Memory.ROM[sourceRelativeOffset++];
-				} else {
-					targetRelativeOffset += offset;
-					while(length--) patched_rom[outputOffset++] = patched_rom[targetRelativeOffset++];
-				}
-				break;
-		}
-	}
-
-	delete[] data;
-
-	uint32 out_crc32 = caCRC32(patched_rom, target_size);
-	if(out_crc32 == target_crc32) {
-		memcpy(Memory.ROM, patched_rom, target_size);
-		rom_size = target_size;
-		delete[] patched_rom;
-		return true;
-	} else {
-		delete[] patched_rom;
-		fprintf(stderr, "WARNING: BPS patching failed.\nROM has not been altered.\n");
 		return false;
-	}
 }
 
 static long ReadInt (Stream *r, unsigned nbytes)

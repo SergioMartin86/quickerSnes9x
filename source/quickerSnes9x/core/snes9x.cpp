@@ -215,131 +215,7 @@ extern FILE	*trace;
 static thread_local char	*rom_filename = NULL;
 
 static bool parse_controller_spec (int, const char *);
-static void parse_crosshair_spec (enum crosscontrols, const char *);
-static bool try_load_config_file (const char *, ConfigFile &);
 
-
-static bool parse_controller_spec (int port, const char *arg)
-{
-	if (!strcasecmp(arg, "none"))
-		S9xSetController(port, CTL_NONE,       0, 0, 0, 0);
-	else
-	if (!strncasecmp(arg, "pad",   3) && arg[3] >= '1' && arg[3] <= '8' && arg[4] == '\0')
-		S9xSetController(port, CTL_JOYPAD, arg[3] - '1', 0, 0, 0);
-	else
-	if (!strncasecmp(arg, "mouse", 5) && arg[5] >= '1' && arg[5] <= '2' && arg[6] == '\0')
-		S9xSetController(port, CTL_MOUSE,  arg[5] - '1', 0, 0, 0);
-	else
-	if (!strcasecmp(arg, "superscope"))
-		S9xSetController(port, CTL_SUPERSCOPE, 0, 0, 0, 0);
-	else
-	if (!strcasecmp(arg, "justifier"))
-		S9xSetController(port, CTL_JUSTIFIER,  0, 0, 0, 0);
-	else
-	if (!strcasecmp(arg, "two-justifiers"))
-		S9xSetController(port, CTL_JUSTIFIER,  1, 0, 0, 0);
-	else
-	if (!strncasecmp(arg, "mp5:", 4) && ((arg[4] >= '1' && arg[4] <= '8') || arg[4] == 'n') &&
-										((arg[5] >= '1' && arg[5] <= '8') || arg[5] == 'n') &&
-										((arg[6] >= '1' && arg[6] <= '8') || arg[6] == 'n') &&
-										((arg[7] >= '1' && arg[7] <= '8') || arg[7] == 'n') && arg[8] == '\0')
-		S9xSetController(port, CTL_MP5, (arg[4] == 'n') ? -1 : arg[4] - '1',
-										(arg[5] == 'n') ? -1 : arg[5] - '1',
-										(arg[6] == 'n') ? -1 : arg[6] - '1',
-										(arg[7] == 'n') ? -1 : arg[7] - '1');
-	else
-		return (false);
-
-	return (true);
-}
-
-static void parse_crosshair_spec (enum crosscontrols ctl, const char *spec)
-{
-	int			idx = -1, i;
-	const char	*fg = NULL, *bg = NULL, *s = spec;
-
-	if (s[0] == '"')
-	{
-		s++;
-		for (i = 0; s[i] != '\0'; i++)
-			if (s[i] == '"' && s[i - 1] != '\\')
-				break;
-
-		idx = 31 - ctl;
-
-		std::string	fname(s, i);
-		if (!S9xLoadCrosshairFile(idx, fname.c_str()))
-			return;
-
-		s += i + 1;
-	}
-	else
-	{
-		if (isdigit(*s))
-		{
-			idx = *s - '0';
-			s++;
-		}
-
-		if (isdigit(*s))
-		{
-			idx = idx * 10 + *s - '0';
-			s++;
-		}
-
-		if (idx > 31)
-		{
-			fprintf(stderr, "Invalid crosshair spec '%s'.\n", spec);
-			return;
-		}
-	}
-
-	while (*s != '\0' && isspace(*s))
-		s++;
-
-	if (*s != '\0')
-	{
-		fg = s;
-
-		while (isalnum(*s))
-			s++;
-
-		if (*s != '/' || !isalnum(s[1]))
-		{
-			fprintf(stderr, "Invalid crosshair spec '%s.'\n", spec);
-			return;
-		}
-
-		bg = ++s;
-
-		while (isalnum(*s))
-			s++;
-
-		if (*s != '\0')
-		{
-			fprintf(stderr, "Invalid crosshair spec '%s'.\n", spec);
-			return;
-		}
-	}
-
-	S9xSetControllerCrosshair(ctl, idx, fg, bg);
-}
-
-static bool try_load_config_file (const char *fname, ConfigFile &conf)
-{
-	FSTREAM	fp;
-
-	fp = OPEN_FSTREAM(fname, "r");
-	if (fp)
-	{
-		fprintf(stdout, "Reading config file %s.\n", fname);
-		conf.LoadFile(new fStream(fp));
-        CLOSE_FSTREAM(fp);
-		return (true);
-	}
-
-	return (false);
-}
 
 void S9xLoadConfigFiles ()
 {
@@ -433,17 +309,6 @@ void S9xLoadConfigFiles ()
 	if (conf.Exists("Controls::Port2"))
 		parse_controller_spec(1, conf.GetString("Controls::Port2"));
 
-	if (conf.Exists("Controls::Mouse1Crosshair"))
-		parse_crosshair_spec(X_MOUSE1,     conf.GetString("Controls::Mouse1Crosshair"));
-	if (conf.Exists("Controls::Mouse2Crosshair"))
-		parse_crosshair_spec(X_MOUSE2,     conf.GetString("Controls::Mouse2Crosshair"));
-	if (conf.Exists("Controls::SuperscopeCrosshair"))
-		parse_crosshair_spec(X_SUPERSCOPE, conf.GetString("Controls::SuperscopeCrosshair"));
-	if (conf.Exists("Controls::Justifier1Crosshair"))
-		parse_crosshair_spec(X_JUSTIFIER1, conf.GetString("Controls::Justifier1Crosshair"));
-	if (conf.Exists("Controls::Justifier2Crosshair"))
-		parse_crosshair_spec(X_JUSTIFIER2, conf.GetString("Controls::Justifier2Crosshair"));
-
 	// Hack
 
 	Settings.DisableGameSpecificHacks       = !conf.GetBool("Hack::EnableGameSpecificHacks",       true);
@@ -479,6 +344,40 @@ void S9xLoadConfigFiles ()
 
 	S9xParsePortConfig(conf, 1);
 	S9xVerifyControllers();
+}
+
+static bool parse_controller_spec (int port, const char *arg)
+{
+	if (!strcasecmp(arg, "none"))
+		S9xSetController(port, CTL_NONE,       0, 0, 0, 0);
+	else
+	if (!strncasecmp(arg, "pad",   3) && arg[3] >= '1' && arg[3] <= '8' && arg[4] == '\0')
+		S9xSetController(port, CTL_JOYPAD, arg[3] - '1', 0, 0, 0);
+	else
+	if (!strncasecmp(arg, "mouse", 5) && arg[5] >= '1' && arg[5] <= '2' && arg[6] == '\0')
+		S9xSetController(port, CTL_MOUSE,  arg[5] - '1', 0, 0, 0);
+	else
+	if (!strcasecmp(arg, "superscope"))
+		S9xSetController(port, CTL_SUPERSCOPE, 0, 0, 0, 0);
+	else
+	if (!strcasecmp(arg, "justifier"))
+		S9xSetController(port, CTL_JUSTIFIER,  0, 0, 0, 0);
+	else
+	if (!strcasecmp(arg, "two-justifiers"))
+		S9xSetController(port, CTL_JUSTIFIER,  1, 0, 0, 0);
+	else
+	if (!strncasecmp(arg, "mp5:", 4) && ((arg[4] >= '1' && arg[4] <= '8') || arg[4] == 'n') &&
+										((arg[5] >= '1' && arg[5] <= '8') || arg[5] == 'n') &&
+										((arg[6] >= '1' && arg[6] <= '8') || arg[6] == 'n') &&
+										((arg[7] >= '1' && arg[7] <= '8') || arg[7] == 'n') && arg[8] == '\0')
+		S9xSetController(port, CTL_MP5, (arg[4] == 'n') ? -1 : arg[4] - '1',
+										(arg[5] == 'n') ? -1 : arg[5] - '1',
+										(arg[6] == 'n') ? -1 : arg[6] - '1',
+										(arg[7] == 'n') ? -1 : arg[7] - '1');
+	else
+		return (false);
+
+	return (true);
 }
 
 void S9xUsage (void)
