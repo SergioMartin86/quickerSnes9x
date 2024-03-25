@@ -100,7 +100,7 @@ int S9xUnfreezeFromStream (jaffarCommon::deserializer::Base& d)
 		d.pop(&CPU, sizeof(CPU));
 		d.pop(&Registers, sizeof(Registers));
 
-  if (_enablePPUBlock)	d.pop(&PPU, sizeof(PPU));
+  if (_enablePPUBlock)	{ S9xResetPPU(); d.pop(&PPU, sizeof(PPU)); }
   if (_enableDMABlock) d.pop(&DMA, sizeof(DMA));
 		if (_enableVRABlock) d.pop(Memory.VRAM, 0x10000);
 		if (_enableRAMBlock) d.pop(Memory.RAM, 0x20000);
