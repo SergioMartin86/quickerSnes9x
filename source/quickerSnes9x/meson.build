@@ -69,23 +69,16 @@ quickerSnes9xIncludeDirs = [
   'core/filter', 
 ]
 
-quickerSnes9xCompileFlags = [
-    '-DNO_DUP_MAIN',
-    '-DHAVE_MKSTEMP',
-    '-DHAVE_STRINGS_H',
-    '-DHAVE_SYS_IOCTL_H',
-    '-DHAVE_STDINT_H',
-    '-DRIGHTSHIFT_IS_SAR',
-    '-DUSE_XVIDEO',
-    '-DNOSOUND'
-]
-
 # quickerSnes9x Core Configuration
 
  quickerSnes9xDependency = declare_dependency(
-  compile_args        : [  '-DNOSOUND', '-DNO_DUP_MAIN', '-Werror'  ],
+  compile_args        : [  '-Werror', '-DNOSOUND', '-DNO_DUP_MAIN'  ],
   include_directories : include_directories(quickerSnes9xIncludeDirs),
-  sources             : [ quickerSnes9xSrc ]
+  sources             : [ quickerSnes9xSrc ],
+  dependencies        : [   dependency('x11',  required : true),
+                            dependency('xext', required : true),
+                            dependency('xv',   required : true),
+                        ]
  )
 
 

@@ -7,54 +7,35 @@
 
 class Resampler : public ring_buffer
 {
-    public:
-        virtual void clear (void)        = 0;
-        virtual void time_ratio (double) = 0;
-        virtual void read (short *, int) = 0;
-        virtual int  avail (void)        = 0;
+  public:
 
-        Resampler (int num_samples) : ring_buffer (num_samples << 1)
-        {
-        }
+  virtual void clear(void)        = 0;
+  virtual void time_ratio(double) = 0;
+  virtual void read(short *, int) = 0;
+  virtual int  avail(void)        = 0;
 
-        ~Resampler ()
-        {
-        }
+  Resampler(int num_samples)
+    : ring_buffer(num_samples << 1)
+  {}
 
-        inline bool
-        push (short *src, int num_samples)
-        {
-            if (max_write () < num_samples)
-                return false;
+  ~Resampler() {}
 
-            !num_samples || ring_buffer::push ((unsigned char *) src, num_samples << 1);
+  inline bool push(short *src, int num_samples)
+  {
+    if (max_write() < num_samples) return false;
 
-            return true;
-        }
+    !num_samples || ring_buffer::push((unsigned char *)src, num_samples << 1);
 
-        inline int
-        space_empty (void) const
-        {
-            return buffer_size - size;
-        }
+    return true;
+  }
 
-        inline int
-        space_filled (void) const
-        {
-            return size;
-        }
+  inline int space_empty(void) const { return buffer_size - size; }
 
-        inline int
-        max_write (void) const
-        {
-            return space_empty () >> 1;
-        }
+  inline int space_filled(void) const { return size; }
 
-        inline void
-        resize (int num_samples)
-        {
-            ring_buffer::resize (num_samples << 1);
-        }
+  inline int max_write(void) const { return space_empty() >> 1; }
+
+  inline void resize(int num_samples) { ring_buffer::resize(num_samples << 1); }
 };
 
 #endif /* __RESAMPLER_H */

@@ -1,7 +1,8 @@
 #include <snes/snes.hpp>
 
 #define DSP_CPP
-namespace SNES {
+namespace SNES
+{
 
 thread_local DSP dsp;
 
@@ -20,31 +21,22 @@ void DSP::reset()
   clock = 0;
 }
 
-static void from_dsp_to_state (uint8 **buf, void *var, size_t size)
+static void from_dsp_to_state(uint8 **buf, void *var, size_t size)
 {
   memcpy(*buf, var, size);
   *buf += size;
 }
 
-static void to_dsp_from_state (uint8 **buf, void *var, size_t size)
+static void to_dsp_from_state(uint8 **buf, void *var, size_t size)
 {
-	memcpy(var, *buf, size);
-	*buf += size;
+  memcpy(var, *buf, size);
+  *buf += size;
 }
 
-void DSP::save_state (uint8 **ptr)
-{
-	spc_dsp.copy_state(ptr, from_dsp_to_state);
-}
+void DSP::save_state(uint8 **ptr) { spc_dsp.copy_state(ptr, from_dsp_to_state); }
 
-void DSP::load_state (uint8 **ptr)
-{
-	spc_dsp.copy_state(ptr, to_dsp_from_state);
-}
+void DSP::load_state(uint8 **ptr) { spc_dsp.copy_state(ptr, to_dsp_from_state); }
 
-DSP::DSP()
-{
-	clock = 0;
-}
+DSP::DSP() { clock = 0; }
 
-}
+} // namespace SNES

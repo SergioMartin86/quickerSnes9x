@@ -84,10 +84,10 @@ class EmuInstanceBase
   virtual void enableRendering() = 0;
   virtual void disableRendering() = 0;
 
-  inline void loadROMFile(const std::string &romData)
+  inline void loadROM(const std::string &romData)
   {
     // Actually loading rom file
-    auto status = loadROMFileImpl(romData);
+    auto status = loadROMImpl(romData);
     if (status == false) JAFFAR_THROW_RUNTIME("Could not process ROM file");
 
     _stateSize = getStateSizeImpl();
@@ -129,7 +129,7 @@ class EmuInstanceBase
 
   protected:
 
-  virtual bool loadROMFileImpl(const std::string &romData) = 0;
+  virtual bool loadROMImpl(const std::string &romData) = 0;
   virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2) = 0;
 
   virtual void enableStateBlockImpl(const std::string& block) {};

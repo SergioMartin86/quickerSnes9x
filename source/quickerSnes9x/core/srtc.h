@@ -187,30 +187,29 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _SRTC_H_
 #define _SRTC_H_
 
 struct SRTCData
 {
-	uint8	reg[20];
+  uint8 reg[20];
 };
 
 // for snapshot only
 struct SSRTCSnapshot
 {
-	int32	rtc_mode;	// enum RTC_Mode
-	int32	rtc_index;	// signed
+  int32 rtc_mode;  // enum RTC_Mode
+  int32 rtc_index; // signed
 };
 
-extern __thread struct SRTCData		RTCData;
-extern __thread struct SSRTCSnapshot	srtcsnap;
+extern __thread struct SRTCData      RTCData;
+extern __thread struct SSRTCSnapshot srtcsnap;
 
-void S9xInitSRTC (void);
-void S9xResetSRTC (void);
-void S9xSRTCPreSaveState (void);
-void S9xSRTCPostLoadState (int);
-void S9xSetSRTC (uint8, uint16);
-uint8 S9xGetSRTC (uint16);
+void  S9xInitSRTC(void);
+void  S9xResetSRTC(void);
+void  S9xSRTCPreSaveState(void);
+void  S9xSRTCPostLoadState(int);
+void  S9xSetSRTC(uint8, uint16);
+uint8 S9xGetSRTC(uint16);
 
 #endif

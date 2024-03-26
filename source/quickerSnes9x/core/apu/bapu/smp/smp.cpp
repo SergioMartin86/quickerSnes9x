@@ -4,14 +4,15 @@
 #include <snes/snes.hpp>
 
 #define SMP_CPP
-namespace SNES {
+namespace SNES
+{
 
 #if defined(DEBUGGER)
   #include "debugger/debugger.cpp"
   #include "debugger/disassembler.cpp"
-  SMPDebugger smp;
+SMPDebugger smp;
 #else
-  SMP thread_local smp;
+SMP thread_local smp;
 #endif
 
 #include "algorithms.cpp"
@@ -20,31 +21,39 @@ namespace SNES {
 #include "memory.cpp"
 #include "timing.cpp"
 
-void SMP::synchronize_cpu() {
+void SMP::synchronize_cpu()
+{
 #ifndef SNES9X
-  if(CPU::Threaded == true) {
-  //if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(cpu.thread);
-  } else {
-    while(clock >= 0) cpu.enter();
+  if (CPU::Threaded == true)
+  {
+    //if(clock >= 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(cpu.thread);
+  } else
+  {
+    while (clock >= 0) cpu.enter();
   }
 #endif
 }
 
-void SMP::synchronize_dsp() {
+void SMP::synchronize_dsp()
+{
 #ifndef SNES9X
-  if(DSP::Threaded == true) {
-  //if(dsp.clock < 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(dsp.thread);
-  } else {
-    while(dsp.clock < 0) dsp.enter();
+  if (DSP::Threaded == true)
+  {
+    //if(dsp.clock < 0 && scheduler.sync != Scheduler::SynchronizeMode::All) co_switch(dsp.thread);
+  } else
+  {
+    while (dsp.clock < 0) dsp.enter();
   }
 #endif
 }
 
-void SMP::enter() {
-  while(clock < 0) op_step();
+void SMP::enter()
+{
+  while (clock < 0) op_step();
 }
 
-void SMP::power() {
+void SMP::power()
+{
 #ifndef SNES9X
   Processor::frequency = system.apu_frequency();
 #endif
@@ -55,7 +64,8 @@ void SMP::power() {
   timer1.target = 0;
   timer2.target = 0;
 
-  for(unsigned n = 0; n < 256; n++) {
+  for (unsigned n = 0; n < 256; n++)
+  {
     cycle_table_dsp[n] = (cycle_count_table[n] * 24);
     cycle_table_cpu[n] = (cycle_count_table[n] * 24) * cpu.frequency;
   }
@@ -65,18 +75,19 @@ void SMP::power() {
   reset();
 }
 
-void SMP::reset() {
-  for(unsigned n = 0x0000; n <= 0xffff; n++) apuram[n] = 0x00;
+void SMP::reset()
+{
+  for (unsigned n = 0x0000; n <= 0xffff; n++) apuram[n] = 0x00;
 
   opcode_number = 0;
-  opcode_cycle = 0;
+  opcode_cycle  = 0;
 
-  regs.pc = 0xffc0;
-  regs.sp = 0xef;
+  regs.pc  = 0xffc0;
+  regs.sp  = 0xef;
   regs.B.a = 0x00;
-  regs.x = 0x00;
+  regs.x   = 0x00;
   regs.B.y = 0x00;
-  regs.p = 0x02;
+  regs.p   = 0x02;
 
   //$00f1
   status.iplrom_enable = true;
@@ -96,7 +107,8 @@ void SMP::reset() {
 }
 
 #ifndef SNES9X
-void SMP::serialize(serializer &s) {
+void SMP::serialize(serializer &s)
+{
   Processor::serialize(s);
 
   s.array(apuram, 64 * 1024);
@@ -147,11 +159,8 @@ void SMP::serialize(serializer &s) {
 }
 #endif
 
-SMP::SMP() {
-  apuram = new uint8[64 * 1024];
-}
+SMP::SMP() { apuram = new uint8[64 * 1024]; }
 
-SMP::~SMP() {
-}
+SMP::~SMP() {}
 
-}
+} // namespace SNES

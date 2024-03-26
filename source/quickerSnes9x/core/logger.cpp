@@ -187,72 +187,66 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #include "snes9x.h"
 #include "movie.h"
 #include "logger.h"
 
-static thread_local int	resetno = 0;
-static thread_local int	framecounter = 0;
-static thread_local FILE	*video = NULL;
-static thread_local FILE	*audio = NULL;
+static thread_local int   resetno      = 0;
+static thread_local int   framecounter = 0;
+static thread_local FILE *video        = NULL;
+static thread_local FILE *audio        = NULL;
 
-
-void S9xResetLogger (void)
+void S9xResetLogger(void)
 {
-	if (!Settings.DumpStreams)
-		return;
+  if (!Settings.DumpStreams) return;
 
-	char	buffer[128];
+  char buffer[128];
 
-	S9xCloseLogger();
-	framecounter = 0;
+  S9xCloseLogger();
+  framecounter = 0;
 
-	sprintf(buffer, "videostream%d.dat", resetno);
-	video = fopen(buffer, "wb");
-	if (!video)
-	{
-		printf("Opening %s failed. Logging cancelled.\n", buffer);
-		return;
-	}
+  sprintf(buffer, "videostream%d.dat", resetno);
+  video = fopen(buffer, "wb");
+  if (!video)
+  {
+    printf("Opening %s failed. Logging cancelled.\n", buffer);
+    return;
+  }
 
-	sprintf(buffer, "audiostream%d.dat", resetno);
-	audio = fopen(buffer, "wb");
-	if (!audio)
-	{
-		printf("Opening %s failed. Logging cancelled.\n", buffer);
-		fclose(video);
-		return;
-	}
+  sprintf(buffer, "audiostream%d.dat", resetno);
+  audio = fopen(buffer, "wb");
+  if (!audio)
+  {
+    printf("Opening %s failed. Logging cancelled.\n", buffer);
+    fclose(video);
+    return;
+  }
 
-	resetno++;
+  resetno++;
 }
 
-void S9xCloseLogger (void)
+void S9xCloseLogger(void)
 {
-	if (video)
-	{
-		fclose(video);
-		video = NULL;
-	}
+  if (video)
+  {
+    fclose(video);
+    video = NULL;
+  }
 
-	if (audio)
-	{
-		fclose(audio);
-		audio = NULL;
-	}
-}	
-
-void S9xVideoLogger (void *pixels, int width, int height, int depth, int bytes_per_line)
-{
-	int	fc = S9xMovieGetFrameCounter();
-	if (fc > 0)
-		framecounter = fc;
-	else
-		framecounter++;
-
+  if (audio)
+  {
+    fclose(audio);
+    audio = NULL;
+  }
 }
 
-void S9xAudioLogger (void *samples, int length)
+void S9xVideoLogger(void *pixels, int width, int height, int depth, int bytes_per_line)
 {
+  int fc = S9xMovieGetFrameCounter();
+  if (fc > 0)
+    framecounter = fc;
+  else
+    framecounter++;
 }
+
+void S9xAudioLogger(void *samples, int length) {}

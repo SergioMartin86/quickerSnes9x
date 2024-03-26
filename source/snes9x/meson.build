@@ -84,7 +84,11 @@ snes9xCompileFlags = [
  snes9xDependency = declare_dependency(
   compile_args        : [  '-DNOSOUND', '-DNO_DUP_MAIN' ],
   include_directories : include_directories(snes9xIncludeDirs),
-  sources             : [ snes9xSrc ]
+  sources             : [ snes9xSrc ],
+  dependencies        : [   dependency('x11',  required : true),
+                            dependency('xext', required : true),
+                            dependency('xv',   required : true),
+                          ]
  )
 
 

@@ -17,46 +17,60 @@ all other #include lines. */
 // module. A failed requirement indicates a bug outside the module.
 // void require( bool expr );
 #undef require
-#define require( expr ) assert( expr )
+#define require(expr) assert(expr)
 
 // Like printf() except output goes to debug log file. Might be defined to do
 // nothing (not even evaluate its arguments).
 // void dprintf( const char* format, ... );
-static inline void blargg_dprintf_( const char*, ... ) { }
+static inline void blargg_dprintf_(const char *, ...) {}
 #undef dprintf
-#define dprintf (1) ? (void) 0 : blargg_dprintf_
+#define dprintf (1) ? (void)0 : blargg_dprintf_
 
 // If enabled, evaluate expr and if false, make debug log entry with source file
 // and line. Meant for finding situations that should be examined further, but that
 // don't indicate a problem. In all cases, execution continues normally.
 #undef check
-#define check( expr ) ((void) 0)
+#define check(expr) ((void)0)
 
 // If expr yields error string, return it from current function, otherwise continue.
 #undef RETURN_ERR
-#define RETURN_ERR( expr ) do {                         \
-		blargg_err_t blargg_return_err_ = (expr);               \
-		if ( blargg_return_err_ ) return blargg_return_err_;    \
-	} while ( 0 )
+#define RETURN_ERR(expr)                                                                                                                                                           \
+  do {                                                                                                                                                                             \
+    blargg_err_t blargg_return_err_ = (expr);                                                                                                                                      \
+    if (blargg_return_err_) return blargg_return_err_;                                                                                                                             \
+  }                                                                                                                                                                                \
+  while (0)
 
 // If ptr is 0, return out of memory error string.
 #undef CHECK_ALLOC
-#define CHECK_ALLOC( ptr ) do { if ( (ptr) == 0 ) return "Out of memory"; } while ( 0 )
+#define CHECK_ALLOC(ptr)                                                                                                                                                           \
+  do {                                                                                                                                                                             \
+    if ((ptr) == 0) return "Out of memory";                                                                                                                                        \
+  }                                                                                                                                                                                \
+  while (0)
 
 // Avoid any macros which evaluate their arguments multiple times
 #undef min
 #undef max
 
-#define DEF_MIN_MAX( type ) \
-	static inline type min( type x, type y ) { if ( x < y ) return x; return y; }\
-	static inline type max( type x, type y ) { if ( y < x ) return x; return y; }
+#define DEF_MIN_MAX(type)                                                                                                                                                          \
+  static inline type min(type x, type y)                                                                                                                                           \
+  {                                                                                                                                                                                \
+    if (x < y) return x;                                                                                                                                                           \
+    return y;                                                                                                                                                                      \
+  }                                                                                                                                                                                \
+  static inline type max(type x, type y)                                                                                                                                           \
+  {                                                                                                                                                                                \
+    if (y < x) return x;                                                                                                                                                           \
+    return y;                                                                                                                                                                      \
+  }
 
-DEF_MIN_MAX( int )
-DEF_MIN_MAX( unsigned )
-DEF_MIN_MAX( long )
-DEF_MIN_MAX( unsigned long )
-DEF_MIN_MAX( float )
-DEF_MIN_MAX( double )
+DEF_MIN_MAX(int)
+DEF_MIN_MAX(unsigned)
+DEF_MIN_MAX(long)
+DEF_MIN_MAX(unsigned long)
+DEF_MIN_MAX(float)
+DEF_MIN_MAX(double)
 
 #undef DEF_MIN_MAX
 
@@ -94,7 +108,7 @@ typedef unsigned char byte;
 
 // BLARGG_SOURCE_BEGIN: If defined, #included, allowing redefition of dprintf and check
 #ifdef BLARGG_SOURCE_BEGIN
-	#include BLARGG_SOURCE_BEGIN
+  #include BLARGG_SOURCE_BEGIN
 #endif
 
 #endif

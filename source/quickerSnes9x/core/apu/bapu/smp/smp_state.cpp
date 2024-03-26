@@ -1,7 +1,8 @@
 #include "snes/snes.hpp"
 #include <stdio.h>
 
-typedef struct spc_file {
+typedef struct spc_file
+{
   uint8 header[33];
   uint8 idtag[3];
   uint8 version_minor;
@@ -23,60 +24,55 @@ typedef struct spc_file {
   uint8 iplrom[64];
 } spc_file;
 
-namespace SNES {
+namespace SNES
+{
 
 #include "dsp/blargg_endian.h"
 
-void SMP::save_spc (uint8 *block) {
+void SMP::save_spc(uint8 *block)
+{
   spc_file out;
 
   const char *header = "SNES-SPC700 Sound File Data v0.30";
-  memcpy (out.header, header, 33);
+  memcpy(out.header, header, 33);
   out.idtag[0] = out.idtag[1] = 26;
-  out.idtag[2] = 27;
-  out.version_minor = 30;
+  out.idtag[2]                = 27;
+  out.version_minor           = 30;
 
-  out.pc_low = regs.pc & 0xff;
-  out.pc_high = (regs.pc >> 8) & 0xff;
-  out.a = regs.B.a;
-  out.x = regs.x;
-  out.y = regs.B.y;
-  out.psw = (uint8) ((unsigned) regs.p);
-  out.sp = regs.sp;
+  out.pc_low      = regs.pc & 0xff;
+  out.pc_high     = (regs.pc >> 8) & 0xff;
+  out.a           = regs.B.a;
+  out.x           = regs.x;
+  out.y           = regs.B.y;
+  out.psw         = (uint8)((unsigned)regs.p);
+  out.sp          = regs.sp;
   out.unused_a[0] = out.unused_a[1] = 0;
 
-  memset (out.id666, 0, 210);
-  memcpy (out.apuram, apuram, 65536);
+  memset(out.id666, 0, 210);
+  memcpy(out.apuram, apuram, 65536);
 
-  for (int i = 0xf2; i <= 0xf9; i++)
-  {
-      out.apuram[i] = mmio_read (i);
-  }
+  for (int i = 0xf2; i <= 0xf9; i++) { out.apuram[i] = mmio_read(i); }
 
-  for (int i = 0xfd; i <= 0xff; i++)
-  {
-      out.apuram[i] = mmio_read (i);
-  }
+  for (int i = 0xfd; i <= 0xff; i++) { out.apuram[i] = mmio_read(i); }
 
-  for (int i = 0; i < 128; i++)
-  {
-      out.dsp_registers[i] = dsp.read (i);
-  }
+  for (int i = 0; i < 128; i++) { out.dsp_registers[i] = dsp.read(i); }
 
-  memset (out.unused_b, 0, 64);
-  memcpy (out.iplrom, iplrom, 64);
+  memset(out.unused_b, 0, 64);
+  memcpy(out.iplrom, iplrom, 64);
 
-  memcpy (block, &out, 66048);
+  memcpy(block, &out, 66048);
 }
 
-
-void SMP::save_state(uint8 **block) {
+void SMP::save_state(uint8 **block)
+{
   uint8 *ptr = *block;
   memcpy(ptr, apuram, 64 * 1024);
   ptr += 64 * 1024;
 
 #undef INT32
-#define INT32(i) set_le32(ptr, (i)); ptr += sizeof(int32)
+#define INT32(i)                                                                                                                                                                   \
+  set_le32(ptr, (i));                                                                                                                                                              \
+  ptr += sizeof(int32)
   INT32(clock);
 
   INT32(opcode_number);
@@ -132,13 +128,16 @@ void SMP::save_state(uint8 **block) {
   *block = ptr;
 }
 
-void SMP::load_state(uint8 **block) {
+void SMP::load_state(uint8 **block)
+{
   uint8 *ptr = *block;
   memcpy(apuram, ptr, 64 * 1024);
   ptr += 64 * 1024;
 
 #undef INT32
-#define INT32(i) i = get_le32(ptr); ptr += sizeof(int32)
+#define INT32(i)                                                                                                                                                                   \
+  i = get_le32(ptr);                                                                                                                                                               \
+  ptr += sizeof(int32)
   INT32(clock);
 
   INT32(opcode_number);

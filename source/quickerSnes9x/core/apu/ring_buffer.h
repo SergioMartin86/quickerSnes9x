@@ -10,102 +10,84 @@
 
 class ring_buffer
 {
-protected:
-    int size;
-    int buffer_size;
-    int start;
-    unsigned char *buffer;
+  protected:
 
-public:
-    ring_buffer (int buffer_size)
-    {
-        this->buffer_size = buffer_size;
-        buffer = new unsigned char[this->buffer_size];
-        memset (buffer, 0, this->buffer_size);
+  int            size;
+  int            buffer_size;
+  int            start;
+  unsigned char *buffer;
 
-        size = 0;
-        start = 0;
-    }
+  public:
 
-    virtual ~ring_buffer (void)
-    {
-        delete[] buffer;
-    }
+  ring_buffer(int buffer_size)
+  {
+    this->buffer_size = buffer_size;
+    buffer            = new unsigned char[this->buffer_size];
+    memset(buffer, 0, this->buffer_size);
 
-    bool
-    push (unsigned char *src, int bytes)
-    {
-        if (space_empty () < bytes)
-            return false;
+    size  = 0;
+    start = 0;
+  }
 
-        int end = (start + size) % buffer_size;
-        int first_write_size = MIN (bytes, buffer_size - end);
+  virtual ~ring_buffer(void) { delete[] buffer; }
 
-        memcpy (buffer + end, src, first_write_size);
+  bool push(unsigned char *src, int bytes)
+  {
+    if (space_empty() < bytes) return false;
 
-        if (bytes > first_write_size)
-            memcpy (buffer, src + first_write_size, bytes - first_write_size);
+    int end              = (start + size) % buffer_size;
+    int first_write_size = MIN(bytes, buffer_size - end);
 
-        size += bytes;
+    memcpy(buffer + end, src, first_write_size);
 
-        return true;
-    }
+    if (bytes > first_write_size) memcpy(buffer, src + first_write_size, bytes - first_write_size);
 
-    bool
-    pull (unsigned char *dst, int bytes)
-    {
-        if (space_filled () < bytes)
-            return false;
+    size += bytes;
 
-        memcpy (dst, buffer + start, MIN (bytes, buffer_size - start));
+    return true;
+  }
 
-        if (bytes > (buffer_size - start))
-            memcpy (dst + (buffer_size - start), buffer, bytes - (buffer_size - start));
+  bool pull(unsigned char *dst, int bytes)
+  {
+    if (space_filled() < bytes) return false;
 
-        start = (start + bytes) % buffer_size;
-        size -= bytes;
+    memcpy(dst, buffer + start, MIN(bytes, buffer_size - start));
 
-        return true;
-    }
+    if (bytes > (buffer_size - start)) memcpy(dst + (buffer_size - start), buffer, bytes - (buffer_size - start));
 
-    inline int
-    space_empty (void) const
-    {
-        return buffer_size - size;
-    }
+    start = (start + bytes) % buffer_size;
+    size -= bytes;
 
-    inline int
-    space_filled (void) const
-    {
-        return size;
-    }
+    return true;
+  }
 
-    void
-    clear (void)
-    {
-        start = 0;
-        size = 0;
-        memset (buffer, 0, buffer_size);
-    }
+  inline int space_empty(void) const { return buffer_size - size; }
 
-    void
-    resize (int size)
-    {
-        delete[] buffer;
-        buffer_size = size;
-        buffer = new unsigned char[buffer_size];
-        memset (buffer, 0, this->buffer_size);
+  inline int space_filled(void) const { return size; }
 
-        this->size = 0;
-        start = 0;
-    }
+  void clear(void)
+  {
+    start = 0;
+    size  = 0;
+    memset(buffer, 0, buffer_size);
+  }
 
-    inline void
-    cache_silence (void)
-    {
-        clear ();
-        size = buffer_size;
-    }
+  void resize(int size)
+  {
+    delete[] buffer;
+    buffer_size = size;
+    buffer      = new unsigned char[buffer_size];
+    memset(buffer, 0, this->buffer_size);
+
+    this->size = 0;
+    start      = 0;
+  }
+
+  inline void cache_silence(void)
+  {
+    clear();
+    size = buffer_size;
+  }
 };
 
 #endif

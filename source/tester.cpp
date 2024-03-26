@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   // Loading ROM File
   std::string romFileData;
   if (jaffarCommon::file::loadStringFromFile(romFileData, romFilePath) == false) JAFFAR_THROW_LOGIC("Could not rom file: %s\n", romFilePath.c_str());
-  e.loadROMFile(romFileData);
+  e.loadROM(romFileData);
 
   // Calculating ROM SHA1
   auto romSHA1 = jaffarCommon::hash::getSHA1String(romFileData);

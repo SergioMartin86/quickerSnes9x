@@ -187,7 +187,6 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 

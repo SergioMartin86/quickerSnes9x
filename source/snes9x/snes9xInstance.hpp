@@ -30,7 +30,7 @@ class EmuInstance : public EmuInstanceBase
   initSnes9x(argc, argv);
  }
 
-  virtual bool loadROMFileImpl(const std::string &romData) override
+  virtual bool loadROMImpl(const std::string &romData) override
   {
     uint32 saved_flags = CPU.Flags;
 

@@ -187,12 +187,11 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifdef DEBUGGER
 
-#include "snes9x.h"
-#include "fxinst.h"
-#include "fxemu.h"
+  #include "snes9x.h"
+  #include "fxinst.h"
+  #include "fxemu.h"
 
 /*
   When printing a line from the pipe, it could look like this:

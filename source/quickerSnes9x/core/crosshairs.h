@@ -187,23 +187,22 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _CROSSHAIRS_H_
 #define _CROSSHAIRS_H_
 
 // Read in the specified crosshair file, replacing whatever data might be in that slot.
 // Available slots are 1-31.
-// The input file must be a PNG or a text file. 
+// The input file must be a PNG or a text file.
 // PNG:  15x15 pixels, palettized, with 3 colors (white, black, and transparent).
 // text: 15 lines of 16 characters (counting the \n), consisting of ' ', '#', or '.'.
 
-bool S9xLoadCrosshairFile (int idx, const char *filename);
+bool S9xLoadCrosshairFile(int idx, const char *filename);
 
 // Return the specified crosshair. Woo-hoo.
 // char * to a 225-byte string, with '#' marking foreground, '.' marking background,
 // and anything else transparent.
 
-const char * S9xGetCrosshair (int idx);
+const char *S9xGetCrosshair(int idx);
 
 // In controls.cpp. Sets the crosshair for the specified device. Defaults are:
 //                cross   fgcolor    bgcolor
@@ -220,15 +219,15 @@ const char * S9xGetCrosshair (int idx);
 
 enum crosscontrols
 {
-	X_MOUSE1,
-	X_MOUSE2,
-	X_SUPERSCOPE,
-	X_JUSTIFIER1,
-	X_JUSTIFIER2
+  X_MOUSE1,
+  X_MOUSE2,
+  X_SUPERSCOPE,
+  X_JUSTIFIER1,
+  X_JUSTIFIER2
 };
 
-void S9xSetControllerCrosshair (enum crosscontrols ctl, int8 idx, const char *fg, const char *bg);
-void S9xGetControllerCrosshair (enum crosscontrols ctl, int8 *idx, const char **fg, const char **bg);
+void S9xSetControllerCrosshair(enum crosscontrols ctl, int8 idx, const char *fg, const char *bg);
+void S9xGetControllerCrosshair(enum crosscontrols ctl, int8 *idx, const char **fg, const char **bg);
 
 // In gfx.cpp, much like S9xDisplayChar() except it takes the parameters
 // listed and looks up GFX.Screen.
@@ -241,6 +240,6 @@ void S9xGetControllerCrosshair (enum crosscontrols ctl, int8 *idx, const char **
 //  3 = 16 16 16     7 = 31 16  0   11 =  0 23 31   15 = 31  0 16
 //  16-31 are 50% transparent versions of 0-15.
 
-void S9xDrawCrosshair (const char *crosshair, uint8 fgcolor, uint8 bgcolor, int16 x, int16 y);
+void S9xDrawCrosshair(const char *crosshair, uint8 fgcolor, uint8 bgcolor, int16 x, int16 y);
 
 #endif

@@ -187,7 +187,6 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _SNAPSHOT_H_
 #define _SNAPSHOT_H_
 
@@ -195,21 +194,20 @@
 #include <jaffarCommon/serializers/base.hpp>
 #include <jaffarCommon/deserializers/base.hpp>
 
+#define SNAPSHOT_MAGIC "#!s9xsnp"
+#define SNAPSHOT_VERSION_IRQ 7
+#define SNAPSHOT_VERSION_BAPU 8
+#define SNAPSHOT_VERSION 9
 
-#define SNAPSHOT_MAGIC			"#!s9xsnp"
-#define SNAPSHOT_VERSION_IRQ    7
-#define SNAPSHOT_VERSION_BAPU   8
-#define SNAPSHOT_VERSION		9
+#define SUCCESS 1
+#define WRONG_FORMAT (-1)
+#define WRONG_VERSION (-2)
+#define FILE_NOT_FOUND (-3)
+#define WRONG_MOVIE_SNAPSHOT (-4)
+#define NOT_A_MOVIE_SNAPSHOT (-5)
+#define SNAPSHOT_INCONSISTENT (-6)
 
-#define SUCCESS					1
-#define WRONG_FORMAT			(-1)
-#define WRONG_VERSION			(-2)
-#define FILE_NOT_FOUND			(-3)
-#define WRONG_MOVIE_SNAPSHOT	(-4)
-#define NOT_A_MOVIE_SNAPSHOT	(-5)
-#define SNAPSHOT_INCONSISTENT	(-6)
-
-void S9xFreezeToStream (jaffarCommon::serializer::Base& s);
-int S9xUnfreezeFromStream (jaffarCommon::deserializer::Base& d);
+void S9xFreezeToStream(jaffarCommon::serializer::Base &s);
+int  S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d);
 
 #endif

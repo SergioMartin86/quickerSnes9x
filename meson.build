@@ -8,6 +8,9 @@ project('quickerSnes9x','c','cpp',
 # Loading dependencies
 subdir('source')
 
+# Do not build any targets if this is a subproject
+if meson.is_subproject() == false
+
 # Common application flags
 commonCompileArgs = [ '-Wall', '-Wfatal-errors' ]
 
@@ -24,10 +27,8 @@ if get_option('buildPlayer') == true
     'source/player.cpp',
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
     dependencies        : [ quickerSnes9xDependency,
-                            jaffarCommonDependency,
-                            dependency('x11', required : false),
-                            dependency('xext', required : false),
-                            dependency('xv', required : false), ],
+                            jaffarCommonDependency
+                          ],
     include_directories : include_directories(['source']),
     link_args           : [ '-lncurses' ],
   )
@@ -37,9 +38,7 @@ if get_option('buildPlayer') == true
     cpp_args            : [ commonCompileArgs, '-DNCURSES' ],
     dependencies        : [ snes9xDependency,
                             jaffarCommonDependency,
-                            dependency('x11', required : false),
-                            dependency('xext', required : false),
-                            dependency('xv', required : false), ],
+                          ],
     include_directories : include_directories(['source']),
     link_args           : [ '-lncurses' ],
   )
@@ -64,3 +63,5 @@ snes9xTester = executable('snes9xTester',
 
 # Building tests
 subdir('tests')
+
+endif # If not subproject

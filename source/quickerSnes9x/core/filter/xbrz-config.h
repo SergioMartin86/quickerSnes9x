@@ -22,12 +22,12 @@ namespace xbrz
 {
 struct ScalerCfg
 {
-    double luminanceWeight            = 1;
-    double equalColorTolerance        = 30;
-    double dominantDirectionThreshold = 3.6;
-    double steepDirectionThreshold    = 2.2;
-    double newTestAttribute           = 0; //unused; test new parameters
+  double luminanceWeight            = 1;
+  double equalColorTolerance        = 30;
+  double dominantDirectionThreshold = 3.6;
+  double steepDirectionThreshold    = 2.2;
+  double newTestAttribute           = 0; //unused; test new parameters
 };
-}
+} // namespace xbrz
 
 #endif

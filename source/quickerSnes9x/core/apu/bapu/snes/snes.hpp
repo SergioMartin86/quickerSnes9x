@@ -6,14 +6,14 @@
 #define SNES9X
 
 #if defined(__GNUC__)
-  #define inline        inline
-  #define alwaysinline  inline __attribute__((always_inline))
+  #define inline inline
+  #define alwaysinline inline __attribute__((always_inline))
 #elif defined(_MSC_VER)
-  #define inline        inline
-  #define alwaysinline  inline __forceinline
+  #define inline inline
+  #define alwaysinline inline __forceinline
 #else
-  #define inline        inline
-  #define alwaysinline  inline
+  #define inline inline
+  #define alwaysinline inline
 #endif
 
 #define debugvirtual
@@ -23,8 +23,8 @@ namespace SNES
 
 struct Processor
 {
-    unsigned frequency;
-    int32 clock;
+  unsigned frequency;
+  int32    clock;
 };
 
 #include "../smp/smp.hpp"
@@ -32,25 +32,20 @@ struct Processor
 
 class CPU
 {
-public:
-    enum { Threaded = false };
-    int frequency;
-    uint8 registers[4];
+  public:
 
-    inline void reset ()
-    {
-        registers[0] = registers[1] = registers[2] = registers[3] = 0;
-    }
+  enum
+  {
+    Threaded = false
+  };
+  int   frequency;
+  uint8 registers[4];
 
-    alwaysinline void port_write (uint8 port, uint8 data)
-    {
-        registers[port & 3] = data;
-    }
+  inline void reset() { registers[0] = registers[1] = registers[2] = registers[3] = 0; }
 
-    alwaysinline uint8 port_read (uint8 port)
-    {
-        return registers[port & 3];
-    }
+  alwaysinline void port_write(uint8 port, uint8 data) { registers[port & 3] = data; }
+
+  alwaysinline uint8 port_read(uint8 port) { return registers[port & 3]; }
 };
 
 extern thread_local CPU cpu;

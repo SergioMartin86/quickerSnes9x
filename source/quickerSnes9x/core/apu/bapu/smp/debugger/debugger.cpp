@@ -1,6 +1,7 @@
 #ifdef SMP_CPP
 
-void SMPDebugger::op_step() {
+void SMPDebugger::op_step()
+{
   bool break_event = false;
 
   usage[regs.pc] |= UsageExec;
@@ -8,7 +9,8 @@ void SMPDebugger::op_step() {
 
   opcode_edge = true;
   debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Exec, regs.pc, 0x00);
-  if(step_event && step_event() == true) {
+  if (step_event && step_event() == true)
+  {
     debugger.break_event = Debugger::BreakEvent::SMPStep;
     scheduler.exit(Scheduler::ExitReason::DebuggerEvent);
   }
@@ -18,39 +20,42 @@ void SMPDebugger::op_step() {
   synchronize_cpu();
 }
 
-uint8 SMPDebugger::op_read(uint16 addr) {
+uint8 SMPDebugger::op_read(uint16 addr)
+{
   uint8 data = SMP::op_read(addr);
   usage[addr] |= UsageRead;
   debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Read, addr, data);
   return data;
 }
 
-void SMPDebugger::op_write(uint16 addr, uint8 data) {
+void SMPDebugger::op_write(uint16 addr, uint8 data)
+{
   SMP::op_write(addr, data);
   usage[addr] |= UsageWrite;
   usage[addr] &= ~UsageExec;
   debugger.breakpoint_test(Debugger::Breakpoint::Source::APURAM, Debugger::Breakpoint::Mode::Write, addr, data);
 }
 
-SMPDebugger::SMPDebugger() {
-  usage = new uint8[1 << 16]();
-  opcode_pc = 0xffc0;
+SMPDebugger::SMPDebugger()
+{
+  usage       = new uint8[1 << 16]();
+  opcode_pc   = 0xffc0;
   opcode_edge = false;
 }
 
-SMPDebugger::~SMPDebugger() {
-  delete[] usage;
-}
+SMPDebugger::~SMPDebugger() { delete[] usage; }
 
-bool SMPDebugger::property(unsigned id, string &name, string &value) {
+bool SMPDebugger::property(unsigned id, string &name, string &value)
+{
   unsigned n = 0;
 
-  #define item(name_, value_) \
-  if(id == n++) { \
-    name = name_; \
-    value = value_; \
-    return true; \
-  }
+  #define item(name_, value_)                                                                                                                                                      \
+    if (id == n++)                                                                                                                                                                 \
+    {                                                                                                                                                                              \
+      name  = name_;                                                                                                                                                               \
+      value = value_;                                                                                                                                                              \
+      return true;                                                                                                                                                                 \
+    }
 
   //$00f0
   item("$00f0", "");

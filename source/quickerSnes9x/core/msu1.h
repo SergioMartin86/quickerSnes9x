@@ -196,44 +196,46 @@
 
 struct SMSU1
 {
-	uint8	MSU1_STATUS;
-	uint32	MSU1_DATA_SEEK;
-	uint32	MSU1_DATA_POS;
-	uint16	MSU1_TRACK_SEEK;
-	uint16	MSU1_CURRENT_TRACK;
-	uint32	MSU1_RESUME_TRACK;
-	uint8	MSU1_VOLUME;
-	uint8	MSU1_CONTROL;
-	uint32	MSU1_AUDIO_POS;
-	uint32	MSU1_RESUME_POS;
+  uint8  MSU1_STATUS;
+  uint32 MSU1_DATA_SEEK;
+  uint32 MSU1_DATA_POS;
+  uint16 MSU1_TRACK_SEEK;
+  uint16 MSU1_CURRENT_TRACK;
+  uint32 MSU1_RESUME_TRACK;
+  uint8  MSU1_VOLUME;
+  uint8  MSU1_CONTROL;
+  uint32 MSU1_AUDIO_POS;
+  uint32 MSU1_RESUME_POS;
 };
 
-enum SMSU1_FLAG {
-	Revision		= 0x02,	//max: 0x07
-	AudioResume		= 0x04,
-	AudioError		= 0x08,
-	AudioPlaying		= 0x10,
-	AudioRepeating		= 0x20,
-	AudioBusy		= 0x40,
-	DataBusy		= 0x80
+enum SMSU1_FLAG
+{
+  Revision       = 0x02, //max: 0x07
+  AudioResume    = 0x04,
+  AudioError     = 0x08,
+  AudioPlaying   = 0x10,
+  AudioRepeating = 0x20,
+  AudioBusy      = 0x40,
+  DataBusy       = 0x80
 };
 
-enum SMSU1_CMD {
-	Play			= 0x01,
-	Repeat			= 0x02,
-	Resume			= 0x04
+enum SMSU1_CMD
+{
+  Play   = 0x01,
+  Repeat = 0x02,
+  Resume = 0x04
 };
 
-extern __thread struct SMSU1	MSU1;
+extern __thread struct SMSU1 MSU1;
 
-void S9xResetMSU(void);
-void S9xMSU1Init(void);
-bool S9xMSU1ROMExists(void);
-void S9xMSU1Generate(int sample_count);
-uint8 S9xMSU1ReadPort(int port);
-void S9xMSU1WritePort(int port, uint8 byte);
+void   S9xResetMSU(void);
+void   S9xMSU1Init(void);
+bool   S9xMSU1ROMExists(void);
+void   S9xMSU1Generate(int sample_count);
+uint8  S9xMSU1ReadPort(int port);
+void   S9xMSU1WritePort(int port, uint8 byte);
 uint16 S9xMSU1Samples(void);
-void S9xMSU1SetOutput(int16 *out, int size);
-void S9xMSU1PostLoadState(void);
+void   S9xMSU1SetOutput(int16 *out, int size);
+void   S9xMSU1PostLoadState(void);
 
 #endif

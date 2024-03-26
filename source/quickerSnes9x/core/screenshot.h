@@ -187,10 +187,9 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _SCREENSHOT_H_
 #define _SCREENSHOT_H_
 
-bool8 S9xDoScreenshot (int, int);
+bool8 S9xDoScreenshot(int, int);
 
 #endif

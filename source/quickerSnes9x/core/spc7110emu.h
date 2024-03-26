@@ -15,14 +15,15 @@
  * or in connection with the use or performance of this software.
  *****/
 
-
 #ifndef _SPC7110EMU_H_
 #define _SPC7110EMU_H_
 
 #include "spc7110dec.h"
 
-class SPC7110 {
-public:
+class SPC7110
+{
+  public:
+
   void init();
   void enable();
   void power();
@@ -33,20 +34,20 @@ public:
   unsigned data_pointer();
   unsigned data_adjust();
   unsigned data_increment();
-  void set_data_pointer(unsigned addr);
-  void set_data_adjust(unsigned addr);
+  void     set_data_pointer(unsigned addr);
+  void     set_data_adjust(unsigned addr);
 
-  void update_time(int offset = 0);
+  void   update_time(int offset = 0);
   time_t create_time();
 
-  uint8 mmio_read (unsigned addr);
+  uint8 mmio_read(unsigned addr);
   void  mmio_write(unsigned addr, uint8 data);
 
-  uint8 read (unsigned addr);
+  uint8 read(unsigned addr);
   void  write(unsigned addr, uint8 data);
 
   //spc7110decomp
-  void decomp_init();
+  void  decomp_init();
   uint8 decomp_read();
 
   SPC7110();
@@ -126,11 +127,21 @@ public:
   uint8 r4841; //RTC index/data port
   uint8 r4842; //RTC status
 
-  enum RTC_State { RTCS_Inactive, RTCS_ModeSelect, RTCS_IndexSelect, RTCS_Write } rtc_state;
-  enum RTC_Mode  { RTCM_Linear = 0x03, RTCM_Indexed = 0x0c } rtc_mode;
+  enum RTC_State
+  {
+    RTCS_Inactive,
+    RTCS_ModeSelect,
+    RTCS_IndexSelect,
+    RTCS_Write
+  } rtc_state;
+  enum RTC_Mode
+  {
+    RTCM_Linear  = 0x03,
+    RTCM_Indexed = 0x0c
+  } rtc_mode;
   unsigned rtc_index;
 
-  static __thread  const unsigned months[12];
+  static __thread const unsigned months[12];
 };
 
 #endif

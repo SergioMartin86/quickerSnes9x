@@ -187,7 +187,6 @@
   Nintendo Co., Limited and its subsidiary companies.
  ***********************************************************************************/
 
-
 #ifndef _STREAM_H_
 #define _STREAM_H_
 
@@ -195,91 +194,97 @@
 
 class Stream
 {
-	public:
-		Stream (void);
-		virtual ~Stream (void);
-		virtual int get_char (void) = 0;
-		virtual char * gets (char *, size_t) = 0;
-		virtual char * getline (void);	// free() when done
-		virtual std::string getline (bool &);
-		virtual size_t read (void *, size_t) = 0;
-        virtual size_t write (void *, size_t) = 0;
-        virtual size_t pos (void) = 0;
-        virtual size_t size (void) = 0;
-        virtual int revert (size_t from, size_t offset) = 0;
-        virtual void closeStream() = 0;
+  public:
+
+  Stream(void);
+  virtual ~Stream(void);
+  virtual int         get_char(void)       = 0;
+  virtual char       *gets(char *, size_t) = 0;
+  virtual char       *getline(void); // free() when done
+  virtual std::string getline(bool &);
+  virtual size_t      read(void *, size_t)               = 0;
+  virtual size_t      write(void *, size_t)              = 0;
+  virtual size_t      pos(void)                          = 0;
+  virtual size_t      size(void)                         = 0;
+  virtual int         revert(size_t from, size_t offset) = 0;
+  virtual void        closeStream()                      = 0;
 };
 
 class fStream : public Stream
 {
-	public:
-		fStream (FSTREAM);
-		virtual ~fStream (void);
-		virtual int get_char (void);
-		virtual char * gets (char *, size_t);
-		virtual size_t read (void *, size_t);
-        virtual size_t write (void *, size_t);
-        virtual size_t pos (void);
-        virtual size_t size (void);
-        virtual int revert (size_t from, size_t offset);
-        virtual void closeStream();
+  public:
 
-	private:
-		FSTREAM	fp;
+  fStream(FSTREAM);
+  virtual ~fStream(void);
+  virtual int    get_char(void);
+  virtual char  *gets(char *, size_t);
+  virtual size_t read(void *, size_t);
+  virtual size_t write(void *, size_t);
+  virtual size_t pos(void);
+  virtual size_t size(void);
+  virtual int    revert(size_t from, size_t offset);
+  virtual void   closeStream();
+
+  private:
+
+  FSTREAM fp;
 };
 
 #ifdef UNZIP_SUPPORT
-#  ifdef SYSTEM_ZIP
-#    include <minizip/unzip.h>
-#  else
-#    include "unzip.h"
-#  endif
+  #ifdef SYSTEM_ZIP
+    #include <minizip/unzip.h>
+  #else
+    #include "unzip.h"
+  #endif
 
-#define unz_BUFFSIZ	1024
+  #define unz_BUFFSIZ 1024
 
 class unzStream : public Stream
 {
-	public:
-		unzStream (unzFile &);
-		virtual ~unzStream (void);
-		virtual int get_char (void);
-		virtual char * gets (char *, size_t);
-		virtual size_t read (void *, size_t);
-        virtual size_t write (void *, size_t);
-        virtual size_t pos (void);
-        virtual size_t size (void);
-        virtual int revert (size_t from, size_t offset);
-        virtual void closeStream();
+  public:
 
-	private:
-		unzFile	file;
-		char	buffer[unz_BUFFSIZ];
-		char	*head;
-		size_t	numbytes;
+  unzStream(unzFile &);
+  virtual ~unzStream(void);
+  virtual int    get_char(void);
+  virtual char  *gets(char *, size_t);
+  virtual size_t read(void *, size_t);
+  virtual size_t write(void *, size_t);
+  virtual size_t pos(void);
+  virtual size_t size(void);
+  virtual int    revert(size_t from, size_t offset);
+  virtual void   closeStream();
+
+  private:
+
+  unzFile file;
+  char    buffer[unz_BUFFSIZ];
+  char   *head;
+  size_t  numbytes;
 };
 
 #endif
 
 class memStream : public Stream
 {
-	public:
-        memStream (uint8 *,size_t);
-        memStream (const uint8 *,size_t);
-		virtual ~memStream (void);
-		virtual int get_char (void);
-		virtual char * gets (char *, size_t);
-		virtual size_t read (void *, size_t);
-        virtual size_t write (void *, size_t);
-        virtual size_t pos (void);
-        virtual size_t size (void);
-        virtual int revert (size_t from, size_t offset);
-        virtual void closeStream();
+  public:
 
-		uint8   *mem;
-        size_t  msize;
-        size_t  remaining;
-		uint8	*head;
-        bool    readonly;
+  memStream(uint8 *, size_t);
+  memStream(const uint8 *, size_t);
+  virtual ~memStream(void);
+  virtual int    get_char(void);
+  virtual char  *gets(char *, size_t);
+  virtual size_t read(void *, size_t);
+  virtual size_t write(void *, size_t);
+  virtual size_t pos(void);
+  virtual size_t size(void);
+  virtual int    revert(size_t from, size_t offset);
+  virtual void   closeStream();
+
+  uint8 *mem;
+  size_t msize;
+  size_t remaining;
+  uint8 *head;
+  bool   readonly;
 };
 
 /* dummy stream that always reads 0 and writes nowhere
@@ -287,24 +292,25 @@ class memStream : public Stream
 */
 class nulStream : public Stream
 {
-	public:
-        nulStream (void);
-		virtual ~nulStream (void);
-        virtual int get_char (void);
-        virtual char * gets (char *, size_t);
-		virtual size_t read (void *, size_t);
-        virtual size_t write (void *, size_t);
-        virtual size_t pos (void);
-        virtual size_t size (void);
-        virtual int revert (size_t from, size_t offset);
-        virtual void closeStream();
+  public:
 
-    private:
-        size_t  bytes_written;
+  nulStream(void);
+  virtual ~nulStream(void);
+  virtual int    get_char(void);
+  virtual char  *gets(char *, size_t);
+  virtual size_t read(void *, size_t);
+  virtual size_t write(void *, size_t);
+  virtual size_t pos(void);
+  virtual size_t size(void);
+  virtual int    revert(size_t from, size_t offset);
+  virtual void   closeStream();
+
+  private:
+
+  size_t bytes_written;
 };
 
-Stream *openStreamFromFSTREAM(const char* filename, const char* mode);
-Stream *reopenStreamFromFd(int fd, const char* mode);
-
+Stream *openStreamFromFSTREAM(const char *filename, const char *mode);
+Stream *reopenStreamFromFd(int fd, const char *mode);
 
 #endif
