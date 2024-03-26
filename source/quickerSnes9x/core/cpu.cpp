@@ -202,11 +202,11 @@
 #include "debug.h"
 #endif
 
-static void S9xResetCPU (void);
-static void S9xSoftResetCPU (void);
+inline void S9xResetCPU (void);
+inline void S9xSoftResetCPU (void);
 
 
-static void S9xResetCPU (void)
+inline void S9xResetCPU (void)
 {
 	S9xSoftResetCPU();
 	Registers.SL = 0xff;
@@ -218,7 +218,7 @@ static void S9xResetCPU (void)
 	ClearFlags(Decimal);
 }
 
-static void S9xSoftResetCPU (void)
+inline void S9xSoftResetCPU (void)
 {
 	CPU.Cycles = 182; // Or 188. This is the cycle count just after the jump to the Reset Vector.
 	CPU.PrevCycles = CPU.Cycles;

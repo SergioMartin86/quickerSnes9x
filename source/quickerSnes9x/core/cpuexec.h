@@ -233,7 +233,7 @@ void S9xReset (void);
 void S9xSoftReset (void);
 void S9xDoHEventProcessing (void);
 
-static inline void S9xUnpackStatus (void)
+inline void S9xUnpackStatus (void)
 { 
 	ICPU._Zero = (Registers.PL & Zero) == 0;
 	ICPU._Negative = (Registers.PL & Negative);
@@ -241,13 +241,13 @@ static inline void S9xUnpackStatus (void)
 	ICPU._Overflow = (Registers.PL & Overflow) >> 6;
 }
 
-static inline void S9xPackStatus (void)
+inline void S9xPackStatus (void)
 {
 	Registers.PL &= ~(Zero | Negative | Carry | Overflow);
 	Registers.PL |= ICPU._Carry | ((ICPU._Zero == 0) << 1) | (ICPU._Negative & 0x80) | (ICPU._Overflow << 6);
 }
 
-static inline void S9xFixCycles (void)
+inline void S9xFixCycles (void)
 {
 	if (CheckEmulation())
 	{
@@ -283,7 +283,7 @@ static inline void S9xFixCycles (void)
 	}
 }
 
-static inline void S9xCheckInterrupts (void)
+inline void S9xCheckInterrupts (void)
 {
 	bool8	thisIRQ = PPU.HTimerEnabled || PPU.VTimerEnabled;
 

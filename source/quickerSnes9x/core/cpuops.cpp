@@ -213,17 +213,17 @@
 
 /* ADC ********************************************************************* */
 
-static void Op69M1 (void)
+inline void Op69M1 (void)
 {
 	ADC(Immediate8(READ));
 }
 
-static void Op69M0 (void)
+inline void Op69M0 (void)
 {
 	ADC(Immediate16(READ));
 }
 
-static void Op69Slow (void)
+inline void Op69Slow (void)
 {
 	if (CheckMemory())
 		ADC(Immediate8Slow(READ));
@@ -299,19 +299,19 @@ rOPM (73Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, ADC)
 
 /* AND ********************************************************************* */
 
-static void Op29M1 (void)
+inline void Op29M1 (void)
 {
 	Registers.AL &= Immediate8(READ);
 	SetZN(Registers.AL);
 }
 
-static void Op29M0 (void)
+inline void Op29M0 (void)
 {
 	Registers.A.W &= Immediate16(READ);
 	SetZN(Registers.A.W);
 }
 
-static void Op29Slow (void)
+inline void Op29Slow (void)
 {
 	if (CheckMemory())
 	{
@@ -393,7 +393,7 @@ rOPM (33Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, AND)
 
 /* ASL ********************************************************************* */
 
-static void Op0AM1 (void)
+inline void Op0AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	ICPU._Carry = (Registers.AL & 0x80) != 0;
@@ -401,7 +401,7 @@ static void Op0AM1 (void)
 	SetZN(Registers.AL);
 }
 
-static void Op0AM0 (void)
+inline void Op0AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	ICPU._Carry = (Registers.AH & 0x80) != 0;
@@ -409,7 +409,7 @@ static void Op0AM0 (void)
 	SetZN(Registers.A.W);
 }
 
-static void Op0ASlow (void)
+inline void Op0ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -448,17 +448,17 @@ mOPM (1ESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, ASL)
 
 /* BIT ********************************************************************* */
 
-static void Op89M1 (void)
+inline void Op89M1 (void)
 {
 	ICPU._Zero = Registers.AL & Immediate8(READ);
 }
 
-static void Op89M0 (void)
+inline void Op89M0 (void)
 {
 	ICPU._Zero = (Registers.A.W & Immediate16(READ)) != 0;
 }
 
-static void Op89Slow (void)
+inline void Op89Slow (void)
 {
 	if (CheckMemory())
 		ICPU._Zero = Registers.AL & Immediate8Slow(READ);
@@ -487,21 +487,21 @@ rOPM (3CSlow,   AbsoluteIndexedXSlow,             WRAP_NONE, BIT)
 
 /* CMP ********************************************************************* */
 
-static void OpC9M1 (void)
+inline void OpC9M1 (void)
 {
 	int16	Int16 = (int16) Registers.AL - (int16) Immediate8(READ);
 	ICPU._Carry = Int16 >= 0;
 	SetZN((uint8) Int16);
 }
 
-static void OpC9M0 (void)
+inline void OpC9M0 (void)
 {
 	int32	Int32 = (int32) Registers.A.W - (int32) Immediate16(READ);
 	ICPU._Carry = Int32 >= 0;
 	SetZN((uint16) Int32);
 }
 
-static void OpC9Slow (void)
+inline void OpC9Slow (void)
 {
 	if (CheckMemory())
 	{
@@ -585,21 +585,21 @@ rOPM (D3Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, CMP)
 
 /* CPX ********************************************************************* */
 
-static void OpE0X1 (void)
+inline void OpE0X1 (void)
 {
 	int16	Int16 = (int16) Registers.XL - (int16) Immediate8(READ);
 	ICPU._Carry = Int16 >= 0;
 	SetZN((uint8) Int16);
 }
 
-static void OpE0X0 (void)
+inline void OpE0X0 (void)
 {
 	int32	Int32 = (int32) Registers.X.W - (int32) Immediate16(READ);
 	ICPU._Carry = Int32 >= 0;
 	SetZN((uint16) Int32);
 }
 
-static void OpE0Slow (void)
+inline void OpE0Slow (void)
 {
 	if (CheckIndex())
 	{
@@ -625,21 +625,21 @@ rOPX (ECSlow,   AbsoluteSlow,                     WRAP_NONE, CPX)
 
 /* CPY ********************************************************************* */
 
-static void OpC0X1 (void)
+inline void OpC0X1 (void)
 {
 	int16	Int16 = (int16) Registers.YL - (int16) Immediate8(READ);
 	ICPU._Carry = Int16 >= 0;
 	SetZN((uint8) Int16);
 }
 
-static void OpC0X0 (void)
+inline void OpC0X0 (void)
 {
 	int32	Int32 = (int32) Registers.Y.W - (int32) Immediate16(READ);
 	ICPU._Carry = Int32 >= 0;
 	SetZN((uint16) Int32);
 }
 
-static void OpC0Slow (void)
+inline void OpC0Slow (void)
 {
 	if (CheckIndex())
 	{
@@ -665,21 +665,21 @@ rOPX (CCSlow,   AbsoluteSlow,                     WRAP_NONE, CPY)
 
 /* DEC ********************************************************************* */
 
-static void Op3AM1 (void)
+inline void Op3AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.AL--;
 	SetZN(Registers.AL);
 }
 
-static void Op3AM0 (void)
+inline void Op3AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W--;
 	SetZN(Registers.A.W);
 }
 
-static void Op3ASlow (void)
+inline void Op3ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -716,19 +716,19 @@ mOPM (DESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, DEC)
 
 /* EOR ********************************************************************* */
 
-static void Op49M1 (void)
+inline void Op49M1 (void)
 {
 	Registers.AL ^= Immediate8(READ);
 	SetZN(Registers.AL);
 }
 
-static void Op49M0 (void)
+inline void Op49M0 (void)
 {
 	Registers.A.W ^= Immediate16(READ);
 	SetZN(Registers.A.W);
 }
 
-static void Op49Slow (void)
+inline void Op49Slow (void)
 {
 	if (CheckMemory())
 	{
@@ -810,21 +810,21 @@ rOPM (53Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, EOR)
 
 /* INC ********************************************************************* */
 
-static void Op1AM1 (void)
+inline void Op1AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.AL++;
 	SetZN(Registers.AL);
 }
 
-static void Op1AM0 (void)
+inline void Op1AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W++;
 	SetZN(Registers.A.W);
 }
 
-static void Op1ASlow (void)
+inline void Op1ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -861,19 +861,19 @@ mOPM (FESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, INC)
 
 /* LDA ********************************************************************* */
 
-static void OpA9M1 (void)
+inline void OpA9M1 (void)
 {
 	Registers.AL = Immediate8(READ);
 	SetZN(Registers.AL);
 }
 
-static void OpA9M0 (void)
+inline void OpA9M0 (void)
 {
 	Registers.A.W = Immediate16(READ);
 	SetZN(Registers.A.W);
 }
 
-static void OpA9Slow (void)
+inline void OpA9Slow (void)
 {
 	if (CheckMemory())
 	{
@@ -955,19 +955,19 @@ rOPM (B3Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, LDA)
 
 /* LDX ********************************************************************* */
 
-static void OpA2X1 (void)
+inline void OpA2X1 (void)
 {
 	Registers.XL = Immediate8(READ);
 	SetZN(Registers.XL);
 }
 
-static void OpA2X0 (void)
+inline void OpA2X0 (void)
 {
 	Registers.X.W = Immediate16(READ);
 	SetZN(Registers.X.W);
 }
 
-static void OpA2Slow (void)
+inline void OpA2Slow (void)
 {
 	if (CheckIndex())
 	{
@@ -1000,19 +1000,19 @@ rOPX (BESlow,   AbsoluteIndexedYSlow,             WRAP_BANK, LDX)
 
 /* LDY ********************************************************************* */
 
-static void OpA0X1 (void)
+inline void OpA0X1 (void)
 {
 	Registers.YL = Immediate8(READ);
 	SetZN(Registers.YL);
 }
 
-static void OpA0X0 (void)
+inline void OpA0X0 (void)
 {
 	Registers.Y.W = Immediate16(READ);
 	SetZN(Registers.Y.W);
 }
 
-static void OpA0Slow (void)
+inline void OpA0Slow (void)
 {
 	if (CheckIndex())
 	{
@@ -1045,7 +1045,7 @@ rOPX (BCSlow,   AbsoluteIndexedXSlow,             WRAP_BANK, LDY)
 
 /* LSR ********************************************************************* */
 
-static void Op4AM1 (void)
+inline void Op4AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	ICPU._Carry = Registers.AL & 1;
@@ -1053,7 +1053,7 @@ static void Op4AM1 (void)
 	SetZN(Registers.AL);
 }
 
-static void Op4AM0 (void)
+inline void Op4AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	ICPU._Carry = Registers.A.W & 1;
@@ -1061,7 +1061,7 @@ static void Op4AM0 (void)
 	SetZN(Registers.A.W);
 }
 
-static void Op4ASlow (void)
+inline void Op4ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1100,19 +1100,19 @@ mOPM (5ESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, LSR)
 
 /* ORA ********************************************************************* */
 
-static void Op09M1 (void)
+inline void Op09M1 (void)
 {
 	Registers.AL |= Immediate8(READ);
 	SetZN(Registers.AL);
 }
 
-static void Op09M0 (void)
+inline void Op09M0 (void)
 {
 	Registers.A.W |= Immediate16(READ);
 	SetZN(Registers.A.W);
 }
 
-static void Op09Slow (void)
+inline void Op09Slow (void)
 {
 	if (CheckMemory())
 	{
@@ -1194,7 +1194,7 @@ rOPM (13Slow,   StackRelativeIndirectIndexedSlow, WRAP_NONE, ORA)
 
 /* ROL ********************************************************************* */
 
-static void Op2AM1 (void)
+inline void Op2AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	uint16	w = (((uint16) Registers.AL) << 1) | CheckCarry();
@@ -1203,7 +1203,7 @@ static void Op2AM1 (void)
 	SetZN(Registers.AL);
 }
 
-static void Op2AM0 (void)
+inline void Op2AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	uint32	w = (((uint32) Registers.A.W) << 1) | CheckCarry();
@@ -1212,7 +1212,7 @@ static void Op2AM0 (void)
 	SetZN(Registers.A.W);
 }
 
-static void Op2ASlow (void)
+inline void Op2ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1253,7 +1253,7 @@ mOPM (3ESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, ROL)
 
 /* ROR ********************************************************************* */
 
-static void Op6AM1 (void)
+inline void Op6AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	uint16	w = ((uint16) Registers.AL) | (((uint16) CheckCarry()) << 8);
@@ -1263,7 +1263,7 @@ static void Op6AM1 (void)
 	SetZN(Registers.AL);
 }
 
-static void Op6AM0 (void)
+inline void Op6AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	uint32	w = ((uint32) Registers.A.W) | (((uint32) CheckCarry()) << 16);
@@ -1273,7 +1273,7 @@ static void Op6AM0 (void)
 	SetZN(Registers.A.W);
 }
 
-static void Op6ASlow (void)
+inline void Op6ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1316,17 +1316,17 @@ mOPM (7ESlow,   AbsoluteIndexedXSlow,             WRAP_NONE, ROR)
 
 /* SBC ********************************************************************* */
 
-static void OpE9M1 (void)
+inline void OpE9M1 (void)
 {
 	SBC(Immediate8(READ));
 }
 
-static void OpE9M0 (void)
+inline void OpE9M0 (void)
 {
 	SBC(Immediate16(READ));
 }
 
-static void OpE9Slow (void)
+inline void OpE9Slow (void)
 {
 	if (CheckMemory())
 		SBC(Immediate8Slow(READ));
@@ -1587,12 +1587,12 @@ bOP(70E1,   Relative,      CheckOverflow(), 0, 1)
 bOP(70Slow, RelativeSlow,  CheckOverflow(), 0, CheckEmulation())
 
 // BRL
-static void Op82 (void)
+inline void Op82 (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + RelativeLong(JUMP));
 }
 
-static void Op82Slow (void)
+inline void Op82Slow (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + RelativeLongSlow(JUMP));
 }
@@ -1600,28 +1600,28 @@ static void Op82Slow (void)
 /* Flag Instructions ******************************************************* */
 
 // CLC
-static void Op18 (void)
+inline void Op18 (void)
 {
 	ClearCarry();
 	AddCycles(ONE_CYCLE);
 }
 
 // SEC
-static void Op38 (void)
+inline void Op38 (void)
 {
 	SetCarry();
 	AddCycles(ONE_CYCLE);
 }
 
 // CLD
-static void OpD8 (void)
+inline void OpD8 (void)
 {
 	ClearDecimal();
 	AddCycles(ONE_CYCLE);
 }
 
 // SED
-static void OpF8 (void)
+inline void OpF8 (void)
 {
 	SetDecimal();
 	AddCycles(ONE_CYCLE);
@@ -1631,7 +1631,7 @@ static void OpF8 (void)
 }
 
 // CLI
-static void Op58 (void)
+inline void Op58 (void)
 {
 	ClearIRQ();
 	AddCycles(ONE_CYCLE);
@@ -1639,14 +1639,14 @@ static void Op58 (void)
 }
 
 // SEI
-static void Op78 (void)
+inline void Op78 (void)
 {
 	SetIRQ();
 	AddCycles(ONE_CYCLE);
 }
 
 // CLV
-static void OpB8 (void)
+inline void OpB8 (void)
 {
 	ClearOverflow();
 	AddCycles(ONE_CYCLE);
@@ -1654,21 +1654,21 @@ static void OpB8 (void)
 
 /* DEX/DEY ***************************************************************** */
 
-static void OpCAX1 (void)
+inline void OpCAX1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.XL--;
 	SetZN(Registers.XL);
 }
 
-static void OpCAX0 (void)
+inline void OpCAX0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.X.W--;
 	SetZN(Registers.X.W);
 }
 
-static void OpCASlow (void)
+inline void OpCASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1684,21 +1684,21 @@ static void OpCASlow (void)
 	}
 }
 
-static void Op88X1 (void)
+inline void Op88X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.YL--;
 	SetZN(Registers.YL);
 }
 
-static void Op88X0 (void)
+inline void Op88X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.Y.W--;
 	SetZN(Registers.Y.W);
 }
 
-static void Op88Slow (void)
+inline void Op88Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1716,21 +1716,21 @@ static void Op88Slow (void)
 
 /* INX/INY ***************************************************************** */
 
-static void OpE8X1 (void)
+inline void OpE8X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.XL++;
 	SetZN(Registers.XL);
 }
 
-static void OpE8X0 (void)
+inline void OpE8X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.X.W++;
 	SetZN(Registers.X.W);
 }
 
-static void OpE8Slow (void)
+inline void OpE8Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1746,21 +1746,21 @@ static void OpE8Slow (void)
 	}
 }
 
-static void OpC8X1 (void)
+inline void OpC8X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.YL++;
 	SetZN(Registers.YL);
 }
 
-static void OpC8X0 (void)
+inline void OpC8X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.Y.W++;
 	SetZN(Registers.Y.W);
 }
 
-static void OpC8Slow (void)
+inline void OpC8Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1778,7 +1778,7 @@ static void OpC8Slow (void)
 
 /* NOP ********************************************************************* */
 
-static void OpEA (void)
+inline void OpEA (void)
 {
 	AddCycles(ONE_CYCLE);
 }
@@ -1802,14 +1802,14 @@ static void OpEA (void)
 	Registers.SL--;
 
 // PEA
-static void OpF4E0 (void)
+inline void OpF4E0 (void)
 {
 	uint16	val = (uint16) Absolute(NONE);
 	PushW(val);
 	OpenBus = val & 0xff;
 }
 
-static void OpF4E1 (void)
+inline void OpF4E1 (void)
 {
 	// Note: PEA is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -1819,7 +1819,7 @@ static void OpF4E1 (void)
 	Registers.SH = 1;
 }
 
-static void OpF4Slow (void)
+inline void OpF4Slow (void)
 {
 	uint16	val = (uint16) AbsoluteSlow(NONE);
 	PushW(val);
@@ -1829,14 +1829,14 @@ static void OpF4Slow (void)
 }
 
 // PEI
-static void OpD4E0 (void)
+inline void OpD4E0 (void)
 {
 	uint16	val = (uint16) DirectIndirectE0(NONE);
 	PushW(val);
 	OpenBus = val & 0xff;
 }
 
-static void OpD4E1 (void)
+inline void OpD4E1 (void)
 {
 	// Note: PEI is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -1846,7 +1846,7 @@ static void OpD4E1 (void)
 	Registers.SH = 1;
 }
 
-static void OpD4Slow (void)
+inline void OpD4Slow (void)
 {
 	uint16	val = (uint16) DirectIndirectSlow(NONE);
 	PushW(val);
@@ -1856,14 +1856,14 @@ static void OpD4Slow (void)
 }
 
 // PER
-static void Op62E0 (void)
+inline void Op62E0 (void)
 {
 	uint16	val = (uint16) RelativeLong(NONE);
 	PushW(val);
 	OpenBus = val & 0xff;
 }
 
-static void Op62E1 (void)
+inline void Op62E1 (void)
 {
 	// Note: PER is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -1873,7 +1873,7 @@ static void Op62E1 (void)
 	Registers.SH = 1;
 }
 
-static void Op62Slow (void)
+inline void Op62Slow (void)
 {
 	uint16	val = (uint16) RelativeLongSlow(NONE);
 	PushW(val);
@@ -1883,28 +1883,28 @@ static void Op62Slow (void)
 }
 
 // PHA
-static void Op48E1 (void)
+inline void Op48E1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushBE(Registers.AL);
 	OpenBus = Registers.AL;
 }
 
-static void Op48E0M1 (void)
+inline void Op48E0M1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushB(Registers.AL);
 	OpenBus = Registers.AL;
 }
 
-static void Op48E0M0 (void)
+inline void Op48E0M0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushW(Registers.A.W);
 	OpenBus = Registers.AL;
 }
 
-static void Op48Slow (void)
+inline void Op48Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1926,21 +1926,21 @@ static void Op48Slow (void)
 }
 
 // PHB
-static void Op8BE1 (void)
+inline void Op8BE1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushBE(Registers.DB);
 	OpenBus = Registers.DB;
 }
 
-static void Op8BE0 (void)
+inline void Op8BE0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushB(Registers.DB);
 	OpenBus = Registers.DB;
 }
 
-static void Op8BSlow (void)
+inline void Op8BSlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -1957,14 +1957,14 @@ static void Op8BSlow (void)
 }
 
 // PHD
-static void Op0BE0 (void)
+inline void Op0BE0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushW(Registers.D.W);
 	OpenBus = Registers.DL;
 }
 
-static void Op0BE1 (void)
+inline void Op0BE1 (void)
 {
 	// Note: PHD is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -1974,7 +1974,7 @@ static void Op0BE1 (void)
 	Registers.SH = 1;
 }
 
-static void Op0BSlow (void)
+inline void Op0BSlow (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushW(Registers.D.W);
@@ -1984,21 +1984,21 @@ static void Op0BSlow (void)
 }
 
 // PHK
-static void Op4BE1 (void)
+inline void Op4BE1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushBE(Registers.PB);
 	OpenBus = Registers.PB;
 }
 
-static void Op4BE0 (void)
+inline void Op4BE0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushB(Registers.PB);
 	OpenBus = Registers.PB;
 }
 
-static void Op4BSlow (void)
+inline void Op4BSlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2015,7 +2015,7 @@ static void Op4BSlow (void)
 }
 
 // PHP
-static void Op08E0 (void)
+inline void Op08E0 (void)
 {
 	S9xPackStatus();
 	AddCycles(ONE_CYCLE);
@@ -2023,7 +2023,7 @@ static void Op08E0 (void)
 	OpenBus = Registers.PL;
 }
 
-static void Op08E1 (void)
+inline void Op08E1 (void)
 {
 	S9xPackStatus();
 	AddCycles(ONE_CYCLE);
@@ -2031,7 +2031,7 @@ static void Op08E1 (void)
 	OpenBus = Registers.PL;
 }
 
-static void Op08Slow (void)
+inline void Op08Slow (void)
 {
 	S9xPackStatus();
 	AddCycles(ONE_CYCLE);
@@ -2049,28 +2049,28 @@ static void Op08Slow (void)
 }
 
 // PHX
-static void OpDAE1 (void)
+inline void OpDAE1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushBE(Registers.XL);
 	OpenBus = Registers.XL;
 }
 
-static void OpDAE0X1 (void)
+inline void OpDAE0X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushB(Registers.XL);
 	OpenBus = Registers.XL;
 }
 
-static void OpDAE0X0 (void)
+inline void OpDAE0X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushW(Registers.X.W);
 	OpenBus = Registers.XL;
 }
 
-static void OpDASlow (void)
+inline void OpDASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2092,28 +2092,28 @@ static void OpDASlow (void)
 }
 
 // PHY
-static void Op5AE1 (void)
+inline void Op5AE1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushBE(Registers.YL);
 	OpenBus = Registers.YL;
 }
 
-static void Op5AE0X1 (void)
+inline void Op5AE0X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushB(Registers.YL);
 	OpenBus = Registers.YL;
 }
 
-static void Op5AE0X0 (void)
+inline void Op5AE0X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	PushW(Registers.Y.W);
 	OpenBus = Registers.YL;
 }
 
-static void Op5ASlow (void)
+inline void Op5ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2153,7 +2153,7 @@ static void Op5ASlow (void)
 	b = S9xGetByte(Registers.S.W);
 
 // PLA
-static void Op68E1 (void)
+inline void Op68E1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullBE(Registers.AL);
@@ -2161,7 +2161,7 @@ static void Op68E1 (void)
 	OpenBus = Registers.AL;
 }
 
-static void Op68E0M1 (void)
+inline void Op68E0M1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullB(Registers.AL);
@@ -2169,7 +2169,7 @@ static void Op68E0M1 (void)
 	OpenBus = Registers.AL;
 }
 
-static void Op68E0M0 (void)
+inline void Op68E0M0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.A.W);
@@ -2177,7 +2177,7 @@ static void Op68E0M0 (void)
 	OpenBus = Registers.AH;
 }
 
-static void Op68Slow (void)
+inline void Op68Slow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -2203,7 +2203,7 @@ static void Op68Slow (void)
 }
 
 // PLB
-static void OpABE1 (void)
+inline void OpABE1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullBE(Registers.DB);
@@ -2212,7 +2212,7 @@ static void OpABE1 (void)
 	OpenBus = Registers.DB;
 }
 
-static void OpABE0 (void)
+inline void OpABE0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullB(Registers.DB);
@@ -2221,7 +2221,7 @@ static void OpABE0 (void)
 	OpenBus = Registers.DB;
 }
 
-static void OpABSlow (void)
+inline void OpABSlow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -2240,7 +2240,7 @@ static void OpABSlow (void)
 }
 
 // PLD
-static void Op2BE0 (void)
+inline void Op2BE0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.D.W);
@@ -2248,7 +2248,7 @@ static void Op2BE0 (void)
 	OpenBus = Registers.DH;
 }
 
-static void Op2BE1 (void)
+inline void Op2BE1 (void)
 {
 	// Note: PLD is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -2259,7 +2259,7 @@ static void Op2BE1 (void)
 	Registers.SH = 1;
 }
 
-static void Op2BSlow (void)
+inline void Op2BSlow (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.D.W);
@@ -2270,7 +2270,7 @@ static void Op2BSlow (void)
 }
 
 // PLP
-static void Op28E1 (void)
+inline void Op28E1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullBE(Registers.PL);
@@ -2281,7 +2281,7 @@ static void Op28E1 (void)
 	CHECK_FOR_IRQ();
 }
 
-static void Op28E0 (void)
+inline void Op28E0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullB(Registers.PL);
@@ -2298,7 +2298,7 @@ static void Op28E0 (void)
 	CHECK_FOR_IRQ();
 }
 
-static void Op28Slow (void)
+inline void Op28Slow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -2327,7 +2327,7 @@ static void Op28Slow (void)
 }
 
 // PLX
-static void OpFAE1 (void)
+inline void OpFAE1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullBE(Registers.XL);
@@ -2335,7 +2335,7 @@ static void OpFAE1 (void)
 	OpenBus = Registers.XL;
 }
 
-static void OpFAE0X1 (void)
+inline void OpFAE0X1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullB(Registers.XL);
@@ -2343,7 +2343,7 @@ static void OpFAE0X1 (void)
 	OpenBus = Registers.XL;
 }
 
-static void OpFAE0X0 (void)
+inline void OpFAE0X0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.X.W);
@@ -2351,7 +2351,7 @@ static void OpFAE0X0 (void)
 	OpenBus = Registers.XH;
 }
 
-static void OpFASlow (void)
+inline void OpFASlow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -2377,7 +2377,7 @@ static void OpFASlow (void)
 }
 
 // PLY
-static void Op7AE1 (void)
+inline void Op7AE1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullBE(Registers.YL);
@@ -2385,7 +2385,7 @@ static void Op7AE1 (void)
 	OpenBus = Registers.YL;
 }
 
-static void Op7AE0X1 (void)
+inline void Op7AE0X1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullB(Registers.YL);
@@ -2393,7 +2393,7 @@ static void Op7AE0X1 (void)
 	OpenBus = Registers.YL;
 }
 
-static void Op7AE0X0 (void)
+inline void Op7AE0X0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.Y.W);
@@ -2401,7 +2401,7 @@ static void Op7AE0X0 (void)
 	OpenBus = Registers.YH;
 }
 
-static void Op7ASlow (void)
+inline void Op7ASlow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -2429,21 +2429,21 @@ static void Op7ASlow (void)
 /* Transfer Instructions *************************************************** */
 
 // TAX
-static void OpAAX1 (void)
+inline void OpAAX1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.XL = Registers.AL;
 	SetZN(Registers.XL);
 }
 
-static void OpAAX0 (void)
+inline void OpAAX0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.X.W = Registers.A.W;
 	SetZN(Registers.X.W);
 }
 
-static void OpAASlow (void)
+inline void OpAASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2460,21 +2460,21 @@ static void OpAASlow (void)
 }
 
 // TAY
-static void OpA8X1 (void)
+inline void OpA8X1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.YL = Registers.AL;
 	SetZN(Registers.YL);
 }
 
-static void OpA8X0 (void)
+inline void OpA8X0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.Y.W = Registers.A.W;
 	SetZN(Registers.Y.W);
 }
 
-static void OpA8Slow (void)
+inline void OpA8Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2491,7 +2491,7 @@ static void OpA8Slow (void)
 }
 
 // TCD
-static void Op5B (void)
+inline void Op5B (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.D.W = Registers.A.W;
@@ -2499,7 +2499,7 @@ static void Op5B (void)
 }
 
 // TCS
-static void Op1B (void)
+inline void Op1B (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.S.W = Registers.A.W;
@@ -2508,7 +2508,7 @@ static void Op1B (void)
 }
 
 // TDC
-static void Op7B (void)
+inline void Op7B (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W = Registers.D.W;
@@ -2516,7 +2516,7 @@ static void Op7B (void)
 }
 
 // TSC
-static void Op3B (void)
+inline void Op3B (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W = Registers.S.W;
@@ -2524,21 +2524,21 @@ static void Op3B (void)
 }
 
 // TSX
-static void OpBAX1 (void)
+inline void OpBAX1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.XL = Registers.SL;
 	SetZN(Registers.XL);
 }
 
-static void OpBAX0 (void)
+inline void OpBAX0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.X.W = Registers.S.W;
 	SetZN(Registers.X.W);
 }
 
-static void OpBASlow (void)
+inline void OpBASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2555,21 +2555,21 @@ static void OpBASlow (void)
 }
 
 // TXA
-static void Op8AM1 (void)
+inline void Op8AM1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.AL = Registers.XL;
 	SetZN(Registers.AL);
 }
 
-static void Op8AM0 (void)
+inline void Op8AM0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W = Registers.X.W;
 	SetZN(Registers.A.W);
 }
 
-static void Op8ASlow (void)
+inline void Op8ASlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2586,7 +2586,7 @@ static void Op8ASlow (void)
 }
 
 // TXS
-static void Op9A (void)
+inline void Op9A (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.S.W = Registers.X.W;
@@ -2595,21 +2595,21 @@ static void Op9A (void)
 }
 
 // TXY
-static void Op9BX1 (void)
+inline void Op9BX1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.YL = Registers.XL;
 	SetZN(Registers.YL);
 }
 
-static void Op9BX0 (void)
+inline void Op9BX0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.Y.W = Registers.X.W;
 	SetZN(Registers.Y.W);
 }
 
-static void Op9BSlow (void)
+inline void Op9BSlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2626,21 +2626,21 @@ static void Op9BSlow (void)
 }
 
 // TYA
-static void Op98M1 (void)
+inline void Op98M1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.AL = Registers.YL;
 	SetZN(Registers.AL);
 }
 
-static void Op98M0 (void)
+inline void Op98M0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.A.W = Registers.Y.W;
 	SetZN(Registers.A.W);
 }
 
-static void Op98Slow (void)
+inline void Op98Slow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2657,21 +2657,21 @@ static void Op98Slow (void)
 }
 
 // TYX
-static void OpBBX1 (void)
+inline void OpBBX1 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.XL = Registers.YL;
 	SetZN(Registers.XL);
 }
 
-static void OpBBX0 (void)
+inline void OpBBX0 (void)
 {
 	AddCycles(ONE_CYCLE);
 	Registers.X.W = Registers.Y.W;
 	SetZN(Registers.X.W);
 }
 
-static void OpBBSlow (void)
+inline void OpBBSlow (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2689,7 +2689,7 @@ static void OpBBSlow (void)
 
 /* XCE ********************************************************************* */
 
-static void OpFB (void)
+inline void OpFB (void)
 {
 	AddCycles(ONE_CYCLE);
 
@@ -2719,7 +2719,7 @@ static void OpFB (void)
 
 /* BRK ********************************************************************* */
 
-static void Op00 (void)
+inline void Op00 (void)
 {
 #ifdef DEBUGGER
 	if (CPU.Flags & TRACE_FLAG)
@@ -2910,7 +2910,7 @@ void S9xOpcode_NMI (void)
 
 /* COP ********************************************************************* */
 
-static void Op02 (void)
+inline void Op02 (void)
 {
 #ifdef DEBUGGER
 	if (CPU.Flags & TRACE_FLAG)
@@ -2951,61 +2951,61 @@ static void Op02 (void)
 
 /* JML ********************************************************************* */
 
-static void OpDC (void)
+inline void OpDC (void)
 {
 	S9xSetPCBase(AbsoluteIndirectLong(JUMP));
 }
 
-static void OpDCSlow (void)
+inline void OpDCSlow (void)
 {
 	S9xSetPCBase(AbsoluteIndirectLongSlow(JUMP));
 }
 
-static void Op5C (void)
+inline void Op5C (void)
 {
 	S9xSetPCBase(AbsoluteLong(JUMP));
 }
 
-static void Op5CSlow (void)
+inline void Op5CSlow (void)
 {
 	S9xSetPCBase(AbsoluteLongSlow(JUMP));
 }
 
 /* JMP ********************************************************************* */
 
-static void Op4C (void)
+inline void Op4C (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) Absolute(JUMP)));
 }
 
-static void Op4CSlow (void)
+inline void Op4CSlow (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) AbsoluteSlow(JUMP)));
 }
 
-static void Op6C (void)
+inline void Op6C (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) AbsoluteIndirect(JUMP)));
 }
 
-static void Op6CSlow (void)
+inline void Op6CSlow (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) AbsoluteIndirectSlow(JUMP)));
 }
 
-static void Op7C (void)
+inline void Op7C (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) AbsoluteIndexedIndirect(JUMP)));
 }
 
-static void Op7CSlow (void)
+inline void Op7CSlow (void)
 {
 	S9xSetPCBase(ICPU.ShiftedPB + ((uint16) AbsoluteIndexedIndirectSlow(JUMP)));
 }
 
 /* JSL/RTL ***************************************************************** */
 
-static void Op22E1 (void)
+inline void Op22E1 (void)
 {
 	// Note: JSL is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -3016,7 +3016,7 @@ static void Op22E1 (void)
 	S9xSetPCBase(addr);
 }
 
-static void Op22E0 (void)
+inline void Op22E0 (void)
 {
 	uint32	addr = AbsoluteLong(JSR);
 	PushB(Registers.PB);
@@ -3024,7 +3024,7 @@ static void Op22E0 (void)
 	S9xSetPCBase(addr);
 }
 
-static void Op22Slow (void)
+inline void Op22Slow (void)
 {
 	uint32	addr = AbsoluteLongSlow(JSR);
 	PushB(Registers.PB);
@@ -3034,7 +3034,7 @@ static void Op22Slow (void)
 	S9xSetPCBase(addr);
 }
 
-static void Op6BE1 (void)
+inline void Op6BE1 (void)
 {
 	// Note: RTL is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -3046,7 +3046,7 @@ static void Op6BE1 (void)
 	S9xSetPCBase(Registers.PBPC);
 }
 
-static void Op6BE0 (void)
+inline void Op6BE0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.PCw);
@@ -3055,7 +3055,7 @@ static void Op6BE0 (void)
 	S9xSetPCBase(Registers.PBPC);
 }
 
-static void Op6BSlow (void)
+inline void Op6BSlow (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.PCw);
@@ -3068,7 +3068,7 @@ static void Op6BSlow (void)
 
 /* JSR/RTS ***************************************************************** */
 
-static void Op20E1 (void)
+inline void Op20E1 (void)
 {
 	uint16	addr = Absolute(JSR);
 	AddCycles(ONE_CYCLE);
@@ -3076,7 +3076,7 @@ static void Op20E1 (void)
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void Op20E0 (void)
+inline void Op20E0 (void)
 {
 	uint16	addr = Absolute(JSR);
 	AddCycles(ONE_CYCLE);
@@ -3084,7 +3084,7 @@ static void Op20E0 (void)
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void Op20Slow (void)
+inline void Op20Slow (void)
 {
 	uint16	addr = AbsoluteSlow(JSR);
 
@@ -3102,7 +3102,7 @@ static void Op20Slow (void)
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void OpFCE1 (void)
+inline void OpFCE1 (void)
 {
 	// Note: JSR (a,X) is a new instruction,
 	// and so doesn't respect the emu-mode stack bounds.
@@ -3112,14 +3112,14 @@ static void OpFCE1 (void)
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void OpFCE0 (void)
+inline void OpFCE0 (void)
 {
 	uint16	addr = AbsoluteIndexedIndirect(JSR);
 	PushW(Registers.PCw - 1);
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void OpFCSlow (void)
+inline void OpFCSlow (void)
 {
 	uint16	addr = AbsoluteIndexedIndirectSlow(JSR);
 	PushW(Registers.PCw - 1);
@@ -3128,7 +3128,7 @@ static void OpFCSlow (void)
 	S9xSetPCBase(ICPU.ShiftedPB + addr);
 }
 
-static void Op60E1 (void)
+inline void Op60E1 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullWE(Registers.PCw);
@@ -3137,7 +3137,7 @@ static void Op60E1 (void)
 	S9xSetPCBase(Registers.PBPC);
 }
 
-static void Op60E0 (void)
+inline void Op60E0 (void)
 {
 	AddCycles(TWO_CYCLES);
 	PullW(Registers.PCw);
@@ -3146,7 +3146,7 @@ static void Op60E0 (void)
 	S9xSetPCBase(Registers.PBPC);
 }
 
-static void Op60Slow (void)
+inline void Op60Slow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -3166,7 +3166,7 @@ static void Op60Slow (void)
 
 /* MVN/MVP ***************************************************************** */
 
-static void Op54X1 (void)
+inline void Op54X1 (void)
 {
 	uint32	SrcBank;
 
@@ -3185,7 +3185,7 @@ static void Op54X1 (void)
 	AddCycles(TWO_CYCLES);
 }
 
-static void Op54X0 (void)
+inline void Op54X0 (void)
 {
 	uint32	SrcBank;
 
@@ -3204,7 +3204,7 @@ static void Op54X0 (void)
 	AddCycles(TWO_CYCLES);
 }
 
-static void Op54Slow (void)
+inline void Op54Slow (void)
 {
 	uint32	SrcBank;
 
@@ -3232,7 +3232,7 @@ static void Op54Slow (void)
 	AddCycles(TWO_CYCLES);
 }
 
-static void Op44X1 (void)
+inline void Op44X1 (void)
 {
 	uint32	SrcBank;
 
@@ -3251,7 +3251,7 @@ static void Op44X1 (void)
 	AddCycles(TWO_CYCLES);
 }
 
-static void Op44X0 (void)
+inline void Op44X0 (void)
 {
 	uint32	SrcBank;
 
@@ -3270,7 +3270,7 @@ static void Op44X0 (void)
 	AddCycles(TWO_CYCLES);
 }
 
-static void Op44Slow (void)
+inline void Op44Slow (void)
 {
 	uint32	SrcBank;
 
@@ -3300,7 +3300,7 @@ static void Op44Slow (void)
 
 /* REP/SEP ***************************************************************** */
 
-static void OpC2 (void)
+inline void OpC2 (void)
 {
 	uint8	Work8 = ~Immediate8(READ);
 	Registers.PL &= Work8;
@@ -3329,7 +3329,7 @@ static void OpC2 (void)
 	CHECK_FOR_IRQ();
 }
 
-static void OpC2Slow (void)
+inline void OpC2Slow (void)
 {
 	uint8	Work8 = ~Immediate8Slow(READ);
 	Registers.PL &= Work8;
@@ -3358,7 +3358,7 @@ static void OpC2Slow (void)
 	CHECK_FOR_IRQ();
 }
 
-static void OpE2 (void)
+inline void OpE2 (void)
 {
 	uint8	Work8 = Immediate8(READ);
 	Registers.PL |= Work8;
@@ -3387,7 +3387,7 @@ static void OpE2 (void)
 	S9xFixCycles();
 }
 
-static void OpE2Slow (void)
+inline void OpE2Slow (void)
 {
 	uint8	Work8 = Immediate8Slow(READ);
 	Registers.PL |= Work8;
@@ -3418,7 +3418,7 @@ static void OpE2Slow (void)
 
 /* XBA ********************************************************************* */
 
-static void OpEB (void)
+inline void OpEB (void)
 {
 	uint8	Work8 = Registers.AL;
 	Registers.AL = Registers.AH;
@@ -3429,7 +3429,7 @@ static void OpEB (void)
 
 /* RTI ********************************************************************* */
 
-static void Op40Slow (void)
+inline void Op40Slow (void)
 {
 	AddCycles(TWO_CYCLES);
 
@@ -3469,7 +3469,7 @@ static void Op40Slow (void)
 /* STP/WAI ***************************************************************** */
 
 // WAI
-static void OpCB (void)
+inline void OpCB (void)
 {
 #ifdef SA1_OPCODES
 	SA1.WaitingForInterrupt = TRUE;
@@ -3483,7 +3483,7 @@ static void OpCB (void)
 }
 
 // STP
-static void OpDB (void)
+inline void OpDB (void)
 {
 	Registers.PCw--;
 	CPU.Flags |= DEBUG_MODE_FLAG | HALTED_FLAG;
@@ -3495,7 +3495,7 @@ static void OpDB (void)
 extern FILE	*trace, *trace2;
 #endif
 
-static void Op42 (void)
+inline void Op42 (void)
 {
 #ifdef DEBUGGER
 	uint8	byte = (uint8) S9xGetWord(Registers.PBPC);
