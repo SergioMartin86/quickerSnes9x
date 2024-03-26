@@ -72,22 +72,13 @@ class PlaybackInstance
     // Checking the required step id does not exceed contents of the sequence
     if (stepId > _stepSequence.size()) JAFFAR_THROW_RUNTIME("[Error] Attempting to render a step larger than the step sequence");
 
-    // Getting closer step interval to the one requested
-    size_t newStepId = stepId;
-    if (stepId != _stepSequence.size()-1) newStepId = (stepId / _storeInterval) * _storeInterval;
-
-    // If its the first step, then simply reset
-    if (newStepId == 0) _emu->doHardReset();
-
     // Else we load the requested step
-    const auto stateData = getStateData(newStepId);
+    const auto stateData = getStateData(stepId);
     jaffarCommon::deserializer::Contiguous d(stateData, _fullStateSize);
     _emu->deserializeState(d);
 
     // Updating image
-     doRendering = true;
-    _emu->advanceState(getStateInput(newStepId == 0 ? 0 : newStepId-1));
-     doRendering = false;
+    _emu->updateRenderer();
   }
 
   size_t getSequenceLength() const
