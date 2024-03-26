@@ -190,9 +190,6 @@
 #ifndef _blit_h_
 #define _blit_h_
 
-#include "2xsai.h"
-#include "epx.h"
-#include "hq2x.h"
 #include "snes_ntsc.h"
 
 bool8 S9xBlitFilterInit(void);

@@ -917,8 +917,6 @@ void S9xInitDisplay(int argc, char **argv)
 
   // Init various scale-filters
   S9xBlitFilterInit();
-  S9xBlit2xSaIFilterInit();
-  S9xBlitHQ2xFilterInit();
 
   /* Set up parameters for creating the window */
   XSetWindowAttributes attrib;
@@ -1144,8 +1142,6 @@ void S9xDeinitDisplay(void)
     XCloseDisplay(GUI.display);
   }
   S9xBlitFilterDeinit();
-  S9xBlit2xSaIFilterDeinit();
-  S9xBlitHQ2xFilterDeinit();
 }
 
 void SetupImage(void)

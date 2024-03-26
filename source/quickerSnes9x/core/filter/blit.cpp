@@ -672,23 +672,18 @@ void S9xBlitPixSmooth2x2(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstR
 
 void S9xBlitPixSuper2xSaI16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height)
 {
-  Super2xSaI(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height);
 }
 
-void S9xBlitPix2xSaI16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { _2xSaI(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height); }
+void S9xBlitPix2xSaI16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { }
 
 void S9xBlitPixSuperEagle16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height)
 {
-  SuperEagle(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height);
 }
 
-void S9xBlitPixEPX16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { EPX_16(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height); }
-
-void S9xBlitPixHQ2x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { HQ2X_16(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height); }
-
-void S9xBlitPixHQ3x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { HQ3X_16(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height); }
-
-void S9xBlitPixHQ4x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) { HQ4X_16(srcPtr, srcRowBytes, dstPtr, dstRowBytes, width, height); }
+void S9xBlitPixEPX16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height)  { }
+void S9xBlitPixHQ2x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) {  }
+void S9xBlitPixHQ3x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) {  }
+void S9xBlitPixHQ4x16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height) {  }
 
 void S9xBlitPixNTSC16(uint8 *srcPtr, int srcRowBytes, uint8 *dstPtr, int dstRowBytes, int width, int height)
 {
