@@ -117,16 +117,10 @@ class EmuInstanceBase
   {
     return _differentialStateSize;
   }
-  
-  void updateRenderer() 
-  {
-     S9xStartScreenRefresh();
-     S9xUpdateScreen();
-     S9xEndScreenRefresh();
-  }
 
   // Virtual functions
 
+  virtual void updateRenderer() = 0;
   virtual void serializeState(jaffarCommon::serializer::Base& s) const = 0;
   virtual void deserializeState(jaffarCommon::deserializer::Base& d) = 0;
 

@@ -48,7 +48,6 @@ class EmuInstance : public EmuInstanceBase
 
   void enableRendering() override
   {
-    doRendering = true;
     S9xInitInputDevices();
     S9xInitDisplay(0, NULL);
     S9xSetupDefaultKeymap();
@@ -59,7 +58,6 @@ class EmuInstance : public EmuInstanceBase
 
   void disableRendering() override
   {
-    doRendering = false;
   }
 
   void serializeState(jaffarCommon::serializer::Base& s) const override
@@ -72,6 +70,14 @@ class EmuInstance : public EmuInstanceBase
     S9xUnfreezeFromStream(d);
   }
 
+  void updateRenderer() override
+  {
+     doRendering = true;
+     S9xStartScreenRefresh();
+     S9xUpdateScreen();
+     S9xEndScreenRefresh();
+  }
+  
   size_t getStateSizeImpl() const override
   {
     jaffarCommon::serializer::Contiguous s;
@@ -116,6 +122,25 @@ class EmuInstance : public EmuInstanceBase
     if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
   };
 
+  uint8_t* getRAM() const
+  {
+    return (uint8_t*)Memory.RAM;
+  }
+
+  size_t getRAMSize() const
+  {
+    return 0x20000;
+  }
+
+  uint8_t* getSRAM() const
+  {
+    return (uint8_t*)Memory.SRAM;
+  }
+
+  size_t getSRAMSize() const
+  {
+    return 0x20000;
+  }
 
   void doSoftReset() override
   {

@@ -100,6 +100,13 @@ class EmuInstance : public EmuInstanceBase
     return S9xFreezeSize();
   }
 
+  void updateRenderer() override
+  {
+     S9xStartScreenRefresh();
+     S9xUpdateScreen();
+     S9xEndScreenRefresh();
+  }
+
   inline size_t getDifferentialStateSizeImpl() const override { return getStateSizeImpl(); }
 
   void enableLiteStateBlockImpl(const std::string& block)
