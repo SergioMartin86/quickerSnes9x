@@ -1,13 +1,14 @@
+#pragma once 
 
-
-extern __thread bool _enablePPUBlock;
-extern __thread bool _enableDMABlock;
-extern __thread bool _enableVRABlock;
-extern __thread bool _enableRAMBlock;
-extern __thread bool _enableSRABlock;
-extern __thread bool _enableFILBlock;
-extern __thread bool _enableSNDBlock;
-extern __thread bool _enableCTLBlock;
-extern __thread bool _enableTIMBlock;
-
-extern __thread size_t _SMBBlocks;
+struct optionalBlocks_t
+{
+bool _enablePPUBlock = true;
+bool _enableDMABlock = true;
+bool _enableVRABlock = true;
+bool _enableRAMBlock = true;
+bool _enableSRABlock = true;
+bool _enableFILBlock = true;
+bool _enableSNDBlock = true;
+bool _enableCTLBlock = true;
+bool _enableTIMBlock = true;
+};

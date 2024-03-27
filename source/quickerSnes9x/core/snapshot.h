@@ -193,6 +193,7 @@
 #include "snes9x.h"
 #include <jaffarCommon/serializers/base.hpp>
 #include <jaffarCommon/deserializers/base.hpp>
+#include <lightStateConfig.h>
 
 #define SNAPSHOT_MAGIC "#!s9xsnp"
 #define SNAPSHOT_VERSION_IRQ 7
@@ -207,7 +208,7 @@
 #define NOT_A_MOVIE_SNAPSHOT (-5)
 #define SNAPSHOT_INCONSISTENT (-6)
 
-void S9xFreezeToStream(jaffarCommon::serializer::Base &s);
-int  S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d);
+void S9xFreezeToStream(jaffarCommon::serializer::Base &s, const optionalBlocks_t& optionalBlocks);
+int  S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d, const optionalBlocks_t& optionalBlocks);
 
 #endif

@@ -24,7 +24,6 @@ quickerSnes9xSrc =  [
   'core/dsp2.cpp',
   'core/dsp3.cpp',
   'core/dsp4.cpp',
-  'core/lightStateConfig.cpp',
   'core/fxinst.cpp',
   'core/fxemu.cpp',
   'core/gfx.cpp',

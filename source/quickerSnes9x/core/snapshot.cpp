@@ -16,9 +16,8 @@
 #include "movie.h"
 #include "display.h"
 #include "language.h"
-#include <lightStateConfig.h>
 
-void S9xFreezeToStream(jaffarCommon::serializer::Base &s)
+void S9xFreezeToStream(jaffarCommon::serializer::Base &s, const optionalBlocks_t& optionalBlocks)
 {
   uint8 soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
 
@@ -26,27 +25,27 @@ void S9xFreezeToStream(jaffarCommon::serializer::Base &s)
 
   s.push(&Registers, sizeof(Registers));
 
-  if (_enablePPUBlock) s.push(&PPU, sizeof(PPU));
-  if (_enableDMABlock) s.push(&DMA, sizeof(DMA));
-  if (_enableVRABlock) s.push(Memory.VRAM, 0x10000);
-  if (_enableRAMBlock) s.push(Memory.RAM, 0x20000);
-  if (_enableSRABlock) s.push(Memory.SRAM, 0x20000);
-  if (_enableFILBlock) s.push(Memory.FillRAM, 0x8000);
+  if (optionalBlocks._enablePPUBlock) s.push(&PPU, sizeof(PPU));
+  if (optionalBlocks._enableDMABlock) s.push(&DMA, sizeof(DMA));
+  if (optionalBlocks._enableVRABlock) s.push(Memory.VRAM, 0x10000);
+  if (optionalBlocks._enableRAMBlock) s.push(Memory.RAM, 0x20000);
+  if (optionalBlocks._enableSRABlock) s.push(Memory.SRAM, 0x20000);
+  if (optionalBlocks._enableFILBlock) s.push(Memory.FillRAM, 0x8000);
 
-  if (_enableSNDBlock)
+  if (optionalBlocks._enableSNDBlock)
   {
     S9xAPUSaveState(soundsnapshot);
     s.push(soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
   }
 
-  if (_enableCTLBlock)
+  if (optionalBlocks._enableCTLBlock)
   {
     struct SControlSnapshot ctl_snap;
     S9xControlPreSaveState(&ctl_snap);
     s.push(&ctl_snap, sizeof(ctl_snap));
   }
 
-  if (_enableTIMBlock) s.push(&Timings, sizeof(Timings));
+  if (optionalBlocks._enableTIMBlock) s.push(&Timings, sizeof(Timings));
 
   if (Settings.SuperFX)
   {
@@ -90,7 +89,7 @@ void S9xFreezeToStream(jaffarCommon::serializer::Base &s)
   if (Settings.MSU1) s.push(&MSU1, sizeof(MSU1));
 }
 
-int S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d)
+int S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d, const optionalBlocks_t& optionalBlocks)
 {
   int version = SNAPSHOT_VERSION;
 
@@ -99,26 +98,26 @@ int S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d)
   d.pop(&CPU, sizeof(CPU));
   d.pop(&Registers, sizeof(Registers));
 
-  if (_enablePPUBlock)
+  if (optionalBlocks._enablePPUBlock)
   {
     S9xResetPPU();
     d.pop(&PPU, sizeof(PPU));
   }
-  if (_enableDMABlock) d.pop(&DMA, sizeof(DMA));
-  if (_enableVRABlock) d.pop(Memory.VRAM, 0x10000);
-  if (_enableRAMBlock) d.pop(Memory.RAM, 0x20000);
-  if (_enableSRABlock) d.pop(Memory.SRAM, 0x20000);
-  if (_enableFILBlock) d.pop(Memory.FillRAM, 0x8000);
+  if (optionalBlocks._enableDMABlock) d.pop(&DMA, sizeof(DMA));
+  if (optionalBlocks._enableVRABlock) d.pop(Memory.VRAM, 0x10000);
+  if (optionalBlocks._enableRAMBlock) d.pop(Memory.RAM, 0x20000);
+  if (optionalBlocks._enableSRABlock) d.pop(Memory.SRAM, 0x20000);
+  if (optionalBlocks._enableFILBlock) d.pop(Memory.FillRAM, 0x8000);
 
-  if (_enableSNDBlock)
+  if (optionalBlocks._enableSNDBlock)
   {
     uint8_t soundsnapshot[SPC_SAVE_STATE_BLOCK_SIZE];
     d.pop(soundsnapshot, SPC_SAVE_STATE_BLOCK_SIZE);
     S9xAPULoadState(soundsnapshot);
   }
 
-  if (_enableCTLBlock) d.pop(&ctl_snap, sizeof(ctl_snap));
-  if (_enableTIMBlock) d.pop(&Timings, sizeof(Timings));
+  if (optionalBlocks._enableCTLBlock) d.pop(&ctl_snap, sizeof(ctl_snap));
+  if (optionalBlocks._enableTIMBlock) d.pop(&Timings, sizeof(Timings));
 
   if (Settings.SuperFX)
   {

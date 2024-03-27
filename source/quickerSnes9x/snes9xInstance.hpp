@@ -62,12 +62,12 @@ class EmuInstance : public EmuInstanceBase
 
   void serializeState(jaffarCommon::serializer::Base& s) const override
   {
-    S9xFreezeToStream(s);
+    S9xFreezeToStream(s, _optionalBlocks);
   }
 
   void deserializeState(jaffarCommon::deserializer::Base& d) override
   {
-    S9xUnfreezeFromStream(d);
+    S9xUnfreezeFromStream(d,_optionalBlocks);
   }
 
   void updateRenderer() override
@@ -81,7 +81,7 @@ class EmuInstance : public EmuInstanceBase
   size_t getStateSizeImpl() const override
   {
     jaffarCommon::serializer::Contiguous s;
-    S9xFreezeToStream(s);
+    S9xFreezeToStream(s, _optionalBlocks);
     return s.getOutputSize();
   }
 
@@ -91,15 +91,15 @@ class EmuInstance : public EmuInstanceBase
   { 
     bool recognizedBlock = false;
     
-    if (block == "PPU") { _enablePPUBlock = true; recognizedBlock = true; }
-    if (block == "DMA") { _enableDMABlock = true; recognizedBlock = true; }
-    if (block == "VRA") { _enableVRABlock = true; recognizedBlock = true; }
-    if (block == "RAM") { _enableRAMBlock = true; recognizedBlock = true; }
-    if (block == "SRA") { _enableSRABlock = true; recognizedBlock = true; }
-    if (block == "FIL") { _enableFILBlock = true; recognizedBlock = true; }
-    if (block == "SND") { _enableSNDBlock = true; recognizedBlock = true; }
-    if (block == "CTL") { _enableCTLBlock = true; recognizedBlock = true; }
-    if (block == "TIM") { _enableTIMBlock = true; recognizedBlock = true; }
+    if (block == "PPU") { _optionalBlocks._enablePPUBlock = true; recognizedBlock = true; }
+    if (block == "DMA") { _optionalBlocks._enableDMABlock = true; recognizedBlock = true; }
+    if (block == "VRA") { _optionalBlocks._enableVRABlock = true; recognizedBlock = true; }
+    if (block == "RAM") { _optionalBlocks._enableRAMBlock = true; recognizedBlock = true; }
+    if (block == "SRA") { _optionalBlocks._enableSRABlock = true; recognizedBlock = true; }
+    if (block == "FIL") { _optionalBlocks._enableFILBlock = true; recognizedBlock = true; }
+    if (block == "SND") { _optionalBlocks._enableSNDBlock = true; recognizedBlock = true; }
+    if (block == "CTL") { _optionalBlocks._enableCTLBlock = true; recognizedBlock = true; }
+    if (block == "TIM") { _optionalBlocks._enableTIMBlock = true; recognizedBlock = true; }
 
     if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
   };
@@ -109,15 +109,15 @@ class EmuInstance : public EmuInstanceBase
   { 
     bool recognizedBlock = false;
     
-    if (block == "PPU") { _enablePPUBlock = false; recognizedBlock = true; }
-    if (block == "DMA") { _enableDMABlock = false; recognizedBlock = true; }
-    if (block == "VRA") { _enableVRABlock = false; recognizedBlock = true; }
-    if (block == "RAM") { _enableRAMBlock = false; recognizedBlock = true; }
-    if (block == "SRA") { _enableSRABlock = false; recognizedBlock = true; }
-    if (block == "FIL") { _enableFILBlock = false; recognizedBlock = true; }
-    if (block == "SND") { _enableSNDBlock = false; recognizedBlock = true; }
-    if (block == "CTL") { _enableCTLBlock = false; recognizedBlock = true; }
-    if (block == "TIM") { _enableTIMBlock = false; recognizedBlock = true; }
+    if (block == "PPU") { _optionalBlocks._enablePPUBlock = false; recognizedBlock = true; }
+    if (block == "DMA") { _optionalBlocks._enableDMABlock = false; recognizedBlock = true; }
+    if (block == "VRA") { _optionalBlocks._enableVRABlock = false; recognizedBlock = true; }
+    if (block == "RAM") { _optionalBlocks._enableRAMBlock = false; recognizedBlock = true; }
+    if (block == "SRA") { _optionalBlocks._enableSRABlock = false; recognizedBlock = true; }
+    if (block == "FIL") { _optionalBlocks._enableFILBlock = false; recognizedBlock = true; }
+    if (block == "SND") { _optionalBlocks._enableSNDBlock = false; recognizedBlock = true; }
+    if (block == "CTL") { _optionalBlocks._enableCTLBlock = false; recognizedBlock = true; }
+    if (block == "TIM") { _optionalBlocks._enableTIMBlock = false; recognizedBlock = true; }
 
     if (recognizedBlock == false) { fprintf(stderr, "Unrecognized block type: %s\n", block.c_str()); exit(-1);}
   };
@@ -162,6 +162,9 @@ class EmuInstance : public EmuInstanceBase
     S9xMainLoop();
   }
 
+  private:
+
+  optionalBlocks_t _optionalBlocks;
 };
 
 } // namespace snes9x
