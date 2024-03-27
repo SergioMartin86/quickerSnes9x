@@ -45,15 +45,24 @@ class EmuInstance : public EmuInstanceBase
     return true;
   }
 
-  void enableRendering() override
+  void initializeVideoOutput() override
   {
-    doRendering = true;
     S9xInitInputDevices();
     S9xInitDisplay(0, NULL);
     S9xSetupDefaultKeymap();
     S9xTextMode();
     S9xGraphicsMode();
     S9xSetTitle(String);
+  }
+
+  void finalizeVideoOutput() override
+  {
+    S9xDeinitDisplay();
+  }
+
+  void enableRendering() override
+  {
+    doRendering = true;
   }
 
   void disableRendering() override
@@ -102,6 +111,8 @@ class EmuInstance : public EmuInstanceBase
 
   void updateRenderer() override
   {
+     if (doRendering == false) return;
+     
      S9xStartScreenRefresh();
      S9xUpdateScreen();
      S9xEndScreenRefresh();

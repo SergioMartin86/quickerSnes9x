@@ -417,7 +417,6 @@ void S9xDoHEventProcessing(void)
 
     if (CPU.V_Counter == PPU.ScreenHeight + FIRST_VISIBLE_LINE) // VBlank starts from V=225(240).
     {
-      if (doRendering) S9xEndScreenRefresh();
       PPU.HDMA = 0;
       // Bits 7 and 6 of $4212 are computed when read in S9xGetPPU.
 #ifdef DEBUGGER
@@ -457,9 +456,6 @@ void S9xDoHEventProcessing(void)
     {
       if (Memory.FillRAM[0x4200] & 1) S9xDoAutoJoypad();
     }
-
-    if (CPU.V_Counter == FIRST_VISIBLE_LINE) // V=1
-      S9xStartScreenRefresh();
 
     S9xReschedule();
 

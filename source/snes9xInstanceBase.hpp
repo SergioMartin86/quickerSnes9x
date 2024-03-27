@@ -81,6 +81,8 @@ class EmuInstanceBase
     return result;
   }
 
+  virtual void initializeVideoOutput() = 0;
+  virtual void finalizeVideoOutput() = 0;
   virtual void enableRendering() = 0;
   virtual void disableRendering() = 0;
 
