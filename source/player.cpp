@@ -101,11 +101,14 @@ int main(int argc, char *argv[])
   jaffarCommon::logger::refreshTerminal();
 
   // Creating emulator instance 
-  auto e = snes9x::EmuInstance();
+  auto e = snes9x::EmuInstance(configJs);
 
-  // Setting controller types
-  e.setController1Type(controller1Type);
-  e.setController2Type(controller2Type);
+  // Getting input parser from the emulator
+  const auto inputParser = e.getInputParser();
+
+  // Getting decoded emulator input for each entry in the sequence
+  std::vector<jaffar::input_t> decodedSequence;
+  for (const auto &inputString : sequence) decodedSequence.push_back(inputParser->parseInputString(inputString));
   
   // Loading ROM File
   std::string romFileData;
@@ -152,8 +155,8 @@ int main(int argc, char *argv[])
     // Updating display
     if (disableRender == false) p.renderFrame(currentStep);
 
-    // Getting input
-    const auto &input = p.getStateInput(currentStep);
+    // Getting input data
+    const auto &inputString = p.getInputString(currentStep);
 
     // Getting state hash
     const auto hash = p.getStateHash(currentStep);
@@ -168,7 +171,7 @@ int main(int argc, char *argv[])
 
       jaffarCommon::logger::log("[] ----------------------------------------------------------------\n");
       jaffarCommon::logger::log("[] Current Step #: %lu / %lu\n", currentStep + 1, sequenceLength);
-      jaffarCommon::logger::log("[] Input:          %s\n", input.c_str());
+      jaffarCommon::logger::log("[] Input:          %s\n", inputString.c_str());
       jaffarCommon::logger::log("[] State Hash:     0x%lX%lX\n", hash.first, hash.second);
 
       // Only print commands if not in reproduce mode

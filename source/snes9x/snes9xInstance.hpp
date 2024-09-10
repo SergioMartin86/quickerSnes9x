@@ -20,7 +20,7 @@ class EmuInstance : public EmuInstanceBase
  uint8_t* _baseMem;
  uint8_t* _apuMem;
 
- EmuInstance() : EmuInstanceBase()
+ EmuInstance(const nlohmann::json &config) : EmuInstanceBase(config)
  {
   int argc = 1;
   char bin[] = "./snes9x";
@@ -143,7 +143,7 @@ class EmuInstance : public EmuInstanceBase
   std::string getCoreName() const override { return "snes9x"; }
 
 
-  virtual void advanceStateImpl(const Controller::port_t controller1, const Controller::port_t controller2)
+  void advanceStateImpl(const jaffar::port_t controller1, const jaffar::port_t controller2) override
   {
     MovieSetJoypad(0, controller1);
     MovieSetJoypad(1, controller2);

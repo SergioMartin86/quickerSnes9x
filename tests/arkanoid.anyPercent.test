@@ -1,0 +1,15 @@
+{
+  "Rom File": "roms/Arkanoid - Doh It Again (J) [!].smc",
+  "Expected ROM SHA1": "03F839819A253EED9A928D8D7CC80FCC245AB23D",
+  "Initial State File": "",
+  "Sequence File": "arkanoid.anyPercent.sol",
+  "Disable State Blocks": [ "SRA", "VRA", "CTL" ],
+  "Controller 1 Type": "Joypad",
+  "Controller 2 Type": "Joypad",
+  "Differential Compression":
+  {
+    "Enabled": false,
+    "Max Differences": 2200,
+    "Use Zlib": true
+  }
+}
