@@ -61,6 +61,7 @@ snes9xSrc =  [
 
 snes9xIncludeDirs = [
   '.',
+  '..',
   'core',
   'core/unix',
   'core/apu',
