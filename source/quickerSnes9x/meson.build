@@ -58,6 +58,7 @@ quickerSnes9xSrc =  [
 
 quickerSnes9xIncludeDirs = [
   '.',
+  '..',
   'core',
   'core/unix',
   'core/apu',
