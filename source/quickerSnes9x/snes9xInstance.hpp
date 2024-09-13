@@ -96,6 +96,8 @@ class EmuInstance : public EmuInstanceBase
 
   inline size_t getDifferentialStateSizeImpl() const override { return 0; }
 
+  inline void setStateRAMSize(const size_t stateRAMSize) { _optionalBlocks._stateRAMSize = stateRAMSize; }
+
   void enableStateBlockImpl(const std::string& block)
   { 
     bool recognizedBlock = false;

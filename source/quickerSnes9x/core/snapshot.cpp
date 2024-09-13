@@ -28,7 +28,7 @@ void S9xFreezeToStream(jaffarCommon::serializer::Base &s, const optionalBlocks_t
   if (optionalBlocks._enablePPUBlock) s.push(&PPU, sizeof(PPU));
   if (optionalBlocks._enableDMABlock) s.push(&DMA, sizeof(DMA));
   if (optionalBlocks._enableVRABlock) s.push(Memory.VRAM, 0x10000);
-  if (optionalBlocks._enableRAMBlock) s.push(Memory.RAM, 0x20000);
+  if (optionalBlocks._enableRAMBlock) s.push(Memory.RAM, optionalBlocks._stateRAMSize);
   if (optionalBlocks._enableSRABlock) s.push(Memory.SRAM, 0x20000);
   if (optionalBlocks._enableFILBlock) s.push(Memory.FillRAM, 0x8000);
 
@@ -105,7 +105,7 @@ int S9xUnfreezeFromStream(jaffarCommon::deserializer::Base &d, const optionalBlo
   }
   if (optionalBlocks._enableDMABlock) d.pop(&DMA, sizeof(DMA));
   if (optionalBlocks._enableVRABlock) d.pop(Memory.VRAM, 0x10000);
-  if (optionalBlocks._enableRAMBlock) d.pop(Memory.RAM, 0x20000);
+  if (optionalBlocks._enableRAMBlock) d.pop(Memory.RAM, optionalBlocks._stateRAMSize);
   if (optionalBlocks._enableSRABlock) d.pop(Memory.SRAM, 0x20000);
   if (optionalBlocks._enableFILBlock) d.pop(Memory.FillRAM, 0x8000);
 

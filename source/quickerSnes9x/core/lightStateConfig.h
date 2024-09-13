@@ -2,6 +2,7 @@
 
 struct optionalBlocks_t
 {
+size_t _stateRAMSize = 0x20000;
 bool _enablePPUBlock = true;
 bool _enableDMABlock = true;
 bool _enableVRABlock = true;
