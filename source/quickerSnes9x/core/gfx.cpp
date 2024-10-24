@@ -1902,8 +1902,9 @@ static void DisplayFrameRate(void)
 {
   char                   string[10];
   static __thread uint32 lastFrameCount = 0, calcFps = 0;
-  static __thread time_t lastTime = time(NULL);
-
+  static __thread time_t lastTime;
+  lastTime = time(NULL);
+  
   time_t currTime = time(NULL);
   if (lastTime != currTime)
   {

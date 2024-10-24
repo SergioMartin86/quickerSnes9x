@@ -21,7 +21,6 @@ class StateManager
   size_t    state_size;
   size_t    real_state_size;
   bool      init_done;
-  bool      first_pop;
 
   void reassign_bottom();
   void generate_delta(const void *data);

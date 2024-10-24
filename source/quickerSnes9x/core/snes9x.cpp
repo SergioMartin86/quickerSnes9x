@@ -217,7 +217,7 @@ static bool parse_controller_spec(int, const char *);
 
 void S9xLoadConfigFiles()
 {
-  static __thread ConfigFile conf; // static because some of its functions return pointers
+  static ConfigFile conf; // static because some of its functions return pointers
   conf.Clear();
 
   // ROM

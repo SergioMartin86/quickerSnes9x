@@ -236,16 +236,6 @@ static __thread const uint8 flashcard[20] = {0x4D, 0x00, 0x50, 0x00, // vendor i
                                              0x1A, 0x00,             // 2MB Flash (1MB = 0x2A)
                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-static __thread const uint8 init2192[32] = // FIXME
-  {00, 00, 00, 00, 00,                     // unknown
-   01, 01, 00, 00, 00,
-   00,                 // seconds (?)
-   00,                 // minutes
-   00,                 // hours
-   10, 10, 10, 10, 10, // unknown
-   10, 10, 10, 10, 10, // dummy
-   00, 00, 00, 00, 00, 00, 00, 00, 00};
-
 static thread_local bool8  FlashMode;
 static thread_local uint32 FlashSize;
 static thread_local uint8 *MapROM, *FlashROM;
@@ -1363,12 +1353,12 @@ void S9xResetBSX(void)
   BSX.MMC[0x0E]                 = 0x80;
 
   // stream reset
-  BSX.sat_pf_latch1_enable, BSX.sat_dt_latch1_enable = FALSE;
-  BSX.sat_pf_latch2_enable, BSX.sat_dt_latch2_enable = FALSE;
+  BSX.sat_pf_latch1_enable = BSX.sat_dt_latch1_enable = FALSE;
+  BSX.sat_pf_latch2_enable = BSX.sat_dt_latch2_enable = FALSE;
 
-  BSX.sat_stream1_loaded, BSX.sat_stream2_loaded = FALSE;
-  BSX.sat_stream1_first, BSX.sat_stream2_first   = FALSE;
-  BSX.sat_stream1_count, BSX.sat_stream2_count   = 0;
+  BSX.sat_stream1_loaded = BSX.sat_stream2_loaded = FALSE;
+  BSX.sat_stream1_first = BSX.sat_stream2_first   = FALSE;
+  BSX.sat_stream1_count = BSX.sat_stream2_count   = 0;
 
   if (BSX.sat_stream1.is_open()) BSX.sat_stream1.close();
 

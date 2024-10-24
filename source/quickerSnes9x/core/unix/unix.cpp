@@ -253,9 +253,6 @@ thread_local StateManager stateMan;
 #define SOUND_BUFFER_SIZE (1024 * 16)
 #define SOUND_BUFFER_SIZE_MASK (SOUND_BUFFER_SIZE - 1)
 
-static thread_local volatile bool8 block_signal         = FALSE;
-static thread_local volatile bool8 block_generate_sound = FALSE;
-
 static thread_local const char *sound_device = NULL;
 
 static thread_local const char *s9x_base_dir = NULL, *rom_filename = NULL, *snapshot_filename = NULL, *play_smv_filename = NULL, *record_smv_filename = NULL;

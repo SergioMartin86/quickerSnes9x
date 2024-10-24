@@ -98,7 +98,7 @@ class EmuInstance : public EmuInstanceBase
 
   inline void setStateRAMSize(const size_t stateRAMSize) { _optionalBlocks._stateRAMSize = stateRAMSize; }
 
-  void enableStateBlockImpl(const std::string& block)
+  void enableStateBlockImpl(const std::string& block) override
   { 
     bool recognizedBlock = false;
     
@@ -116,7 +116,7 @@ class EmuInstance : public EmuInstanceBase
   };
 
 
-  void disableStateBlockImpl(const std::string& block)
+  void disableStateBlockImpl(const std::string& block) override
   { 
     bool recognizedBlock = false;
     

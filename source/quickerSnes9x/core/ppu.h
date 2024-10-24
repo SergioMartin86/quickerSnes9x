@@ -402,9 +402,9 @@ typedef struct
   uint8 _5A22;
 } SnesModel;
 
-extern __thread SnesModel *Model;
-extern __thread SnesModel  M1SNES;
-extern __thread SnesModel  M2SNES;
+extern SnesModel *Model;
+extern SnesModel  M1SNES;
+extern SnesModel  M2SNES;
 
 #define MAX_5C77_VERSION 0x01
 #define MAX_5C78_VERSION 0x03

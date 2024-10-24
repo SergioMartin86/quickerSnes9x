@@ -251,9 +251,9 @@ __thread uint8 *HDMAMemPointers[8];
 __thread uint16 BlackColourMap[256];
 __thread uint16 DirectColourMaps[8][256];
 
-thread_local SnesModel  M1SNES      = {1, 3, 2};
-thread_local SnesModel  M2SNES      = {2, 4, 3};
-thread_local SnesModel *Model       = &M1SNES;
+SnesModel  M1SNES      = {1, 3, 2};
+SnesModel  M2SNES      = {2, 4, 3};
+SnesModel *Model       = &M1SNES;
 thread_local bool       doRendering = false;
 
 #ifdef GFX_MULTI_FORMAT
