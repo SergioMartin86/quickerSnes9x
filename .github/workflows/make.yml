@@ -18,7 +18,9 @@ jobs:
     - name: Create build directory
       run: mkdir build
     - name: Installing apt packages
-      run: sudo apt install libgtest-dev gcovr libnuma-dev libtbb-dev libsdl2-dev libsdl2-image-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtest-dev gcovr libnuma-dev libtbb-dev libsdl2-dev libsdl2-image-dev
     - name: Installing meson and ninja
       run: python3 -m pip install meson ninja
     - name: Run meson configuration
