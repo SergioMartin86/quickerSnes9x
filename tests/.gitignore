@@ -2,6 +2,7 @@
 *.bin
 *.sfc
 *.smc
+*.bps
 *.Identifier
 *.zip
 *.fds
