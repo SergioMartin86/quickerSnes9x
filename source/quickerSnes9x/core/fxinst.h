@@ -558,7 +558,7 @@ extern __thread struct FxRegs_s GSU;
   }
 
 extern void (*fx_PlotTable[])(void);
-extern void (*fx_OpcodeTable[])(void);
+extern __thread void (*fx_OpcodeTable[])(void); // thread-local: patched per-thread from GSU plot mode (see fxinst.cpp)
 
 // Set this define if branches are relative to the instruction in the delay slot (I think they are)
 #define BRANCH_DELAY_RELATIVE

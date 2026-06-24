@@ -60,6 +60,58 @@ snes9xTester = executable('snes9xTester',
   dependencies        : [ snes9xDependency, jaffarCommonDependency ],
 )
 
+# Parallel determinism / thread-safety stress tester for the quicker core
+
+quickerSnes9xParallelTester = executable('quickerSnes9xParallelTester',
+  'source/parallelTester.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
+# Cross-thread state-transfer tester: serialized states must be portable between
+# threads (Save on A -> Load on B -> random inputs -> reload -> correct result).
+
+quickerSnes9xTransferTester = executable('quickerSnes9xTransferTester',
+  'source/transferTester.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
+# Save-state size analysis tool (live WRAM extent, differential footprint)
+
+quickerSnes9xStateMeasure = executable('quickerSnes9xStateMeasure',
+  'source/stateMeasure.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
+# Perturbation-confirmer: proves a WRAM region is gameplay-inert (e.g. sound-engine
+# bytes) so it can be safely excluded from the dedup hash / desync validation.
+
+quickerSnes9xPerturbConfirm = executable('quickerSnes9xPerturbConfirm',
+  'source/perturbConfirm.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
+# Auto-scan/subdivide driver: emits the minimal gameplay-relevant WRAM mask
+# (recursively classifies regions via the perturbation oracle + union-confirms).
+
+quickerSnes9xInertScan = executable('quickerSnes9xInertScan',
+  'source/inertScan.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
+# Lazy-timer A/B validator: null-input intro playthrough, rolling full-state hash.
+# Build twice (lazy on, and with -DLAZY_SMP_TIMERS=0) and diff per ROM.
+
+quickerSnes9xTimerABCheck = executable('quickerSnes9xTimerABCheck',
+  'source/timerABCheck.cpp',
+  cpp_args            : [ commonCompileArgs, '-DPREVENT_RENDERING' ],
+  dependencies        : [ quickerSnes9xDependency, jaffarCommonDependency ],
+)
+
 # Building tests
 subdir('tests')
 

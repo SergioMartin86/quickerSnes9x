@@ -4,7 +4,7 @@
 namespace SNES
 {
 
-thread_local DSP dsp;
+constinit thread_local DSP dsp; // constinit asserts no TLS init guard (see sdsp.hpp)
 
 #include "SPC_DSP.cpp"
 
@@ -36,7 +36,5 @@ static void to_dsp_from_state(uint8 **buf, void *var, size_t size)
 void DSP::save_state(uint8 **ptr) { spc_dsp.copy_state(ptr, from_dsp_to_state); }
 
 void DSP::load_state(uint8 **ptr) { spc_dsp.copy_state(ptr, to_dsp_from_state); }
-
-DSP::DSP() { clock = 0; }
 
 } // namespace SNES

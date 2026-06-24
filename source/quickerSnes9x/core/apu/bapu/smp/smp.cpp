@@ -100,6 +100,7 @@ void SMP::reset()
   status.ram00f9 = 0x00;
 
   //timers
+  timer_pending       = 0; // lazy timers: no cycles pending at reset
   timer0.enable = timer1.enable = timer2.enable = false;
   timer0.stage1_ticks = timer1.stage1_ticks = timer2.stage1_ticks = 0;
   timer0.stage2_ticks = timer1.stage2_ticks = timer2.stage2_ticks = 0;

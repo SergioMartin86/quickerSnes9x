@@ -2539,8 +2539,12 @@ uint32 fx_step_over (uint32 nInstructions)
 void (*fx_PlotTable[])(void) = {&fx_plot_2bit, &fx_plot_4bit, &fx_plot_4bit, &fx_plot_8bit, &fx_plot_obj, &fx_rpix_2bit, &fx_rpix_4bit, &fx_rpix_4bit, &fx_rpix_8bit, &fx_rpix_obj};
 
 // Opcode table
-
-void (*fx_OpcodeTable[])(void) = {
+// NOTE: thread-local — fx_OpcodeTable is patched per-thread at runtime (see
+// fxemu.cpp, the fx_OpcodeTable[0x04c/0x14c/0x24c/0x34c] = GSU.pfPlot/pfRpix
+// assignments depend on the calling thread's GSU plot mode). Sharing it across
+// threads races for SuperFX titles. The initializer is all link-time-constant
+// function pointers, so this stays in .tdata with no TLS init guard.
+__thread void (*fx_OpcodeTable[])(void) = {
   // ALT0 Table
 
   // 00 - 0f

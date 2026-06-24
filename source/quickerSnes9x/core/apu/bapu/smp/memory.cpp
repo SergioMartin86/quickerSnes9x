@@ -21,6 +21,7 @@ unsigned SMP::mmio_read(unsigned addr)
 
   case 0xfd:
   {
+    sync_timers(); // bring timers current before reading the output counter (lazy timers)
     unsigned result     = timer0.stage3_ticks & 15;
     timer0.stage3_ticks = 0;
     return result;
@@ -28,6 +29,7 @@ unsigned SMP::mmio_read(unsigned addr)
 
   case 0xfe:
   {
+    sync_timers();
     unsigned result     = timer1.stage3_ticks & 15;
     timer1.stage3_ticks = 0;
     return result;
@@ -35,6 +37,7 @@ unsigned SMP::mmio_read(unsigned addr)
 
   case 0xff:
   {
+    sync_timers();
     unsigned result     = timer2.stage3_ticks & 15;
     timer2.stage3_ticks = 0;
     return result;
@@ -49,6 +52,7 @@ void SMP::mmio_write(unsigned addr, unsigned data)
   switch (addr)
   {
   case 0xf1:
+    sync_timers(); // flush elapsed cycles under the OLD enable state before changing it (lazy timers)
     status.iplrom_enable = data & 0x80;
 
     if (data & 0x30)
@@ -108,10 +112,10 @@ void SMP::mmio_write(unsigned addr, unsigned data)
 
   case 0xf9: status.ram00f9 = data; break;
 
-  case 0xfa: timer0.target = data; break;
+  case 0xfa: sync_timers(); timer0.target = data; break; // flush under OLD target before changing it
 
-  case 0xfb: timer1.target = data; break;
+  case 0xfb: sync_timers(); timer1.target = data; break;
 
-  case 0xfc: timer2.target = data; break;
+  case 0xfc: sync_timers(); timer2.target = data; break;
   }
 }

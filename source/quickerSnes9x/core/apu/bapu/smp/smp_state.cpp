@@ -65,6 +65,8 @@ void SMP::save_spc(uint8 *block)
 
 void SMP::save_state(uint8 **block)
 {
+  sync_timers(); // flush pending cycles so the serialized timer stages are current (lazy timers)
+
   uint8 *ptr = *block;
   memcpy(ptr, apuram, 64 * 1024);
   ptr += 64 * 1024;
@@ -130,6 +132,8 @@ void SMP::save_state(uint8 **block)
 
 void SMP::load_state(uint8 **block)
 {
+  timer_pending = 0; // loaded timer stages are current; nothing pending (lazy timers)
+
   uint8 *ptr = *block;
   memcpy(apuram, ptr, 64 * 1024);
   ptr += 64 * 1024;

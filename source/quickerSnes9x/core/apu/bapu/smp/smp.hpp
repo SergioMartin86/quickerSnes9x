@@ -1,3 +1,14 @@
+// Lazy SMP timer evaluation (perf): instead of ticking the three SPC700 timers
+// on every emulated cycle (pure bookkeeping, ~24% of runtime), accumulate a
+// pending-cycle count and flush all timers with a bit-exact batched advance only
+// at their observation points (timer-output reads $FD-$FF, control/target writes
+// $F1/$FA-$FC, and state save). Set to 0 to restore the per-cycle behaviour
+// (kept for A/B validation against the per-cycle reference; override with
+// -DLAZY_SMP_TIMERS=0 at build time without editing this file).
+#ifndef LAZY_SMP_TIMERS
+#define LAZY_SMP_TIMERS 1
+#endif
+
 class SMP : public Processor
 {
   public:
@@ -109,11 +120,15 @@ class SMP : public Processor
 
     inline void tick();
     inline void tick(unsigned clocks);
+    inline void tick_batch(unsigned clocks); // bit-exact catch-up of `clocks` cycles (lazy timers)
   };
 
   Timer<128> timer0;
   Timer<128> timer1;
   Timer<16>  timer2;
+
+  unsigned                           timer_pending; // cycles ticked but not yet flushed into the timers (lazy)
+  void                               sync_timers();  // flush timer_pending into all three timers (external linkage: also called from smp_state.cpp)
 
   inline void                        tick();
   inline void                        tick(unsigned clocks);

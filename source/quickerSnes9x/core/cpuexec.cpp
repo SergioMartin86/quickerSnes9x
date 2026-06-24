@@ -199,8 +199,48 @@
   #include "missing.h"
 #endif
 
+// Aggressive WAI cycle-jump (perf): collapse the idle WAI spin to one jump per
+// H-event when no H/V timer is active. Bit-identical to the conservative
+// single-step (see S9xMainLoop). Override with -DAGGRESSIVE_WAI=0 for A/B.
+#ifndef AGGRESSIVE_WAI
+#define AGGRESSIVE_WAI 1
+#endif
+
 inline void              S9xReschedule(void);
 extern thread_local bool doRendering;
+
+// Cold path of S9xCheckInterrupts (see cpuexec.h) — reached only when an H or V
+// timer is enabled. Kept out-of-line so the common timers-off case stays inline.
+void S9xCheckInterruptsSlow(void)
+{
+  bool8 thisIRQ = PPU.HTimerEnabled || PPU.VTimerEnabled;
+
+  if (CPU.IRQLine && thisIRQ) CPU.IRQTransition = TRUE;
+
+  if (PPU.HTimerEnabled)
+  {
+    int32 htimepos = PPU.HTimerPosition;
+    if (CPU.Cycles >= Timings.H_Max && htimepos < CPU.PrevCycles) htimepos += Timings.H_Max;
+
+    if (CPU.PrevCycles >= htimepos || CPU.Cycles < htimepos) thisIRQ = FALSE;
+  }
+
+  if (PPU.VTimerEnabled)
+  {
+    int32 vcounter = CPU.V_Counter;
+    if (CPU.Cycles >= Timings.H_Max && (!PPU.HTimerEnabled || PPU.HTimerPosition < CPU.PrevCycles))
+    {
+      vcounter++;
+      if (vcounter >= Timings.V_Max) vcounter = 0;
+    }
+
+    if (vcounter != PPU.VTimerPosition) thisIRQ = FALSE;
+  }
+
+  if (!CPU.IRQLastState && thisIRQ) CPU.IRQLine = TRUE;
+
+  CPU.IRQLastState = thisIRQ;
+}
 
 void S9xMainLoop(void)
 {
@@ -242,6 +282,63 @@ void S9xMainLoop(void)
     }
 
     if (CPU.Flags & SCAN_KEYS_FLAG) break;
+
+    // WAI fast-path: while the CPU is parked in WAI (opcode 0xCB) the program
+    // counter never moves, so the per-iteration opcode fetch, PCBase block-
+    // boundary recompute, PC inc/dec and indirect dispatch are all invariant and
+    // need not be redone. We replicate ONLY their cycle-affecting work — exactly
+    // the fetch path's (Cycles += MemSpeed; CheckInterrupts) plus OpCB's body
+    // AddCycles(TWO_CYCLES) — so this is bit-identical to spinning through the
+    // full loop, just without the redundant fetch/dispatch. The interrupt
+    // preamble above still runs every iteration (via continue) and is what ends
+    // the wait: NMI/IRQ clear WaitingForInterrupt (and bump PC), SCAN_KEYS breaks.
+    // Gated to the fast (PCBase) memory path and non-SA1 carts so the slow
+    // S9xGetByte fetch (OpenBus side effect) and the SA1 co-loop are unaffected.
+    if (__builtin_expect(CPU.WaitingForInterrupt && CPU.PCBase != NULL && !Settings.SA1, 0))
+    {
+#if AGGRESSIVE_WAI
+      const int32 S = CPU.MemSpeed + TWO_CYCLES; // cycles consumed per WAI spin iteration
+      // Aggressive cycle-JUMP: a WAI iteration advances Cycles by S and only
+      // does observable work when it crosses an H-event boundary or the NMI
+      // trigger. With BOTH H/V timers disabled, S9xCheckInterrupts is a pure
+      // no-op (it only clears IRQLastState — no IRQ can transition), so the
+      // intermediate iterations have NO observable effect and can be collapsed:
+      // jump straight to the first spin-reachable Cycles value (C + k*S) at or
+      // past the next barrier, then process that one event. We never jump OVER
+      // an event (barrier = the nearest of NextEvent / NMITriggerPos), and we
+      // land on the exact value the per-step spin would (so PrevCycles = Cycles
+      // - TWO_CYCLES, matching the spin's last iteration). When a timer IS
+      // enabled a timer IRQ could fire mid-wait, so we fall back to single-step.
+      if (S > 0 && !PPU.HTimerEnabled && !PPU.VTimerEnabled)
+      {
+        int32 barrier = CPU.NextEvent;
+        if (CPU.NMILine && Timings.NMITriggerPos < barrier) barrier = Timings.NMITriggerPos;
+        const int32 delta = barrier - CPU.Cycles;
+        const int32 k     = (delta > 0) ? ((delta + S - 1) / S) : 1;
+
+        CPU.IRQLastState = FALSE; // net effect of k no-op CheckInterrupts (timers disabled)
+        CPU.Cycles += k * S;
+        CPU.PrevCycles = CPU.Cycles - TWO_CYCLES;
+        while (CPU.Cycles >= CPU.NextEvent) S9xDoHEventProcessing();
+
+        continue;
+      }
+#endif
+
+      // Conservative single-step (bit-identical to the full spin): used when a
+      // timer is enabled (so CheckInterrupts can legitimately raise an IRQ at a
+      // specific sub-event cycle) or when the jump is disabled.
+      CPU.PrevCycles = CPU.Cycles;
+      CPU.Cycles += CPU.MemSpeed;
+      S9xCheckInterrupts();
+
+      CPU.PrevCycles = CPU.Cycles;
+      CPU.Cycles += TWO_CYCLES;
+      S9xCheckInterrupts();
+      while (CPU.Cycles >= CPU.NextEvent) S9xDoHEventProcessing();
+
+      continue;
+    }
 
     uint8            Op;
     struct SOpcodes *Opcodes;

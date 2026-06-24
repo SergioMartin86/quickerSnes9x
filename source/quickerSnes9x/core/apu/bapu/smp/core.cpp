@@ -1,8 +1,23 @@
+// Flush the cycles accumulated since the last observation into all three timers
+// (lazy timer evaluation — see LAZY_SMP_TIMERS in smp.hpp).
+void SMP::sync_timers()
+{
+  if (timer_pending == 0) return;
+  timer0.tick_batch(timer_pending);
+  timer1.tick_batch(timer_pending);
+  timer2.tick_batch(timer_pending);
+  timer_pending = 0;
+}
+
 void SMP::tick()
 {
+#if LAZY_SMP_TIMERS
+  timer_pending++;
+#else
   timer0.tick();
   timer1.tick();
   timer2.tick();
+#endif
 
 #ifndef SNES9X
   clock += cycle_step_cpu;
@@ -16,9 +31,13 @@ void SMP::tick()
 
 void SMP::tick(unsigned clocks)
 {
+#if LAZY_SMP_TIMERS
+  timer_pending += clocks;
+#else
   timer0.tick(clocks);
   timer1.tick(clocks);
   timer2.tick(clocks);
+#endif
 
   clock += clocks;
   dsp.clock += clocks;
